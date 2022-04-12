@@ -1,0 +1,1 @@
+-O2 -DNDEBUG=1 -fPIC  -fno-stack-protector -DHAVE_SWAPCONTEXT -DXMLPARSER=none -DWITH_PARSIM -DWITH_NETBUILDER -DAUTOIMPORT_NAMESPACE -I. -Ihtdocs -I/home/benjamin/omnetpp-4.6/include
