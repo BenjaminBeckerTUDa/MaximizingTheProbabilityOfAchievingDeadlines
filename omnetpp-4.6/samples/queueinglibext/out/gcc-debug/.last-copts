@@ -1,0 +1,1 @@
+-g -Wall -fPIC  -fno-stack-protector -DHAVE_SWAPCONTEXT -DXMLPARSER=none -DWITH_PARSIM -DWITH_NETBUILDER -DAUTOIMPORT_NAMESPACE -I../queueinglib -I. -I/home/benjamin/omnetpp-4.6/include
