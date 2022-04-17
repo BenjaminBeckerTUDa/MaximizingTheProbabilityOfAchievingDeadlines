@@ -107,6 +107,7 @@ void PLR::startup()
 		avgDelay = 99999;
 	}
 	nextHop = -1;
+	nextHop_calc=-1;
 
 	cdf = new double[pDFSlots+1]{0};
 	if (isSink)
@@ -119,9 +120,11 @@ void PLR::startup()
 	else
 	{
 		routingTable = new int[pDFSlots+1]{0};
+		routingTable_calc = new int[pDFSlots+1]{0};
 		for (int i = 0; i <= pDFSlots; i++)
 		{
 			routingTable[i] = -1;
+			routingTable_calc[i] = -1;
 		}
 	}
 	
@@ -264,7 +267,7 @@ void PLR::addMaxToCDF()
 		if (neighbor_avg < avgDelay)
 		{
 			avgDelay = neighbor_avg;
-			nextHop = address;
+			nextHop_calc = address;
 		}
 	}
 
@@ -276,7 +279,7 @@ void PLR::addMaxToCDF()
 			if(neighbor_hop_cdfs[address][i] > cdf[i])
 			{
 				cdf[i] = neighbor_hop_cdfs[address][i];
-				routingTable[i] = address;
+				routingTable_calc[i] = address;
 			}
 		}
 	}
@@ -285,7 +288,7 @@ void PLR::addMaxToCDF()
 	{
 		if(cdf[i+1] == cdf[i])
 		{
-			routingTable[i+1] = routingTable[i];
+			routingTable_calc[i+1] = routingTable_calc[i];
 
 		}
 	}	
@@ -450,7 +453,7 @@ void PLR::fromApplicationLayer(cPacket * pkt, const char *destination)
 	netPacket->setDeadline(dlPacket->getDeadline());
 	currentSequenceNumber++;
 	encapsulatePacket(netPacket, pkt);
-	
+
 	monitoring_receivedFrom[-1][(int) (getClock().dbl()/simTime * monitoring_slots)]++;
 	
 	if (netPacket->getDeadline() > toNanoseconds(getClock().dbl()))
@@ -463,10 +466,15 @@ void PLR::fromApplicationLayer(cPacket * pkt, const char *destination)
 		{
 			toMacLayer(netPacket, nh);
 			monitoring_sentData[(int) (getClock().dbl()/simTime * monitoring_slots)]++;
+			
+			
 		}
 		else
 		{
 			monitoring_droppedData[(int) (getClock().dbl()/simTime * monitoring_slots)]++;
+			
+			int sourceInt = std::stoi(netPacket->getSource());
+			// trace() << "no next hop = " << sourceInt <<","<<netPacket->getSequenceNumber()<<","<<ttl;
 		}
 	}
 	else
@@ -497,9 +505,7 @@ void PLR::fromMacLayer(cPacket * pkt, int macAddress, double rssi, double lqi)
 		neighbor_hop_cdfs.insert({macAddress, new double[pDFSlots+2]{0}});
 		neighbor_histograms.insert({macAddress, new int[pDFSlots+1]{0}});
 	}
-	
-	
-	
+
 	PLRPacket *netPacket = dynamic_cast <PLRPacket*>(pkt);
 	if (!netPacket)
 	{
@@ -516,62 +522,71 @@ void PLR::fromMacLayer(cPacket * pkt, int macAddress, double rssi, double lqi)
 		}
 		case PLR_DATA_PACKET:
 		{
-				int sourceInt = std::stoi(netPacket->getSource());
-				long long ttl = netPacket->getDeadline() - toNanoseconds(getClock().dbl());
-				if ( seenPackets.find(sourceInt) == seenPackets.end() ) {
-					std::set<int> a;
-					seenPackets[sourceInt] = a;
-				}
-				if ((seenPackets[sourceInt]).find(netPacket->getSequenceNumber()) == (seenPackets[sourceInt]).end()){
-					(seenPackets[sourceInt]).insert(netPacket->getSequenceNumber()); 
-					monitoring_receivedFrom[macAddress][(int) (getClock().dbl()/simTime * monitoring_slots)]++;
-					
-					if (isSink)
-					{
-						long long ttl = netPacket->getDeadline() - toNanoseconds(getClock().dbl());
-						if (netPacket->getDeadline() > toNanoseconds(getClock().dbl()))
-						{
-							monitoring_receivedPacketsInTime++; //monitoring
-							monitoring_forwardedTo[0][(int) (getClock().dbl()/simTime * monitoring_slots)]++;
+			int sourceInt = std::stoi(netPacket->getSource());
+			long long ttl = netPacket->getDeadline() - toNanoseconds(getClock().dbl());
 
-							stringstream strValue; strValue << netPacket->getSource(); unsigned int source; strValue >> source; 
-							if (monitoring_SourceOfsuccessfullyDeliveredPackets.find(source) == monitoring_SourceOfsuccessfullyDeliveredPackets.end())
-							{
-								monitoring_SourceOfsuccessfullyDeliveredPackets.insert({source, new int[pDFSlots+1]{0}});
-							}
-							monitoring_SourceOfsuccessfullyDeliveredPackets[source][(int) (getClock().dbl()/simTime * monitoring_slots)]++;
-						}
-						else
+			
+			if ( seenPackets.find(sourceInt) == seenPackets.end() ) {
+				std::set<int> a;
+				seenPackets[sourceInt] = a;
+			}
+			if ((seenPackets[sourceInt]).find(netPacket->getSequenceNumber()) == (seenPackets[sourceInt]).end()){
+				(seenPackets[sourceInt]).insert(netPacket->getSequenceNumber()); 
+				monitoring_receivedFrom[macAddress][(int) (getClock().dbl()/simTime * monitoring_slots)]++;
+				
+				if (isSink)
+				{
+					long long ttl = netPacket->getDeadline() - toNanoseconds(getClock().dbl());
+					if (netPacket->getDeadline() > toNanoseconds(getClock().dbl()))
+					{
+						monitoring_receivedPacketsInTime++; //monitoring
+						monitoring_forwardedTo[0][(int) (getClock().dbl()/simTime * monitoring_slots)]++;
+
+						stringstream strValue; strValue << netPacket->getSource(); unsigned int source; strValue >> source; 
+						if (monitoring_SourceOfsuccessfullyDeliveredPackets.find(source) == monitoring_SourceOfsuccessfullyDeliveredPackets.end())
 						{
-							monitoring_forwardedTo[-1][(int) (getClock().dbl()/simTime * monitoring_slots)]++;
+							monitoring_SourceOfsuccessfullyDeliveredPackets.insert({source, new int[pDFSlots+1]{0}});
 						}
+						monitoring_SourceOfsuccessfullyDeliveredPackets[source][(int) (getClock().dbl()/simTime * monitoring_slots)]++;
 					}
 					else
-					{	
-						if (netPacket->getDeadline() > toNanoseconds(getClock().dbl()))
-						{
-							int nh = getNextHop(ttl);
-							monitoring_forwardedTo[nh][(int) (getClock().dbl()/simTime * monitoring_slots)]++;
-							if (not (nh == -1))
-							{
-								PLRPacket *dupPacket = netPacket->dup();
-								dupPacket->setSequenceNumber(currentSequenceNumber);
-								currentSequenceNumber++;
-								
-								toMacLayer(dupPacket, nh);
-								monitoring_sentData[(int) (getClock().dbl()/simTime * monitoring_slots)]++;
-							}
-							else
-							{
-								monitoring_droppedData[(int) (getClock().dbl()/simTime * monitoring_slots)]++;
-							}
-						}
+					{
+						// trace() << "expired TTL = " << sourceInt <<","<<netPacket->getSequenceNumber()<<","<<ttl;
+						monitoring_forwardedTo[-1][(int) (getClock().dbl()/simTime * monitoring_slots)]++;
 					}
 				}
 				else
-				{
-					//hier ist ein drop wegen loop, oder verlorengegangenem ACK...
+				{	
+					if (netPacket->getDeadline() > toNanoseconds(getClock().dbl()))
+					{
+						int nh = getNextHop(ttl);
+						monitoring_forwardedTo[nh][(int) (getClock().dbl()/simTime * monitoring_slots)]++;
+						if (not (nh == -1))
+						{
+							PLRPacket *dupPacket = netPacket->dup();
+							dupPacket->setSequenceNumber(currentSequenceNumber);
+							currentSequenceNumber++;
+							
+							toMacLayer(dupPacket, nh);
+							monitoring_sentData[(int) (getClock().dbl()/simTime * monitoring_slots)]++;
+						}
+						else
+						{
+							// trace() << "no next hop = " << sourceInt <<","<<netPacket->getSequenceNumber()<<","<<ttl;
+							monitoring_droppedData[(int) (getClock().dbl()/simTime * monitoring_slots)]++;
+						}
+					}
+					else
+					{
+						// trace() << "expired TTL = " << sourceInt <<","<<netPacket->getSequenceNumber()<<","<<ttl;
+					}
 				}
+			}
+			else
+			{
+				// trace() << "seen twice: source,id,ttl = " << sourceInt <<","<<netPacket->getSequenceNumber()<<","<<ttl;
+				//hier ist ein drop wegen loop, oder verlorengegangenem ACK...
+			}
 			monitoring_receivedData[(int) (getClock().dbl()/simTime * monitoring_slots)]++;
 			break;
 		}
@@ -629,7 +644,8 @@ void PLR::nextRound()
 	- delete next hop
 	*/
 	avgDelay = 99999;
-	nextHop = -1;	
+	nextHop = nextHop_calc;	
+	nextHop_calc = -1;
 
 	/*
 	- set hop cdfs 0
@@ -651,7 +667,8 @@ void PLR::nextRound()
 	for (int i = 0; i <= pDFSlots; i++)
 	{	
 		cdf[i]=0;
-		routingTable[i] = -1;
+		routingTable[i] = routingTable_calc[i];
+		routingTable_calc[i] = -1;
 	}
 }
 
