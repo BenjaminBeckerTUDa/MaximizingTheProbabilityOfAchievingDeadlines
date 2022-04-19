@@ -34,10 +34,10 @@ simple Radio {
 
 	double carrierFreq = default (2400.0);	// the carrier frequency (in MHz) to begin with.
 
-	int collisionModel = default (2);	// 0-> No interference
-										// 1-> Simple interference
-										// 2-> Additive interefence
-										// 3-> Advanced interference (not implemented)
+	int collisionModel = default (2);		// 0-> No interference
+							// 1-> Simple interference
+							// 2-> Additive interefence
+							// 3-> Advanced interference (not implemented)
 
 	double CCAthreshold = default (-95.0);	// the threshold of the RSSI register (in dBm) 
 											// were above it channel is NOT clear

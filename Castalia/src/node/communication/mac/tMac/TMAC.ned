@@ -14,9 +14,10 @@ package node.communication.mac.tMac;
 
 simple TMAC like node.communication.mac.iMac {
  parameters:
-    //debug parameters
+    	//debug parameters
 	bool collectTraceInfo = default (false);
-	bool printStateTransitions = default (false);
+	bool printStateTransitions = default (true);
+	int simTime = default (3600);
 
 	//mac layer packet sizes, these parameters are described in TMacFrame.msg file
 	int ackPacketSize = default (11);
@@ -31,16 +32,16 @@ simple TMAC like node.communication.mac.iMac {
 
 	//TMAC protocol parameters
 	int maxTxRetries = default (2);
-	bool allowSinkSync = default (true);	//This parameter allows sink node to start synchronisation immediately
-	bool useFrts = default (false);			//enable/disable FRTS (Future Request To Send), true value not supported
+	bool allowSinkSync = default (true);		//This parameter allows sink node to start synchronisation immediately
+	bool useFrts = default (false);		//enable/disable FRTS (Future Request To Send), true value not supported
 	bool useRtsCts = default (true);		//This allows to enable/disable RTS/CTS handshake
 	bool disableTAextension = default (false);	//disabling TA extension effectively creates an SMAC protocol
-	bool conservativeTA = default (true);	//conservative activation timeout - will always stay awake for 
-											//atleast 15 ms after any activity on the radio
+	bool conservativeTA = default (true);		//conservative activation timeout - will always stay awake for 
+							//atleast 15 ms after any activity on the radio
 
 	double resyncTime = default (6);		// timer for re-sending SYNC msg, in seconds
 	double contentionPeriod = default (10);	// 10 ms
-	double listenTimeout = default (15);	// 15 ms, is the timeout TA (Activation event)
+	double listenTimeout = default (15);		// 15 ms, is the timeout TA (Activation event)
 	double waitTimeout = default (5);		// timeout for expecting a reply to DATA or RTS packet
 	double frameTime = default (610);		// frame time (standard = 610ms)
 

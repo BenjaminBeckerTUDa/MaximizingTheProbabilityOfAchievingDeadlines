@@ -32,7 +32,6 @@ struct AppNetInfoExchange_type {
 
 packet ApplicationPacket {
 	AppNetInfoExchange_type appNetInfoExchange;
-
 	string applicationID;		// virtual app uses application ID to filter packet delivery.
 	unsigned int sequenceNumber;// a field to distinguish between packets
 	double data;				// a simple type to carry some data

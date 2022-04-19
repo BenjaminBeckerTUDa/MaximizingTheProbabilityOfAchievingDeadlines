@@ -37,7 +37,7 @@ void VirtualMac::initialize()
 
 int VirtualMac::handleControlCommand(cMessage * msg)
 {
-	trace() << "WARNING: handleControlCommand not defined in this module";
+	//trace() << "WARNING: handleControlCommand not defined in this module";
 	return 0;
 }
 
@@ -59,8 +59,7 @@ int VirtualMac::bufferPacket(cPacket * rcvFrame)
 		return 0;
 	} else {
 		TXBuffer.push(rcvFrame);
-		trace() << "Packet buffered from network layer, buffer state: "
-		    << TXBuffer.size() << "/" << macBufferSize;
+		//trace() << "Packet buffered from network layer, buffer state: "   << TXBuffer.size() << "/" << macBufferSize;
 		return 1;
 	}
 }
@@ -87,9 +86,7 @@ void VirtualMac::handleMessage(cMessage * msg)
 		case NETWORK_LAYER_PACKET:{
 			RoutingPacket *pkt = check_and_cast <RoutingPacket*>(msg);
 			if (macMaxFrameSize > 0 && macMaxFrameSize < pkt->getByteLength() + macFrameOverhead) {
-				trace() << "Oversized packet dropped. Size:" << pkt->getByteLength() <<
-						", MAC layer overhead:" << macFrameOverhead <<
-						", max MAC frame size:" << macMaxFrameSize;
+				//trace() << "Oversized packet dropped. Size:" << pkt->getByteLength() <<", MAC layer overhead:" << macFrameOverhead <<", max MAC frame size:" << macMaxFrameSize;
 				break;
 			}
 			/* Control is now passed to a specific MAC protocol by calling fromNetworkLayer()
@@ -165,7 +162,7 @@ void VirtualMac::finish()
 
 void VirtualMac::toNetworkLayer(cMessage * macMsg)
 {
-	trace() << "Delivering [" << macMsg->getName() << "] to Network layer";
+	//trace() << "Delivering [" << macMsg->getName() << "] to Network layer";
 	send(macMsg, "toNetworkModule");
 }
 

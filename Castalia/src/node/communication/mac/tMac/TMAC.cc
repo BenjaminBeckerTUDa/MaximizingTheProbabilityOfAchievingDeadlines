@@ -12,7 +12,9 @@
 
 #include <cmath>
 #include "TMAC.h"
+#include "PLRPacket_m.h"
 
+	
 Define_Module(TMAC);
 
 void TMAC::startup()
@@ -20,36 +22,32 @@ void TMAC::startup()
 	printStateTransitions = par("printStateTransitions");
 	ackPacketSize = par("ackPacketSize");
 	frameTime = ((double)par("frameTime")) / 1000.0;	// just convert msecs to secs
-	syncPacketSize = par("syncPacketSize");
 	rtsPacketSize = par("rtsPacketSize");
 	ctsPacketSize = par("ctsPacketSize");
-	resyncTime = par("resyncTime");
-	allowSinkSync = par("allowSinkSync");
 	contentionPeriod = ((double)par("contentionPeriod")) / 1000.0;	// just convert msecs to secs
 	listenTimeout = ((double)par("listenTimeout")) / 1000.0;	// TA: just convert msecs to secs (15ms default);
 	waitTimeout = ((double)par("waitTimeout")) / 1000.0;
 	useFRTS = par("useFrts");
 	useRtsCts = par("useRtsCts");
 	maxTxRetries = par("maxTxRetries");
+	simTime = par("simTime");
 
 	disableTAextension = par("disableTAextension");
 	conservativeTA = par("conservativeTA");
 	collisionResolution = par("collisionResolution");
+	
+	
 	if (collisionResolution != 2 && collisionResolution != 1 && collisionResolution != 0) {
-		trace() << "Unknown value for parameter 'collisionResolution', will default to 1";
+		//"Unknown value for parameter 'collisionResolution', will default to 1";
 		collisionResolution = 1;
 	}
 	//Initialise state descriptions used in debug output
 	if (printStateTransitions) {
-		stateDescr[100] = "MAC_STATE_SETUP";
-		stateDescr[101] = "MAC_STATE_SLEEP";
 		stateDescr[102] = "MAC_STATE_ACTIVE";
 		stateDescr[103] = "MAC_STATE_ACTIVE_SILENT";
 		stateDescr[104] = "MAC_STATE_IN_TX";
 		stateDescr[110] = "MAC_CARRIER_SENSE_FOR_TX_RTS";
 		stateDescr[111] = "MAC_CARRIER_SENSE_FOR_TX_DATA";
-		stateDescr[114] = "MAC_CARRIER_SENSE_FOR_TX_SYNC";
-		stateDescr[115] = "MAC_CARRIER_SENSE_BEFORE_SLEEP";
 		stateDescr[120] = "MAC_STATE_WAIT_FOR_DATA";
 		stateDescr[121] = "MAC_STATE_WAIT_FOR_CTS";
 		stateDescr[122] = "MAC_STATE_WAIT_FOR_ACK";
@@ -67,131 +65,35 @@ void TMAC::startup()
 		isSink = false;
 	}
 
-	syncPacket = NULL;
 	rtsPacket = NULL;
 	ackPacket = NULL;
 	ctsPacket = NULL;
 
-	macState = MAC_STATE_SETUP;
+	macState = MAC_STATE_ACTIVE;
 	scheduleTable.clear();
 	primaryWakeup = true;
-	needResync = 0;
 	currentFrameStart = -1;
-	activationTimeout = 0;
 
 	declareOutput("Sent packets breakdown");
 
-	if (isSink && allowSinkSync)
-		setTimer(SYNC_CREATE, 0.1);
-	else
-		setTimer(SYNC_SETUP, allowSinkSync ? 3 * frameTime : 0.1);
-
 	toRadioLayer(createRadioCommand(SET_CS_INTERRUPT_ON));
+	
+	// monitoring
+	monitoring_slots = 100.0;
+	monitoring_slots_1 = ((int) monitoring_slots)+1;
+	monitoring_queueDelay = new double[monitoring_slots_1]{0};
+	monitoring_queueDelayCounter = new int[monitoring_slots_1]{0};
 }
 
 void TMAC::timerFiredCallback(int timer)
 {
 	switch (timer) {
-
-		case SYNC_SETUP:{
-			/* Timeout to hear a schedule packet has expired at this stage,
-			 * MAC is able to create its own schedule after a random offset
-			 * within the duration of 1 frame
-			 */
-			if (macState == MAC_STATE_SETUP)
-				setTimer(SYNC_CREATE, genk_dblrand(1) * frameTime);
-			break;
-		}
-
-		case SYNC_CREATE:{
-			/* Random offset selected for creating a new schedule has expired.
-			 * If at this stage still no schedule was received, MAC creates
-			 * its own schedule and tries to broadcast it
-			 */
-			if (macState == MAC_STATE_SETUP)
-				createPrimarySchedule();
-			break;
-		}
-
-		case SYNC_RENEW:{
-			/* This node is the author of its own primary schedule
-			 * It is required to rebroadcast a SYNC packet and also
-			 * schedule a self message for the next RESYNC procedure.
-			 */
-			trace() << "Initiated RESYNC procedure";
-			scheduleTable[0].SN++;
-			needResync = 1;
-			setTimer(SYNC_RENEW, resyncTime);
-			break;
-		}
-
 		case FRAME_START:{
-			/* primaryWakeup variable is used to distinguish between primary and secondary schedules
-			 * since the primary schedule is always the one in the beginning of the frame, we set
-			 * primaryWakeup to true here.
-			 */
-			primaryWakeup = true;
 
 			// record the current time and extend activation timeout
-			currentFrameStart = activationTimeout = getClock();
-			extendActivePeriod();
-
-			// schedule the message to start the next frame. Also check for frame offsets
-			// (if we received a RESYNC packet, frame start time could had been shifted due to
-			// clock drift - in this case it is necessary to rebroadcast this resync further)
-			setTimer(FRAME_START, frameTime);
-			if (scheduleTable[0].offset != 0) {
-				trace() << "New frame started, shifted by " << scheduleTable[0].offset;
-				scheduleTable[0].offset = 0;
-				needResync = 1;
-			}
-			// schedule wakeup messages for secondary schedules within the current frame only
-			for (int i = 1; i < (int)scheduleTable.size(); i++) {
-				if (scheduleTable[i].offset < 0) {
-					scheduleTable[i].offset += frameTime;
-				}
-				setTimer(WAKEUP_SILENT + i, scheduleTable[i].offset);
-			}
-
-			// finally, if we were sleeping, need to wake up the radio. And reset the internal MAC
-			// state (to start contending for transmissions if needed)
-			if (macState == MAC_STATE_SLEEP)
-				toRadioLayer(createRadioCommand(SET_STATE, RX));
-			if (macState == MAC_STATE_SLEEP || macState == MAC_STATE_ACTIVE
-					|| macState == MAC_STATE_ACTIVE_SILENT) {
+			currentFrameStart = getClock();
+			if (macState == MAC_STATE_ACTIVE || macState == MAC_STATE_ACTIVE_SILENT) {
 				resetDefaultState("new frame started");
-			}
-			break;
-		}
-
-		case CHECK_TA:{
-			/* Activation timeout fired, however we may need to extend the timeout
-			 * here based on the current MAC state, or if there is no reason to
-			 * extend it, then we need to go to sleep.
-			 */
-
-			//if disableTAextension is on, then we will behave as SMAC - simply go to sleep if the active period is over
-			if (disableTAextension) {
-				primaryWakeup = false;
-				// update MAC and RADIO states
-				toRadioLayer(createRadioCommand(SET_STATE, SLEEP));
-				setMacState(MAC_STATE_SLEEP, "active period expired (SMAC)");
-			}
-			//otherwise, check MAC state and extend active period or go to sleep
-			else if (conservativeTA) {
-				if (macState != MAC_STATE_ACTIVE && macState != MAC_STATE_ACTIVE_SILENT
-				    	&& macState != MAC_STATE_SLEEP) {
-					extendActivePeriod();
-				} else {
-					performCarrierSense(MAC_CARRIER_SENSE_BEFORE_SLEEP);
-				}
-			}
-
-			else {
-				primaryWakeup = false;
-				// update MAC and RADIO states
-				toRadioLayer(createRadioCommand(SET_STATE, SLEEP));
-				setMacState(MAC_STATE_SLEEP, "active period expired (TMAC)");
 			}
 			break;
 		}
@@ -202,21 +104,15 @@ void TMAC::timerFiredCallback(int timer)
 			 * then MAC was set to MAC_STATE_ACTIVE_SILENT. In this case we can not transmit
 			 * and there is no point to perform carrier sense
 			 */
-			if (macState == MAC_STATE_ACTIVE_SILENT
-			    || macState == MAC_STATE_SLEEP)
+			if (macState == MAC_STATE_ACTIVE_SILENT)
 				break;
 
 			// At this stage MAC can only be in one of the states MAC_CARRIER_SENSE_...
-			if (macState != MAC_CARRIER_SENSE_FOR_TX_RTS
-					&& macState != MAC_CARRIER_SENSE_FOR_TX_SYNC
-					&& macState != MAC_CARRIER_SENSE_FOR_TX_DATA
-					&& macState != MAC_CARRIER_SENSE_BEFORE_SLEEP) {
-				trace() << "WARNING: bad MAC state for MAC_SELF_PERFORM_CARRIER_SENSE";
+			if (macState != MAC_CARRIER_SENSE_FOR_TX_RTS && macState != MAC_CARRIER_SENSE_FOR_TX_DATA) {
+				//"WARNING: bad MAC state for MAC_SELF_PERFORM_CARRIER_SENSE: " << stateDescr[macState];
 				break;
 			}
-
 			switch (radioModule->isChannelClear()) {
-
 				case CLEAR:{
 					carrierIsClear();
 					break;
@@ -233,10 +129,8 @@ void TMAC::timerFiredCallback(int timer)
 				}
 
 				case CS_NOT_VALID:{
-					if (macState != MAC_STATE_SLEEP) {
-						toRadioLayer(createRadioCommand(SET_STATE, RX));
-						setTimer(CARRIER_SENSE, phyDelayForValidCS);
-					}
+					toRadioLayer(createRadioCommand(SET_STATE, RX));
+					setTimer(CARRIER_SENSE, phyDelayForValidCS);
 					break;
 				}
 			}
@@ -248,33 +142,9 @@ void TMAC::timerFiredCallback(int timer)
 			break;
 		}
 
-		case WAKEUP_SILENT:{
-			/* This is the wakeup timer for secondary schedules.
-			 * here we only wake up the radio and extend activation timeout for listening.
-			 * NOTE that default state for secondary schedules is MAC_STATE_ACTIVE_SILENT
-			 */
-
-			activationTimeout = getClock();
-			extendActivePeriod();
-			if (macState == MAC_STATE_SLEEP) {
-				toRadioLayer(createRadioCommand(SET_STATE, RX));
-				resetDefaultState("secondary schedule starts");
-			}
-			break;
-		}
 
 		default:{
-			int tmpTimer = timer - WAKEUP_SILENT;
-			if (tmpTimer > 0 && tmpTimer < (int)scheduleTable.size()) {
-				activationTimeout = getClock();
-				extendActivePeriod();
-				if (macState == MAC_STATE_SLEEP) {
-					toRadioLayer(createRadioCommand(SET_STATE, RX));
-					resetDefaultState("secondary schedule starts");
-				}
-			} else {
-				trace() << "Unknown timer " << timer;
-			}
+			break;
 		}
 	}
 }
@@ -291,6 +161,26 @@ int TMAC::handleRadioControlMessage(cMessage * msg)
 
 void TMAC::fromNetworkLayer(cPacket * netPkt, int destination)
 {
+	/*
+	PLRPacket *netPacket = dynamic_cast <PLRPacket*>(netPkt);
+	if (netPacket)
+	{
+		switch (netPacket->getPLRPacketKind()) 
+		{
+			case PLR_DATA_PACKET:
+			{
+				int sourceInt = std::stoi(netPacket->getSource());
+				
+				if (sourceInt == 18)
+				{
+					trace() << "mac from net = source, sn, buffersize " << sourceInt <<","<<netPacket->getSequenceNumber()<<","<<TXBuffer.size();
+				}
+			}
+		}
+	}
+	*/
+	
+	
 	// Create a new MAC frame from the received packet and buffer it (if possible)
 	TMacPacket *macPkt = new TMacPacket("TMAC data packet", MAC_LAYER_PACKET);
 	encapsulatePacket(macPkt, netPkt);
@@ -298,79 +188,77 @@ void TMAC::fromNetworkLayer(cPacket * netPkt, int destination)
 	macPkt->setSource(SELF_MAC_ADDRESS);
 	macPkt->setDestination(destination);
 	//macPkt->setSequenceNumber(txSequenceNum); no need for TMAC specific seq number, virtualMAC takes care of this 
-	if (bufferPacket(macPkt)) {	// this is causing problems
+	if (bufferPacket(macPkt)) 
+	{	// this is causing problems
+		//"state " << stateDescr[macState];
 		if (TXBuffer.size() == 1)
 			checkTxBuffer();
-	} else {
+		// bb : add a timestamp for this specific packet; maybe include sequence number. encapsulatePacket(macPkt, netPkt); added a sequence number, which we can use here
+		if (destination != BROADCAST_MAC_ADDRESS){
+			int sn = macPkt->getSequenceNumber();
+			enqueueTimes[sn] = getClock();
+			//"bb: delay: enqueueTime for sn [" << sn << "] "<< " to " << destination << " = " << getClock();
+		}
+		resetDefaultState("why not??");
+	} 
+	else 
+	{
+		if (destination != BROADCAST_MAC_ADDRESS)
+		{
+			// bb : send a control message to upper layer 
+			//"bb: delay: inf (full buffer)" << macPkt->getSequenceNumber();		
+			PLRControlMessage* plrc = new PLRControlMessage("PLR delay packet", NETWORK_CONTROL_COMMAND);
+			plrc->setPLRControlMessageKind(FAIL);
+			plrc->setTxAddr(destination);
+			toNetworkLayer(plrc);	
+		}
+		
+
+
+		
+		
 		// cancelAndDelete(macPkt);
 		//We could send a control message to upper layer to inform of full buffer
 	}
+	
 }
 
 /* This function will reset the internal MAC state in the following way:
- * 1 -  Check if MAC is still in its active time, if timeout expired - go to sleep.
- * 2 -  Check if MAC is in the primary schedule wakeup (if so, MAC is able to start transmissions
- *	of either SYNC, RTS or DATA packets after a random contention offset.
  * 3 -  IF this is not primary wakeup, MAC can only listen, thus set state to MAC_STATE_ACTIVE_SILENT
  */
 void TMAC::resetDefaultState(const char *descr)
 {
 	if (descr)
-		trace() << "Resetting MAC state to default, reason: " << descr;
+	{
+		//"Resetting MAC state to default, reason: " << descr;
+	}
 
-	if (activationTimeout <= getClock()) {
-		if (disableTAextension) {
-			toRadioLayer(createRadioCommand(SET_STATE, SLEEP));
-			setMacState(MAC_STATE_SLEEP, "active period expired (SMAC)");
+	simtime_t randomContentionInterval = genk_dblrand(1) * contentionPeriod;
+
+	while (!TXBuffer.empty()) {
+		if (txRetries <= 0) {
+			// bb no txRetries left => max delay
+			TMacPacket *macPkt = check_and_cast < TMacPacket * >(TXBuffer.front());
+			if (macPkt -> getDestination() != BROADCAST_MAC_ADDRESS) {					
+				enqueueTimes.erase(macPkt -> getSequenceNumber());
+				PLRControlMessage* plrc = new PLRControlMessage("PLR delay packet", NETWORK_CONTROL_COMMAND);
+				plrc->setPLRControlMessageKind(FAIL);
+				plrc->setTxAddr(macPkt -> getDestination());
+				toNetworkLayer(plrc);
+				//"bb: delay: inf (max txRetries)" << txAddr;
+			}
+			popTxBuffer();
 		} else {
-			performCarrierSense(MAC_CARRIER_SENSE_BEFORE_SLEEP);
-		}
-	} else if (primaryWakeup) {
-		simtime_t randomContentionInterval = genk_dblrand(1) * contentionPeriod;
-		if (needResync) {
-			if (syncPacket)
-				cancelAndDelete(syncPacket);
-			syncPacket = new TMacPacket("TMAC SYNC packet", MAC_LAYER_PACKET);
-			syncPacket->setType(SYNC_TMAC_PACKET);
-			syncPacket->setDestination(BROADCAST_MAC_ADDRESS);
-			syncPacket->setSyncId(scheduleTable[0].ID);
-			syncPacket->setSequenceNumber(scheduleTable[0].SN);
-			syncPacket->setSync(currentFrameStart + frameTime - getClock() -
-						TX_TIME(syncPacketSize) - randomContentionInterval);
-			syncPacket->setByteLength(syncPacketSize);
-			performCarrierSense(MAC_CARRIER_SENSE_FOR_TX_SYNC, randomContentionInterval);
+			if (useRtsCts && txAddr != BROADCAST_MAC_ADDRESS) {
+				performCarrierSense(MAC_CARRIER_SENSE_FOR_TX_RTS, randomContentionInterval);
+			} else {
+				performCarrierSense(MAC_CARRIER_SENSE_FOR_TX_DATA, randomContentionInterval);
+			}
 			return;
 		}
-
-		while (!TXBuffer.empty()) {
-			if (txRetries <= 0) {
-				trace() << "Transmission failed to " << txAddr;
-				popTxBuffer();
-			} else {
-				if (useRtsCts && txAddr != BROADCAST_MAC_ADDRESS) {
-					performCarrierSense(MAC_CARRIER_SENSE_FOR_TX_RTS, randomContentionInterval);
-				} else {
-					performCarrierSense(MAC_CARRIER_SENSE_FOR_TX_DATA, randomContentionInterval);
-				}
-				return;
-			}
-		}
-		setMacState(MAC_STATE_ACTIVE, "nothing to transmit");
-	} else {
-		//primaryWakeup == false
-		setMacState(MAC_STATE_ACTIVE_SILENT, "node is awake not in primary schedule");
 	}
-}
+	setMacState(MAC_STATE_ACTIVE, "nothing to transmit");
 
-/* This function will create a new primary schedule for this node.
- * Most of the task is delegated to updateScheduleTable function
- * This function will only schedule a self message to resycnronise the newly created
- * schedule
- */
-void TMAC::createPrimarySchedule()
-{
-	updateScheduleTable(frameTime, self, 0);
-	setTimer(SYNC_RENEW, resyncTime);
 }
 
 /* Helper function to change internal MAC state and print a debug statement if neccesary */
@@ -380,98 +268,15 @@ void TMAC::setMacState(int newState, const char *descr)
 		return;
 	if (printStateTransitions) {
 		if (descr)
-			trace() << "state changed from " << stateDescr[macState] <<
-					" to " << stateDescr[newState] << ", reason: " << descr;
+		{
+			//"state changed from " << stateDescr[macState] <<					" to " << stateDescr[newState] << ", reason: " << descr;
+		}
 		else
-			trace() << "state changed from " << stateDescr[macState] <<
-					" to " << stateDescr[newState];
-	}
-	macState = newState;
-}
-
-/* This function will update schedule table with the given values for wakeup time,
- * schedule ID and schedule SN
- */
-void TMAC::updateScheduleTable(simtime_t wakeup, int ID, int SN)
-{
-	// First, search through existing schedules
-	for (int i = 0; i < (int)scheduleTable.size(); i++) {
-		//If schedule already exists
-		if (scheduleTable[i].ID == ID) {
-			//And SN is greater than ours, then update
-			if (scheduleTable[i].SN < SN) {
-
-				//Calculate new frame offset for this schedule
-				simtime_t new_offset = getClock() - currentFrameStart + wakeup - frameTime;
-				trace() << "Resync successful for ID:" << ID << " old offset:" <<
-						scheduleTable[i].offset << " new offset:" << new_offset;
-				scheduleTable[i].offset = new_offset;
-				scheduleTable[i].SN = SN;
-
-				if (i == 0) {
-					//If the update came for primary schedule, then the next frame message has to be rescheduled
-					setTimer(FRAME_START, wakeup);
-					currentFrameStart += new_offset;
-				} else {
-					//This is not primary schedule, check that offset value falls within the
-					//interval: 0 < offset < frameTime
-					if (scheduleTable[i].offset < 0)
-						scheduleTable[i].offset += frameTime;
-					if (scheduleTable[i].offset > frameTime)
-						scheduleTable[i].offset -= frameTime;
-				}
-
-			} else if (scheduleTable[i].SN > SN) {
-				/* TMAC received a sync with lower SN than what currently stored in the
-				 * schedule table. With current TMAC implementation, this is not possible,
-				 * however in future it may be neccesary to implement a unicast sync packet
-				 * here to notify the source of this packet with the updated schedule
-				 */
-			}
-			//found and updated the schedule, nothing else need to be done
-			return;
+		{
+			//"state changed from " << stateDescr[macState] <<					" to " << stateDescr[newState];
 		}
 	}
-
-	//At this stage, the schedule was not found in the current table, so it has to be added
-	TMacSchedule newSch;
-	newSch.ID = ID;
-	newSch.SN = SN;
-	trace() << "Creating schedule ID:" << ID << ", SN:" << SN << ", wakeup:" << wakeup;
-
-	//Calculate the offset for the new schedule
-	if (currentFrameStart == -1) {
-		//If currentFrameStart is -1 then this schedule will be the new primary schedule
-		//and it's offset will always be 0
-		newSch.offset = 0;
-	} else {
-		//This schedule is not primary, it is necessary to calculate the offset from primary
-		//schedule for this new schedule
-		newSch.offset = getClock() - currentFrameStart + wakeup - frameTime;
-	}
-
-	//Add new schedule to the table
-	scheduleTable.push_back(newSch);
-
-	//If the new schedule is primary, more things need to be done:
-	if (currentFrameStart == -1) {
-		//This is new primary schedule, and since SYNC packet was received at this time, it is
-		//safe to assume that nodes of this schedule are active and listening right now,
-		//so active period can be safely extended
-		currentFrameStart = activationTimeout = getClock();
-		currentFrameStart += wakeup - frameTime;
-		extendActivePeriod();
-
-		//create and schedule the next frame message
-		setTimer(FRAME_START, wakeup);
-
-		//this flag indicates that this schedule has to be rebroadcasted
-		needResync = 1;
-		primaryWakeup = true;
-
-		//MAC is reset to default state, allowing it to initiate and accept transmissions
-		resetDefaultState("new primary schedule found");
-	}
+	macState = newState;
 }
 
 /* This function will handle a MAC frame received from the lower layer (physical or radio)
@@ -495,7 +300,6 @@ void TMAC::fromRadioLayer(cPacket * pkt, double RSSI, double LQI)
 		}
 		if (collisionResolution != 2 && nav > 0)
 			setTimer(TRANSMISSION_TIMEOUT, nav);
-		extendActivePeriod(nav);
 		setMacState(MAC_STATE_ACTIVE_SILENT, "overheard a packet");
 		return;
 	}
@@ -533,13 +337,13 @@ void TMAC::fromRadioLayer(cPacket * pkt, double RSSI, double LQI)
 		case CTS_TMAC_PACKET:{
 			if (macState == MAC_STATE_WAIT_FOR_CTS) {
 				if (TXBuffer.empty()) {
-					trace() << "WARNING: invalid MAC_STATE_WAIT_FOR_CTS while buffer is empty";
+					//"WARNING: invalid MAC_STATE_WAIT_FOR_CTS while buffer is empty";
 					resetDefaultState("invalid state while buffer is empty");
 				} else if (source == txAddr) {
 					cancelTimer(TRANSMISSION_TIMEOUT);
 					sendDataPacket();
 				} else {
-					trace() << "WARNING: recieved unexpected CTS from " << source;
+					//"WARNING: recieved unexpected CTS from " << source;
 					resetDefaultState("unexpected CTS");
 				}
 			}
@@ -548,6 +352,30 @@ void TMAC::fromRadioLayer(cPacket * pkt, double RSSI, double LQI)
 
 		/* received DATA frame */
 		case DATA_TMAC_PACKET:{
+			
+			
+			
+			/*
+			PLRPacket *netPacket = dynamic_cast <PLRPacket*>(decapsulatePacket(macPkt));
+			if (netPacket)
+			{
+				switch (netPacket->getPLRPacketKind()) 
+				{
+					case PLR_DATA_PACKET:
+					{
+						int sourceInt = std::stoi(netPacket->getSource());
+						
+						if (sourceInt == 18)
+						{
+							trace() << "mac received = source, sn " << sourceInt <<","<<netPacket->getSequenceNumber();
+						}
+					}
+				}
+			}
+			*/
+			
+			
+			
 			// Forward the frame to upper layer first
 			if (isNotDuplicatePacket(macPkt))
 				toNetworkLayer(decapsulatePacket(macPkt));
@@ -583,33 +411,36 @@ void TMAC::fromRadioLayer(cPacket * pkt, double RSSI, double LQI)
 			// create a timeout for this transmission - nothing is expected in reply
 			// so MAC is only waiting for the RADIO to finish the packet transmission
 			setTimer(TRANSMISSION_TIMEOUT, TX_TIME(ackPacketSize));
-			extendActivePeriod(TX_TIME(ackPacketSize));
 			break;
 		}
 
 		/* received ACK frame */
 		case ACK_TMAC_PACKET:{
 			if (macState == MAC_STATE_WAIT_FOR_ACK && source == txAddr) {
-				trace() << "Transmission succesful to " << txAddr;
+				//"Transmission succesful to " << txAddr;
 				cancelTimer(TRANSMISSION_TIMEOUT);
 				popTxBuffer();
 				resetDefaultState("transmission successful (ACK received)");
+				
+				// bb : retrieve timestamp for this ack			
+				double time_ = getClock().dbl() - enqueueTimes[waitForAck_].dbl();
+				enqueueTimes.erase(waitForAck_);
+				
+				//"queue+send-Time of " << waitForAck_ << " = " << time_;
+				
+				//"bb: just received ACK for packet with sn [" << waitForAck_ << "] to adress " << source <<" with time: " << time_;
+				PLRControlMessage* plrc = new PLRControlMessage("PLR delay packet", NETWORK_CONTROL_COMMAND);
+				plrc->setDelay(time_);
+				plrc->setPLRControlMessageKind(DELAY);
+				plrc->setTxAddr(source);
+				toNetworkLayer(plrc);
+
 			}
 			break;
 		}
 
-		/* received SYNC frame */
-		case SYNC_TMAC_PACKET:{
-			// Schedule table is updated with values from the SYNC frame
-			updateScheduleTable(macPkt->getSync(),
-					    macPkt->getSyncId(), macPkt->getSequenceNumber());
-
-			break;
-		}
-
 		default:{
-			trace() << "Packet with unknown type (" << macPkt->getType() <<
-					") received: [" << macPkt->getName() << "]";
+			//"Packet with unknown type (" << macPkt->getType() << ") received: [" << macPkt->getName() << "]";
 		}
 	}
 }
@@ -617,19 +448,72 @@ void TMAC::fromRadioLayer(cPacket * pkt, double RSSI, double LQI)
 void TMAC::carrierIsBusy()
 {
 	/* Since we are hearing some communication on the radio we need to do two things:
-	 * 1 - extend our active period
 	 * 2 - set MAC state to MAC_STATE_ACTIVE_SILENT unless we are actually expecting to receive
-	 *     something (or sleeping)
+	 *     something 
 	 */
-	if (macState == MAC_STATE_SETUP || macState == MAC_STATE_SLEEP)
-		return;
-	if (!disableTAextension)
-		extendActivePeriod();
+
+	/*
+	if (TXBuffer.empty()) {
+	}
+	else
+	{
+		switch (macState) {
+			case MAC_CARRIER_SENSE_FOR_TX_RTS:{
+				MacPacket *macPacket1 = dynamic_cast <MacPacket*>(TXBuffer.front());
+				MacPacket *macPacket2 = macPacket1->dup();
+				PLRPacket *netPacket = dynamic_cast <PLRPacket*>(decapsulatePacket(macPacket2));
+				if (netPacket)
+				{
+					switch (netPacket->getPLRPacketKind()) 
+					{
+						case PLR_DATA_PACKET:
+						{
+							int sourceInt = std::stoi(netPacket->getSource());
+							
+							if (sourceInt == 18)
+							{
+								trace() << "mac carrier busy; cannot tx rts = source, sn " << sourceInt <<","<<netPacket->getSequenceNumber();
+							}
+						}
+					}
+				}
+				break;
+			}
+
+			case MAC_CARRIER_SENSE_FOR_TX_DATA:{
+				MacPacket *macPacket1 = dynamic_cast <MacPacket*>(TXBuffer.front());
+				MacPacket *macPacket2 = macPacket1->dup();
+				PLRPacket *netPacket = dynamic_cast <PLRPacket*>(decapsulatePacket(macPacket2));
+				if (netPacket)
+				{
+					switch (netPacket->getPLRPacketKind()) 
+					{
+						case PLR_DATA_PACKET:
+						{
+							int sourceInt = std::stoi(netPacket->getSource());
+							
+							if (sourceInt == 18)
+							{
+								trace() << "mac carrier busy; cannot tx data = source, sn " << sourceInt <<","<<netPacket->getSequenceNumber();
+							}
+						}
+					}
+				}
+				break;
+			}
+		}
+	}
+	*/
+	
+	
+	
+	
+	
+	
+	
 	if (collisionResolution == 0) {
 		if (macState == MAC_CARRIER_SENSE_FOR_TX_RTS
-				|| macState == MAC_CARRIER_SENSE_FOR_TX_DATA
-				|| macState == MAC_CARRIER_SENSE_FOR_TX_SYNC
-				|| macState == MAC_CARRIER_SENSE_BEFORE_SLEEP) {
+				|| macState == MAC_CARRIER_SENSE_FOR_TX_DATA) {
 			resetDefaultState("sensed carrier");
 		}
 	} else {
@@ -646,11 +530,36 @@ void TMAC::carrierIsBusy()
 void TMAC::carrierIsClear()
 {
 	switch (macState) {
-
 		/* MAC requested carrier sense to transmit an RTS packet */
 		case MAC_CARRIER_SENSE_FOR_TX_RTS:{
+			/*
 			if (TXBuffer.empty()) {
-				trace() << "WARNING! BUFFER_IS_EMPTY in MAC_CARRIER_SENSE_FOR_TX_RTS, will reset state";
+			}
+			else
+			{
+				MacPacket *macPacket1 = dynamic_cast <MacPacket*>(TXBuffer.front());
+				MacPacket *macPacket2 = macPacket1->dup();
+				PLRPacket *netPacket = dynamic_cast <PLRPacket*>(decapsulatePacket(macPacket2));
+				if (netPacket)
+				{
+					switch (netPacket->getPLRPacketKind()) 
+					{
+						case PLR_DATA_PACKET:
+						{
+							int sourceInt = std::stoi(netPacket->getSource());
+							
+							if (sourceInt == 18)
+							{
+								trace() << "mac tx rts = source, sn " << sourceInt <<","<<netPacket->getSequenceNumber();
+							}
+						}
+					}
+				}
+			}
+			*/
+			
+			if (TXBuffer.empty()) {
+				//"WARNING! BUFFER_IS_EMPTY in MAC_CARRIER_SENSE_FOR_TX_RTS, will reset state";
 				resetDefaultState("empty transmission buffer");
 				break;
 			}
@@ -680,49 +589,36 @@ void TMAC::carrierIsClear()
 			break;
 		}
 
-		/* MAC requested carrier sense to transmit a SYNC packet */
-		case MAC_CARRIER_SENSE_FOR_TX_SYNC:{
-			// SYNC packet was created in scheduleSyncPacket function
-			if (syncPacket != NULL) {
-				// Send SYNC packet to radio
-				toRadioLayer(syncPacket);
-				toRadioLayer(createRadioCommand(SET_STATE, TX));
-
-				collectOutput("Sent packets breakdown", "SYNC");
-				syncPacket = NULL;
-
-				// Clear the resync flag
-				needResync = 0;
-
-				// update MAC state
-				setMacState(MAC_STATE_IN_TX, "transmitting SYNC packet");
-
-				// create a timeout for this transmission - nothing is expected in reply
-				// so MAC is only waiting for the RADIO to finish the packet transmission
-				setTimer(TRANSMISSION_TIMEOUT, TX_TIME(syncPacketSize));
-
-			} else {
-				trace() << "WARNING: Invalid MAC_CARRIER_SENSE_FOR_TX_SYNC while syncPacket undefined";
-				resetDefaultState("invalid state, no SYNC packet found");
-			}
-			break;
-		}
-
 		/* MAC requested carrier sense to transmit DATA packet */
-		case MAC_CARRIER_SENSE_FOR_TX_DATA:{
+		case MAC_CARRIER_SENSE_FOR_TX_DATA:
+		{
+			/*
+			if (TXBuffer.empty()) {
+			}
+			else
+			{
+				MacPacket *macPacket1 = dynamic_cast <MacPacket*>(TXBuffer.front());
+				MacPacket *macPacket2 = macPacket1->dup();
+				PLRPacket *netPacket = dynamic_cast <PLRPacket*>(decapsulatePacket(macPacket2));
+				if (netPacket)
+				{
+					switch (netPacket->getPLRPacketKind()) 
+					{
+						case PLR_DATA_PACKET:
+						{
+							int sourceInt = std::stoi(netPacket->getSource());
+							
+							if (sourceInt == 18)
+							{
+								trace() << "mac tx data = source, sn " << sourceInt <<","<<netPacket->getSequenceNumber();
+							}
+						}
+					}
+				}
+			}
+			*/
+	
 			sendDataPacket();
-			break;
-		}
-
-		/* MAC requested carrier sense before going to sleep */
-		case MAC_CARRIER_SENSE_BEFORE_SLEEP:{
-			// primaryWakeup flag is cleared (in case the node will wake up in the current frame
-			// for a secondary schedule)
-			primaryWakeup = false;
-
-			// update MAC and RADIO states
-			toRadioLayer(createRadioCommand(SET_STATE, SLEEP));
-			setMacState(MAC_STATE_SLEEP, "no activity on the channel");
 			break;
 		}
 	}
@@ -731,10 +627,12 @@ void TMAC::carrierIsClear()
 void TMAC::sendDataPacket()
 {
 	if (TXBuffer.empty()) {
-		trace() << "WARNING: Invalid MAC_CARRIER_SENSE_FOR_TX_DATA while TX buffer is empty";
+		//"WARNING: Invalid MAC_CARRIER_SENSE_FOR_TX_DATA while TX buffer is empty";
 		resetDefaultState("empty transmission buffer");
 		return;
 	}
+
+	
 	// create a copy of first message in the TX buffer and send it to the radio
 	toRadioLayer(TXBuffer.front()->dup());
 	collectOutput("Sent packets breakdown", "DATA");
@@ -750,6 +648,18 @@ void TMAC::sendDataPacket()
 		setMacState(MAC_STATE_IN_TX, "sent DATA packet to BROADCAST address");
 		setTimer(TRANSMISSION_TIMEOUT, txTime);
 	} else {
+		// bb: adding packet-SequenceNumber here, assuming next ACK is for it 
+		MacPacket *macPacket = dynamic_cast <MacPacket*>(TXBuffer.front());
+		if (waitForAck_ != macPacket->getSequenceNumber())
+		{
+			double time_ = getClock().dbl() - enqueueTimes[macPacket->getSequenceNumber()].dbl();
+			//"queue-Time of " << macPacket->getSequenceNumber() << " = " << time_ << " queue-Length " << TXBuffer.size();
+			monitoring_queueDelayCounter[(int) (getClock().dbl()/simTime * monitoring_slots)]++;
+			monitoring_queueDelay[(int) (getClock().dbl()/simTime * monitoring_slots)] += time_;
+		}
+		waitForAck_ = macPacket->getSequenceNumber();
+		//"bb: just send packet with sn [" << waitForAck_ << "]" << " to " << macPacket->getDestination();
+		
 		// This packet is unicast, so MAC will be expecting an ACK
 		// packet in reply, so the timeout is longer
 		// If we are not using RTS/CTS exchange, then this attempt
@@ -759,8 +669,8 @@ void TMAC::sendDataPacket()
 			txRetries--;
 		setMacState(MAC_STATE_WAIT_FOR_ACK, "sent DATA packet to UNICAST address");
 		setTimer(TRANSMISSION_TIMEOUT, txTime + waitTimeout);
+		
 	}
-	extendActivePeriod(txTime);
 
 	//update RADIO state
 	toRadioLayer(createRadioCommand(SET_STATE, TX));
@@ -777,26 +687,6 @@ void TMAC::performCarrierSense(int newState, simtime_t delay)
 	setTimer(CARRIER_SENSE, delay);
 }
 
-/* This function will extend active period for MAC, ensuring that the remaining active
- * time it is not less than listenTimeout value. Also a check TA message is scheduled here
- * to allow the node to go to sleep if activation timeout expires
- */
-void TMAC::extendActivePeriod(simtime_t extra)
-{
-	simtime_t curTime = getClock();
-	if (conservativeTA) {
-		simtime_t extraCurTime = curTime + extra;
-		while (activationTimeout < extraCurTime) {
-			activationTimeout += listenTimeout;
-		}
-		if (extraCurTime + listenTimeout < activationTimeout)
-			return;
-		activationTimeout += listenTimeout;
-	} else if (activationTimeout < curTime + listenTimeout + extra) {
-		activationTimeout = curTime + listenTimeout + extra;
-	}
-	setTimer(CHECK_TA, activationTimeout - curTime);
-}
 
 /* This function will check the transmission buffer, and if it is not empty, it will update
  * current communication parameters: txAddr and txRetries
@@ -817,7 +707,27 @@ void TMAC::checkTxBuffer()
 void TMAC::popTxBuffer()
 {
 	cancelAndDelete(TXBuffer.front());
+
 	TXBuffer.pop();
 	checkTxBuffer();
 }
 
+void TMAC::finish()
+{
+	if (isSink) return;
+	string s1 = "";
+	// output queueDelay
+	s1 = "queueDelay:\t";
+	for (int i = 0; i < (monitoring_slots_1-1); i++)
+	{
+		s1 += std::to_string(monitoring_queueDelay[i]) + "\t";
+	}
+	trace() << s1;	
+	
+	s1 = "queueDelayCounter:\t";
+	for (int i = 0; i < (monitoring_slots_1-1); i++)
+	{
+		s1 += std::to_string(monitoring_queueDelayCounter[i]) + "\t";
+	}
+	trace() << s1;	
+}

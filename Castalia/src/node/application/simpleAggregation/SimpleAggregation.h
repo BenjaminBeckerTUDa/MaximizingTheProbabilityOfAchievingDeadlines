@@ -14,6 +14,7 @@
 #define _SIMPLEAGGREGATION_H_
 
 #include "VirtualApplication.h"
+#include "DeadlinePacket_m.h"
 
 using namespace std;
 
@@ -28,9 +29,10 @@ class SimpleAggregation: public VirtualApplication {
 	int routingLevel;
 	double waitingTimeForLowerLevelData;
 	double lastSensedValue;
-	double sampleInterval;
+	unsigned long long maxTTD;
+	double sendInterval;
 	int totalPackets;
-
+	int packetSize;
  protected:
 	void startup();
 	void timerFiredCallback(int);

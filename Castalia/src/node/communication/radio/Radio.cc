@@ -978,16 +978,15 @@ void Radio::readIniFileParameters(void)
 
 	string startingMode = par("mode");
 	RXmode = parseRxMode(startingMode);
-	trace() << "Initialized RX mode to " << RXmode->name;
+	//trace() << "Initialized RX mode to " << RXmode->name;
 
 	string startingTxPower = par("TxOutputPower");
 	TxLevel = parseTxLevel(startingTxPower);
-	trace() << "Initialized TX power output to " << TxLevel->txOutputPower <<
-			" dBm, consuming " << TxLevel->txPowerConsumed << " mW";
+	//trace() << "Initialized TX power output to " << TxLevel->txOutputPower <<			" dBm, consuming " << TxLevel->txPowerConsumed << " mW";
 
 	string defaultSleepLevel = par("sleepLevel");
 	sleepLevel = parseSleepLevel(defaultSleepLevel);
-	trace() << "Default sleep level initialized to " << sleepLevel->name;
+	//trace() << "Default sleep level initialized to " << sleepLevel->name;
 
 	string startingState = par("state");
 	state = RX;
@@ -1371,10 +1370,9 @@ int Radio::parseFloat(const char *c, double *dst)
 void Radio::ReceivedSignalDebug(const char *description)
 {
 	list<ReceivedSignal_type>::iterator it1;
-	trace() << "*** RECEIVED SIGNALS LIST DEBUG AT " << description << " ***";
+	//trace() << "*** RECEIVED SIGNALS LIST DEBUG AT " << description << " ***";
 	for (it1 = receivedSignals.begin(); it1 != receivedSignals.end(); it1++) {
-		trace() << "ID:" << it1->ID << ", power:" << it1->power_dBm << ", crIntrf:" <<
-				it1->currentInterference << ", bitErr:" << it1->bitErrors;
+		//trace() << "ID:" << it1->ID << ", power:" << it1->power_dBm << ", crIntrf:" << it1->currentInterference << ", bitErr:" << it1->bitErrors;
 	}
 }
 
