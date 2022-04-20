@@ -300,7 +300,7 @@ void TMAC::fromRadioLayer(cPacket * pkt, double RSSI, double LQI)
 		}
 		if (collisionResolution != 2 && nav > 0)
 			setTimer(TRANSMISSION_TIMEOUT, nav);
-		setMacState(MAC_STATE_ACTIVE_SILENT, "overheard a packet");
+		//setMacState(MAC_STATE_ACTIVE_SILENT, "overheard a packet");
 		return;
 	}
 
