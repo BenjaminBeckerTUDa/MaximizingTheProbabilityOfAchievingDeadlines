@@ -24,6 +24,7 @@ using namespace std;
 
 enum MacStates {
 	MAC_STATE_SETUP = 100,
+	MAC_STATE_SLEEP = 101,
 	MAC_STATE_ACTIVE = 102,
 	MAC_STATE_ACTIVE_SILENT = 103,
 	MAC_STATE_IN_TX = 104,
@@ -31,12 +32,18 @@ enum MacStates {
 	MAC_CARRIER_SENSE_FOR_TX_RTS = 110,	//These states are used to distinguish whether we are trying to TX
 	MAC_CARRIER_SENSE_FOR_TX_DATA = 111,	// Data OR Cts OR Rts OR Ack
 
+	MAC_CARRIER_SENSE_FOR_TX_SYNC=114,
+	MAC_CARRIER_SENSE_BEFORE_SLEEP=115,
+
 	MAC_STATE_WAIT_FOR_DATA = 120,
 	MAC_STATE_WAIT_FOR_CTS = 121,
 	MAC_STATE_WAIT_FOR_ACK = 122,
 };
 
 enum TMacTimers {
+	SYNC_SETUP = 1,
+	SYNC_CREATE = 2,
+	SYNC_RENEW = 3,
 	FRAME_START = 4,
 	CHECK_TA = 5,
 	CARRIER_SENSE = 6,
@@ -68,9 +75,12 @@ class TMAC: public VirtualMac {
 	int maxTxRetries;
 
 	int ackPacketSize;	//in bytes
+	int syncPacketSize;	//in bytes
 	int rtsPacketSize;	//in bytes
 	int ctsPacketSize;	//in bytes
 
+	bool allowSinkSync;
+	int resyncTime;
 	simtime_t contentionPeriod;
 	simtime_t listenTimeout;
 	simtime_t waitTimeout;
@@ -93,12 +103,14 @@ class TMAC: public VirtualMac {
 	int txRetries;		//number of transmission attempts to txAddr (when reaches 0 - packet is dropped)
 	//int txSequenceNum;	// no need for special sequence number, virtualMAC takes care of it
 	bool primaryWakeup;	//used to distinguish between primary and secondary schedules
+	bool needResync;	//set to 1 when a SYNC packet has to be sent
 	simtime_t currentFrameStart;	//recorded start time of the current frame
 
 	/*--- TMAC activation timeout variable ---*/
 	simtime_t activationTimeout;	//time untill MAC_CHECK_TA message arrival
 
 	/*--- TMAC packet pointers (sometimes packet is created not immediately before sending) ---*/
+	TMacPacket *syncPacket;
 	TMacPacket *rtsPacket;
 	TMacPacket *ctsPacket;
 	TMacPacket *ackPacket;
@@ -123,6 +135,7 @@ class TMAC: public VirtualMac {
 
 	void resetDefaultState(const char *descr = NULL);
 	void setMacState(int newState, const char *descr = NULL);
+	void scheduleSyncPacket(simtime_t when);
 	void createPrimarySchedule();
 	void sendDataPacket();
 	void processMacPacket(TMacPacket *);
