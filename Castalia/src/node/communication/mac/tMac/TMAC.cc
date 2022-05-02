@@ -31,10 +31,14 @@ void TMAC::startup()
 	useRtsCts = par("useRtsCts");
 	maxTxRetries = par("maxTxRetries");
 	simTime = par("simTime");
-
+	
+	
+	
+	
 	disableTAextension = par("disableTAextension");
 	conservativeTA = par("conservativeTA");
 	collisionResolution = par("collisionResolution");
+	
 	
 	
 	if (collisionResolution != 2 && collisionResolution != 1 && collisionResolution != 0) {
@@ -83,6 +87,9 @@ void TMAC::startup()
 	monitoring_slots_1 = ((int) monitoring_slots)+1;
 	monitoring_queueDelay = new double[monitoring_slots_1]{0};
 	monitoring_queueDelayCounter = new int[monitoring_slots_1]{0};
+	
+	
+	
 }
 
 void TMAC::timerFiredCallback(int timer)
@@ -244,6 +251,10 @@ void TMAC::resetDefaultState(const char *descr)
 				PLRControlMessage* plrc = new PLRControlMessage("PLR delay packet", NETWORK_CONTROL_COMMAND);
 				plrc->setPLRControlMessageKind(FAIL);
 				plrc->setTxAddr(macPkt -> getDestination());
+				maxTxRetriesPerReceiver[macPkt -> getDestination()] = maxTxRetriesPerReceiver[macPkt -> getDestination()]/2;
+				if (maxTxRetriesPerReceiver[macPkt -> getDestination()] == 0){
+					maxTxRetriesPerReceiver[macPkt -> getDestination()] = 1;
+				}
 				toNetworkLayer(plrc);
 				//"bb: delay: inf (max txRetries)" << txAddr;
 			}
@@ -434,6 +445,11 @@ void TMAC::fromRadioLayer(cPacket * pkt, double RSSI, double LQI)
 				plrc->setPLRControlMessageKind(DELAY);
 				plrc->setTxAddr(source);
 				toNetworkLayer(plrc);
+				
+				maxTxRetriesPerReceiver[macPkt -> getDestination()] = maxTxRetriesPerReceiver[macPkt -> getDestination()]*2;
+				if (maxTxRetriesPerReceiver[macPkt -> getDestination()] > maxTxRetries){
+					maxTxRetriesPerReceiver[macPkt -> getDestination()] = maxTxRetries;
+				}
 
 			}
 			break;
@@ -631,6 +647,8 @@ void TMAC::sendDataPacket()
 		resetDefaultState("empty transmission buffer");
 		return;
 	}
+	
+	
 
 	
 	// create a copy of first message in the TX buffer and send it to the radio
@@ -652,12 +670,15 @@ void TMAC::sendDataPacket()
 		MacPacket *macPacket = dynamic_cast <MacPacket*>(TXBuffer.front());
 		if (waitForAck_ != macPacket->getSequenceNumber())
 		{
+			
+			
 			double time_ = getClock().dbl() - enqueueTimes[macPacket->getSequenceNumber()].dbl();
 			//"queue-Time of " << macPacket->getSequenceNumber() << " = " << time_ << " queue-Length " << TXBuffer.size();
 			monitoring_queueDelayCounter[(int) (getClock().dbl()/simTime * monitoring_slots)]++;
 			monitoring_queueDelay[(int) (getClock().dbl()/simTime * monitoring_slots)] += time_;
 		}
 		waitForAck_ = macPacket->getSequenceNumber();
+		
 		//"bb: just send packet with sn [" << waitForAck_ << "]" << " to " << macPacket->getDestination();
 		
 		// This packet is unicast, so MAC will be expecting an ACK
@@ -697,7 +718,14 @@ void TMAC::checkTxBuffer()
 		return;
 	TMacPacket *macPkt = check_and_cast < TMacPacket * >(TXBuffer.front());
 	txAddr = macPkt->getDestination();
-	txRetries = maxTxRetries;
+	
+	if (maxTxRetriesPerReceiver.find(txAddr) == maxTxRetriesPerReceiver.end()) 
+	{
+		maxTxRetriesPerReceiver.insert({txAddr, maxTxRetries});
+	}
+	
+	
+	txRetries = maxTxRetriesPerReceiver[txAddr];
 	// txSequenceNum = 0;  no need for TMAC specific seq number, virtualMAC takes care of this 
 }
 

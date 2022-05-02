@@ -113,6 +113,9 @@ class TMAC: public VirtualMac {
 	int* monitoring_queueDelayCounter;
 	double* monitoring_queueDelay;
 
+	double lastTransmissionAttempt;
+	std::map<int, double> maxTxRetriesPerReceiver;
+
  protected:
 	void startup();
 	void finish();

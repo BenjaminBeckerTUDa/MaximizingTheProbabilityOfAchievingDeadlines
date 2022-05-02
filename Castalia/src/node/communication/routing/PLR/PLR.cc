@@ -213,6 +213,7 @@ void PLR::handleNetworkControlCommand(cMessage * pkt)
 
 	if (plrc->getPLRControlMessageKind() == FAIL)
 	{
+		updateAverageLinkDelay(maxDelay, plrc -> getTxAddr());
 		insertDelay(maxDelay, plrc -> getTxAddr());
 	}
 	if (plrc->getPLRControlMessageKind() == DELAY)
@@ -892,6 +893,72 @@ void PLR::finish()
 	
 	
 	
+	
+	
+	
+	if (!isSink){
+		// output: routing table; node-cdf; link-cdfs
+		string s = "";
+		for (int i = 0; i < 25; i++)
+		{
+			s = s + std::to_string(routingTable[i*pDFSlots/25]) + "\t";
+		}
+		s = s + std::to_string(routingTable[pDFSlots]);
+		trace() << "routingTable: \n" << s ;
+		
+		
+		s = "";
+		for (int i = 0; i <= pDFSlots; i++)
+		{
+			s = s + std::to_string(cdf[i]) + "\t";
+		}
+		trace() << "nodes cdf: \n" << s ;	
+		
+		
+		
+		for ( const auto &keyVal : neighbor_pdfs) 
+		{
+			double* pdf = neighbor_pdfs[keyVal.first];
+			s = "";
+			double sum = 0;
+			for (int i = 0; i < pDFSlots; i++)
+			{
+				sum += pdf[i];
+				s = s + std::to_string(sum) + "\t";
+			}
+			trace() << "cdf for link to " << keyVal.first <<":\n"<< s ;	
+		}
+		
+		for ( const auto &keyVal : neighbor_hop_cdfs) 
+		{
+			double* hop_cdf = neighbor_hop_cdfs[keyVal.first];
+			s = "";
+			for (int i = 0; i < pDFSlots; i++)
+			{
+				s = s + std::to_string(hop_cdf[i]) + "\t";
+			}
+			trace() << "cdf for hop to " << keyVal.first <<":\n"<< s ;	
+		}
+		
+		
+		
+		// output nexthop; node-avg delay; and avg delays
+		trace() << "nextHop:  " << nextHop;
+		trace() << "avgDelay: " << std::to_string(avgDelay);
+		for ( const auto &keyVal : neighbor_avgLinkDelays) 
+		{
+			trace() << "avg for link to " << keyVal.first <<":\n"<< std::to_string(neighbor_avgLinkDelays[keyVal.first]);	
+		}
+		
+		for ( const auto &keyVal : neighbor_avgHopDelays) 
+		{
+			trace() << "avg for hop to " << keyVal.first <<":\n"<< std::to_string(neighbor_avgHopDelays[keyVal.first]);	
+		}
+	}
+	
+	
+	
+	
 	return;
 	
 	
@@ -964,7 +1031,7 @@ void PLR::finish()
 			{
 				double avg = neighbor_avgLinkDelays[keyVal.first];
 				trace() << "avg for link to " << keyVal.first <<": ["<< std::to_string(neighbor_avgLinkDelays[keyVal.first]) << "] + avg of that node: [" << std::to_string(neighbor_avgNodeDelays[keyVal.first]) << "] = hop delay: [" << std::to_string(neighbor_avgHopDelays[keyVal.first]) << "]";	
-	    		}
+	    	}
 		}
 		else
 		{
