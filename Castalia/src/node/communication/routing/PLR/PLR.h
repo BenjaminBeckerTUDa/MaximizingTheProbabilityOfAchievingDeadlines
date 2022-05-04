@@ -48,6 +48,7 @@ class PLR: public VirtualRouting {
 	double probeInterval;
 	double cdfBroadcastInterval;
 	double newRoundInterval;
+	double riceK;
 	bool collectReducedTraceInfo;
 	
 	int appMaxTTD;

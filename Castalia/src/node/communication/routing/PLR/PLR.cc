@@ -19,6 +19,7 @@
 
 Define_Module(PLR);
 
+
 void PLR::startup()
 {
 	// check that the Application module used has the boolean parameter "isSink"
@@ -49,6 +50,7 @@ void PLR::startup()
 
 	
 	collectReducedTraceInfo = par("collectReducedTraceInfo");
+	riceK = par("riceK");
 
 	useAverageDelay = par("useAverageDelay");
 	useAvgSecond = par("useAvgSecond");
@@ -719,6 +721,7 @@ void PLR::finish()
 		}
 		trace() << "appSendInterval(ms):\t" << appSendInterval;
 		trace() << "appMaxTTD(ms):\t" << appMaxTTD;
+		trace() << "riceK:\t" << riceK;
 		
 		if (! collectReducedTraceInfo)
 		{
