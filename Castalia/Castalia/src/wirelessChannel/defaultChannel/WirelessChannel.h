@@ -61,6 +61,7 @@ class WirelessChannel: public CastaliaModule {
 	double d0;					// reference distance (in meters)
 	double sigma;				// std of a zero-mean Gaussian RV
 	double bidirectionalSigma;	// std of a zero-mean Gaussian RV
+	float factorK;				// rice factor
 
 	const char *pathLossMapFile;
 	const char *temporalModelParametersFile;

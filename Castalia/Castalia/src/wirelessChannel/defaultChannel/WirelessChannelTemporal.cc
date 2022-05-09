@@ -11,6 +11,11 @@
  ****************************************************************************/
 
 #include "WirelessChannelTemporal.h"
+#include <math.h>
+#include <random>
+#include <chrono>
+
+
 
 //Constructor for channelTemporalModel, the key parameter here is the input file to read the 
 //model data from. Whole parsing of the file is done here
@@ -330,7 +335,7 @@ float channelTemporalModel::drawFromPDF(PDFType * pdf)
 //processed by the model (that is return value can never exceed input value of time)
 //Also if time is greater than coherence Time, the value from coherencePDF is drawn, and input time value is 
 //returned
-double channelTemporalModel::runTemporalModel(double time, float *value_ptr)
+double channelTemporalModel::runTemporalModel(double time, float *value_ptr, float k)
 {
 	if (time == 0 || time >= coherenceTime) {
 		*value_ptr = drawFromPDF(coherencePDF);
@@ -340,9 +345,25 @@ double channelTemporalModel::runTemporalModel(double time, float *value_ptr)
 	for (int i = 0; i < numOfCorrelationTimes; i++) {
 		while (remaining_time >= correlationTime[i].time) {
 			remaining_time -= correlationTime[i].time;
-			*value_ptr = drawFromPDF(&correlationTime[i].pdfs[calculateValueIndex(*value_ptr)]);
+			//*value_ptr = drawFromPDF(&correlationTime[i].pdfs[calculateValueIndex(*value_ptr)]);
+			*value_ptr = rice(k);
 		}
 	}
 	return time - remaining_time;
+}
+
+float channelTemporalModel::rice(float k)
+{
+	unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
+	std::default_random_engine gen(seed);
+	std::normal_distribution<double> dis(0, 1);
+	
+	float mu = sqrt(k / (2 * (k + 1)));
+	float sigma = sqrt(1 / (2 * (k + 1)));
+	float x = mu + dis(gen) * sigma;
+	float y = mu + dis(gen) * sigma;
+	float re = abs(sqrt(x * x + y * y));
+	re = 20 * log10(re);
+	return re;
 }
 
