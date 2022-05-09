@@ -50,6 +50,8 @@ void PLR::startup()
 	
 	collectReducedTraceInfo = par("collectReducedTraceInfo");
 
+	riceK = par("riceK");
+
 	useAverageDelay = par("useAverageDelay");
 	useAvgSecond = par("useAvgSecond");
 	
@@ -717,8 +719,10 @@ void PLR::finish()
 			}
 			
 		}
+
 		trace() << "appSendInterval(ms):\t" << appSendInterval;
 		trace() << "appMaxTTD(ms):\t" << appMaxTTD;
+		trace() << "riceK:\t" << riceK;
 		
 		if (! collectReducedTraceInfo)
 		{

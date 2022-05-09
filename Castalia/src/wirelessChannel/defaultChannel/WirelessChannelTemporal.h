@@ -72,11 +72,12 @@ class channelTemporalModel {
 	void parseLayer(const char *, PDFLayerType *);
 	int calculateValueIndex(float);
 	int isValidLayer(const char *);
+	float rice(float);
 
  public:
 	 channelTemporalModel(const char *, int);
 	~channelTemporalModel();
-	double runTemporalModel(double, float *);
+	double runTemporalModel(double, float *, float k);
 };
 
 #endif

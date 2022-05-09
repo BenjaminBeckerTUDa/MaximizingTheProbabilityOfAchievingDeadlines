@@ -34,6 +34,7 @@ simple PLR like node.communication.routing.iRouting {
 	double probeInterval = default(60.0);
 	double cdfBroadcastInterval = default(5.0);
 	double newRoundInterval = default(60.0);
+	double riceK = default(-1.0);
  gates:
 	output toCommunicationModule;
 	output toMacModule;
