@@ -47,7 +47,10 @@ simple WirelessChannel like wirelessChannel.iWirelessChannel {
 												// is delivering signal messages to radio modules of 
 												// individual nodes
 
-	float factorK = default (1.0);	// rice factor
+	double factorK = default (1.0);	// ricing factor
+
+
+
  gates:
  	output toNode[];
 	input fromMobilityModule @ directIn;

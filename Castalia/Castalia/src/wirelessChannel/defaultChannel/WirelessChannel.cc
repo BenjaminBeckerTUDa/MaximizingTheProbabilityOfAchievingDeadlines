@@ -387,7 +387,7 @@ void WirelessChannel::handleMessage(cMessage * msg)
 				/* Otherwise there are some nodes in that cell.
 				 * Calculate the signal received by these nodes
 				 * It is exactly the same for all of them.
-				 * The signal may be variable in time.
+				 * The signal may be variable in time.xFieldSize
 				 */
 				float currentSignalReceived = signalMsg->getPower_dBm() - (*it1)->avgPathLoss;
 				if (temporalModelDefined) {

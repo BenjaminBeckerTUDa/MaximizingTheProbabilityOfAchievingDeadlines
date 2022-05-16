@@ -1,0 +1,12 @@
+{
+  "ExpandedNodes": [
+    "",
+    "\\Castalia",
+    "\\Castalia\\Castalia",
+    "\\Castalia\\Castalia\\src",
+    "\\Castalia\\Castalia\\src\\wirelessChannel",
+    "\\Castalia\\Castalia\\src\\wirelessChannel\\defaultChannel"
+  ],
+  "SelectedNode": "\\Castalia\\Castalia\\src\\wirelessChannel\\defaultChannel\\WirelessChannelTemporal.cc",
+  "PreviewInSolutionExplorer": false
+}
