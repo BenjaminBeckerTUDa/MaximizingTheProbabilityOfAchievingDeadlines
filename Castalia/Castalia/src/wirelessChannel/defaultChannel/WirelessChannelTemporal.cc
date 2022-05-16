@@ -352,19 +352,18 @@ double channelTemporalModel::runTemporalModel(double time, float *value_ptr, flo
 	return time - remaining_time;
 }
 
+
+unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
+std::default_random_engine gen(seed);
+std::normal_distribution<double> dis(0, 1);
 float channelTemporalModel::rice(double k)
-{
-	unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
-	std::default_random_engine gen(seed);
-	std::normal_distribution<double> dis(0, 1);
-	
+{	
 	float mu = sqrt(k / (2 * (k + 1)));
 	float sigma = sqrt(1 / (2 * (k + 1)));
 	float x = mu + dis(gen) * sigma;
 	float y = mu + dis(gen) * sigma;
 	float re = abs(sqrt(x * x + y * y));
 	re = 20 * log10(re);
-	std::cout << re << std::endl;
 	return re;
 }
 
