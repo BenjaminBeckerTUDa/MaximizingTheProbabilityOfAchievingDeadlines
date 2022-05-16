@@ -335,7 +335,7 @@ float channelTemporalModel::drawFromPDF(PDFType * pdf)
 //processed by the model (that is return value can never exceed input value of time)
 //Also if time is greater than coherence Time, the value from coherencePDF is drawn, and input time value is 
 //returned
-double channelTemporalModel::runTemporalModel(double time, float *value_ptr, float k)
+double channelTemporalModel::runTemporalModel(double time, float *value_ptr, float factorK)
 {
 	if (time == 0 || time >= coherenceTime) {
 		*value_ptr = drawFromPDF(coherencePDF);
@@ -346,13 +346,13 @@ double channelTemporalModel::runTemporalModel(double time, float *value_ptr, flo
 		while (remaining_time >= correlationTime[i].time) {
 			remaining_time -= correlationTime[i].time;
 			//*value_ptr = drawFromPDF(&correlationTime[i].pdfs[calculateValueIndex(*value_ptr)]);
-			*value_ptr = rice(k);
+			*value_ptr = rice(factorK);
 		}
 	}
 	return time - remaining_time;
 }
 
-float channelTemporalModel::rice(float k)
+float channelTemporalModel::rice(double k)
 {
 	unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
 	std::default_random_engine gen(seed);
@@ -364,6 +364,7 @@ float channelTemporalModel::rice(float k)
 	float y = mu + dis(gen) * sigma;
 	float re = abs(sqrt(x * x + y * y));
 	re = 20 * log10(re);
+	std::cout << re << std::endl;
 	return re;
 }
 

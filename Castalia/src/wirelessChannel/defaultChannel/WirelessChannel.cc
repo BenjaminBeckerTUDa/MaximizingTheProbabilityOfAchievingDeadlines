@@ -387,14 +387,14 @@ void WirelessChannel::handleMessage(cMessage * msg)
 				/* Otherwise there are some nodes in that cell.
 				 * Calculate the signal received by these nodes
 				 * It is exactly the same for all of them.
-				 * The signal may be variable in time.
+				 * The signal may be variable in time.xFieldSize
 				 */
 				float currentSignalReceived = signalMsg->getPower_dBm() - (*it1)->avgPathLoss;
 				if (temporalModelDefined) {
 					simtime_t timePassed_msec = (simTime() - (*it1)->lastObservationTime) * 1000;
 					simtime_t timeProcessed_msec =
 							temporalModel->runTemporalModel(SIMTIME_DBL(timePassed_msec),
-							&((*it1)->lastObservedDiffFromAvgPathLoss));
+							&((*it1)->lastObservedDiffFromAvgPathLoss), factorK);
 					currentSignalReceived += (*it1)->lastObservedDiffFromAvgPathLoss;
 					collectHistogram("Fade depth distribution",
 						     (*it1)->lastObservedDiffFromAvgPathLoss);
@@ -506,6 +506,7 @@ void WirelessChannel::readIniFileParameters(void)
 	bidirectionalSigma = par("bidirectionalSigma");
 	PLd0 = par("PLd0");
 	d0 = par("d0");
+	factorK = par("factorK");
 
 	pathLossMapFile = par("pathLossMapFile");
 	temporalModelParametersFile = par("temporalModelParametersFile");
