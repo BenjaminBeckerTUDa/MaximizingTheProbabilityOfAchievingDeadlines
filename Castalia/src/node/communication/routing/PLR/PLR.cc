@@ -7,7 +7,7 @@
  *                                                                             *
  *      NICTA, Locked Bag 9013, Alexandria, NSW 1435, Australia                *
  *      Attention:  License Inquiry.                                           *
- *                                                                             *  
+ *                                                                             *
  *******************************************************************************/
 
 #include "PLR.h"
@@ -27,47 +27,45 @@ void PLR::startup()
 		isSink = appModule->par("isSink");
 	else
 		opp_error("\nPLR has to be used with an application that defines the parameter isSink");
-	
+
 	if (appModule->hasPar("maxTTD"))
-		maxDelay = ((long long) (((long) appModule->par("maxTTD")))) * (long long) 1000; 
+		maxDelay = ((long long)(((long)appModule->par("maxTTD")))) * (long long)1000;
 	else
 		opp_error("\nPLR has to be used with an application that defines the parameter maxTTD");
-		
+
 	if (appModule->hasPar("packetSize"))
-		packetSize = (int) appModule->par("packetSize"); 
+		packetSize = (int)appModule->par("packetSize");
 	else
 		opp_error("\nPLR has to be used with an application that defines the parameter packetSize");
 
 	if (appModule->hasPar("maxTTD"))
-		appMaxTTD = appModule->par("maxTTD"); 
+		appMaxTTD = appModule->par("maxTTD");
 	else
 		opp_error("\nPLR has to be used with an application that defines the parameter maxTTD");
 	if (appModule->hasPar("sendInterval"))
-		appSendInterval = appModule->par("sendInterval"); 
+		appSendInterval = appModule->par("sendInterval");
 	else
 		opp_error("\nPLR has to be used with an application that defines the parameter sendInterval");
 
-	
 	collectReducedTraceInfo = par("collectReducedTraceInfo");
-
 	riceK = par("riceK");
 
-	useAverageDelay = par("useAverageDelay");
+	useAverageDelay = true;
 	useAvgSecond = par("useAvgSecond");
-	
+
 	pDFSlots = par("pDFSlots");
 	pDFMessageTimes = par("pDFMessageTimes");
-	
+
 	probeInterval = par("probeInterval");
 	simTime = par("simTime");
 	cdfBroadcastInterval = par("cdfBroadcastInterval");
-	newRoundInterval = par("newRoundInterval");	
+	newRoundInterval = par("newRoundInterval");
 
-	//monitoring
-	
+	// monitoring
+
 	monitoring_slots = 100.0;
-	monitoring_slots_1 = ((int) monitoring_slots)+1;
-	
+	monitoring_slots_1 = ((int)monitoring_slots) + 1;
+
 	monitoring_receivedPacketsInTime = 0;
 	monitoring_receivedCDFs = new int[monitoring_slots_1]{0};
 	monitoring_broadcastedCDFs = new int[monitoring_slots_1]{0};
@@ -78,26 +76,29 @@ void PLR::startup()
 	monitoring_droppedData = new int[monitoring_slots_1]{0};
 	monitoring_receivedFrom.insert({-1, new int[monitoring_slots_1]{0}});
 	monitoring_forwardedTo.insert({-1, new int[monitoring_slots_1]{0}});
-	monitoring_forwardedTo.insert({-2, new int[monitoring_slots_1]{0}});	
+	monitoring_forwardedTo.insert({-2, new int[monitoring_slots_1]{0}});
 
-	// seed for random number generator 
-	stringstream strValue; strValue << SELF_NETWORK_ADDRESS; unsigned int intValue; strValue >> intValue; std::srand(intValue); 
-        
-        
-	
-	if ( maxDelay < (long long) pDFSlots){
+	// seed for random number generator
+	stringstream strValue;
+	strValue << SELF_NETWORK_ADDRESS;
+	unsigned int intValue;
+	strValue >> intValue;
+	std::srand(intValue);
+
+	if (maxDelay < (long long)pDFSlots)
+	{
 		pDFSlots = maxDelay;
 	}
-	
-	delayStep = maxDelay/(long long)pDFSlots;
+
+	delayStep = maxDelay / (long long)pDFSlots;
 	currentRound = 0;
 	currentSequenceNumber = 0;
-	
+
 	if (isSink)
 	{
 		monitoring_forwardedTo.insert({0, new int[monitoring_slots_1]{0}});
 	}
-	
+
 	// routing table and node delay
 
 	if (isSink)
@@ -109,9 +110,9 @@ void PLR::startup()
 		avgDelay = 99999;
 	}
 	nextHop = -1;
-	nextHop_calc=-1;
+	nextHop_calc = -1;
 
-	cdf = new double[pDFSlots+1]{0};
+	cdf = new double[pDFSlots + 1]{0};
 	if (isSink)
 	{
 		for (int i = 0; i <= pDFSlots; i++)
@@ -121,18 +122,17 @@ void PLR::startup()
 	}
 	else
 	{
-		routingTable = new int[pDFSlots+1]{0};
-		routingTable_calc = new int[pDFSlots+1]{0};
+		routingTable = new int[pDFSlots + 1]{0};
+		routingTable_calc = new int[pDFSlots + 1]{0};
 		for (int i = 0; i <= pDFSlots; i++)
 		{
 			routingTable[i] = -1;
 			routingTable_calc[i] = -1;
 		}
 	}
-	
-	
+
 	// set all timers
-	double time = (static_cast <double> (rand()) / static_cast <double> (RAND_MAX)) * cdfBroadcastInterval;
+	double time = (static_cast<double>(rand()) / static_cast<double>(RAND_MAX)) * cdfBroadcastInterval;
 	setTimer(1, time); // broadcast CDF
 	if (isSink)
 	{
@@ -141,7 +141,7 @@ void PLR::startup()
 	else
 	{
 		setTimer(2, probeInterval); // probing
-	}    	
+	}
 }
 
 void PLR::timerFiredCallback(int index)
@@ -157,30 +157,28 @@ void PLR::timerFiredCallback(int index)
 	{
 		// broadcast CDF
 		broadcastCDF();
-		monitoring_broadcastedCDFs[(int) (getClock().dbl()/simTime * monitoring_slots)]++;
-		double time = (static_cast <double> (rand()) / static_cast <double> (RAND_MAX)) * cdfBroadcastInterval;
+		monitoring_broadcastedCDFs[(int)(getClock().dbl() / simTime * monitoring_slots)]++;
+		double time = (static_cast<double>(rand()) / static_cast<double>(RAND_MAX)) * cdfBroadcastInterval;
 		setTimer(1, time);
 		return;
 	}
-	if (index == 2){
+	if (index == 2)
+	{
 		// set timer for sending individual probe messages
-		for ( int address : neighbors) 
+		for (int address : neighbors)
 		{
-			double randomTime = (static_cast <double> (rand()) / static_cast <double> (RAND_MAX)) * 1.0;
-			setTimer(3+address, address+randomTime);
+			double randomTime = (static_cast<double>(rand()) / static_cast<double>(RAND_MAX)) * 1.0;
+			setTimer(3 + address, address + randomTime);
 		}
 		setTimer(2, probeInterval);
 		return;
 	}
 	// send individual probe message
-	sendProbe(index-3);
+	sendProbe(index - 3);
 }
-
 
 void PLR::broadcastCDF()
 {
-
-	
 	PLRPacket *netPacket = new PLRPacket("PLR cdf packet", NETWORK_LAYER_PACKET);
 	netPacket->setPLRPacketKind(PLR_CDF_PACKET);
 	netPacket->setSource(SELF_NETWORK_ADDRESS);
@@ -190,45 +188,58 @@ void PLR::broadcastCDF()
 
 	netPacket->setAvgDelay(avgDelay);
 
-	double* cdf2;
-	cdf2 = new double[pDFSlots+1]{0};
+	if (useAverageDelay)
+		netPacket->setByteLength(4 + 1);
+	else
+		netPacket->setByteLength(100 + 1);
+
+	double *cdf2;
+	cdf2 = new double[pDFSlots + 1]{0};
 	for (int i = 0; i <= pDFSlots; i++)
-	{	
+	{
 		cdf2[i] = cdf[i];
 	}
 	CDF cdf1;
 	cdf1.setCDF(cdf2);
 	netPacket->setNodeCDF(cdf1);
-	
+
 	netPacket->setRound(currentRound);
-	
+
 	toMacLayer(netPacket, BROADCAST_MAC_ADDRESS);
 }
 
-
-void PLR::handleNetworkControlCommand(cMessage * pkt)
+void PLR::handleNetworkControlCommand(cMessage *pkt)
 {
-	PLRControlMessage *plrc = dynamic_cast <PLRControlMessage*>(pkt);
-	if (!plrc){
+	PLRControlMessage *plrc = dynamic_cast<PLRControlMessage *>(pkt);
+	if (!plrc)
+	{
 		return;
 	}
 
 	if (plrc->getPLRControlMessageKind() == FAIL)
 	{
-		updateAverageLinkDelay(maxDelay, plrc -> getTxAddr());
-		insertDelay(maxDelay, plrc -> getTxAddr());
+		updateAverageLinkDelay(maxDelay, plrc->getTxAddr());
+		insertDelay(maxDelay, plrc->getTxAddr());
 	}
 	if (plrc->getPLRControlMessageKind() == DELAY)
 	{
-		updateAverageLinkDelay(plrc -> getDelay(), plrc -> getTxAddr());
-		insertDelay(toNanoseconds(plrc -> getDelay()), plrc -> getTxAddr());
+		updateAverageLinkDelay(plrc->getDelay(), plrc->getTxAddr());
+		insertDelay(toNanoseconds(plrc->getDelay()), plrc->getTxAddr());
 	}
+	// cb: reply the receiver request message
+	/* 	if (plrc->getPLRControlMessageKind() == RECEIVER_REQUEST)
+		{
+			PLRControlMessage *plrcReceiverReply = new PLRControlMessage("PLR receiver reply message", MAC_CONTROL_COMMAND);
+			plrcReceiverReply->setPLRPacketKind(PLR_RECEIVER_REPLY_PACKET);
+			plrcReceiverReply->setReceiverList(multicastReceivers);
+			toMacLayer(plrcReceiverReply);
+		} */
 }
 
 long long PLR::toNanoseconds(double delay)
 {
 	long long fac = 1000000;
-	return (long long) (delay * fac);
+	return (long long)(delay * fac);
 }
 
 void PLR::updateAverageLinkDelay(double delay_, int address)
@@ -256,10 +267,9 @@ void PLR::insertDelay(long long delay_, int address)
 	{
 		slot = slot;
 	}
-	
-	(neighbor_histograms[address])[slot] = (neighbor_histograms[address])[slot]+1;
-}
 
+	(neighbor_histograms[address])[slot] = (neighbor_histograms[address])[slot] + 1;
+}
 
 void PLR::addMaxToCDF()
 {
@@ -274,12 +284,22 @@ void PLR::addMaxToCDF()
 		}
 	}
 
+	// adding all neighbors with a lower average delay to the list of possible receivers
+	multicastReceiversCalc.clear();
+	for (int address : neighbors)
+	{
+		if (neighbor_avgNodeDelays[address] < avgDelay)
+		{
+			multicastReceiversCalc.push_back(address);
+		}
+	}
+
 	// iterate over all neighbors to find the max values for each cdf slot
 	for (int address : neighbors)
 	{
 		for (int i = 0; i <= pDFSlots; i++)
 		{
-			if(neighbor_hop_cdfs[address][i] > cdf[i])
+			if (neighbor_hop_cdfs[address][i] > cdf[i])
 			{
 				cdf[i] = neighbor_hop_cdfs[address][i];
 				routingTable_calc[i] = address;
@@ -289,12 +309,11 @@ void PLR::addMaxToCDF()
 	// making sure no loops
 	for (int i = 0; i <= pDFSlots; i++)
 	{
-		if(cdf[i+1] == cdf[i])
+		if (cdf[i + 1] == cdf[i])
 		{
-			routingTable_calc[i+1] = routingTable_calc[i];
-
+			routingTable_calc[i + 1] = routingTable_calc[i];
 		}
-	}	
+	}
 }
 
 int PLR::getNextHop(long long ttl)
@@ -304,19 +323,19 @@ int PLR::getNextHop(long long ttl)
 		// no next hop for packets with expired deadlines
 		return -1;
 	}
-	
+
 	if (useAverageDelay)
 	{
 		// always same next hop for average delay
 		return nextHop;
 	}
 	else
-	{		
+	{
 		// return the next hop which corresponds to the ttl (time to deadline)
 		int slot = (int)(ttl / delayStep);
 		if (slot >= pDFSlots)
 		{
-			slot = pDFSlots-1;
+			slot = pDFSlots - 1;
 		}
 		if (routingTable[slot] == -1)
 		{
@@ -331,8 +350,8 @@ int PLR::getNextHop(long long ttl)
 
 void PLR::createPDF(int address)
 {
-	int* histogram = neighbor_histograms[address];
-	double* pdf = neighbor_pdfs[address];
+	int *histogram = neighbor_histograms[address];
+	double *pdf = neighbor_pdfs[address];
 	int sum = 0;
 	for (int i = 0; i <= pDFSlots; i++)
 	{
@@ -342,10 +361,10 @@ void PLR::createPDF(int address)
 	{
 		return;
 	}
-	
+
 	for (int i = 0; i <= pDFSlots; i++)
 	{
-		pdf[i] = (double) histogram[i] / (double) sum;
+		pdf[i] = (double)histogram[i] / (double)sum;
 	}
 }
 
@@ -353,10 +372,10 @@ void PLR::convoluteCDF(int address)
 {
 	neighbor_avgHopDelays[address] = neighbor_avgLinkDelays[address] + neighbor_avgNodeDelays[address];
 
-	double* neighbor_pdf = neighbor_pdfs[address];
-	double* neighbor_cdf = neighbor_cdfs[address];
-	double* neighbor_hop_cdf = neighbor_hop_cdfs[address];
-	
+	double *neighbor_pdf = neighbor_pdfs[address];
+	double *neighbor_cdf = neighbor_cdfs[address];
+	double *neighbor_hop_cdf = neighbor_hop_cdfs[address];
+
 	// do we even need this cdf?
 	bool makesSense = false;
 	for (int i = 0; i < pDFSlots; i++)
@@ -377,77 +396,78 @@ void PLR::convoluteCDF(int address)
 	int minC = -1;
 	for (int i = 0; i < pDFSlots && minC == -1; i++)
 	{
-		minC = (neighbor_cdf[i] > 0) * (i+1) -1;
+		minC = (neighbor_cdf[i] > 0) * (i + 1) - 1;
 	}
 	if (minC == -1)
 	{
 		return;
 	}
-	
+
 	// find lowest slot in pdf which has a value > 0
 	int minP = -1;
 	for (int i = 0; i < pDFSlots && minP == -1; i++)
 	{
-		minP = (neighbor_pdf[i] > 0) * (i+1) -1;
+		minP = (neighbor_pdf[i] > 0) * (i + 1) - 1;
 	}
 	if (minP == -1)
 	{
 		return;
 	}
-	
+
 	// find highest slot in pdf which has a value > 0
 	int maxP = -1;
-	for (int i = pDFSlots-1; i >= 0 && maxP == -1; i--)
+	for (int i = pDFSlots - 1; i >= 0 && maxP == -1; i--)
 	{
-		maxP = (neighbor_pdf[i] > 0) * (i+1) -1;
+		maxP = (neighbor_pdf[i] > 0) * (i + 1) - 1;
 	}
-	
+
 	// convolute CDF
 	for (int i = minP; i <= maxP; i++)
 	{
-		for (int j = minC; i+j <= pDFSlots; j++){
-			neighbor_hop_cdf[i+j] += neighbor_pdf[i] * neighbor_cdf[j]/2.0;
-			neighbor_hop_cdf[i+j+1] += neighbor_pdf[i] * neighbor_cdf[j]/2.0;
+		for (int j = minC; i + j <= pDFSlots; j++)
+		{
+			neighbor_hop_cdf[i + j] += neighbor_pdf[i] * neighbor_cdf[j] / 2.0;
+			neighbor_hop_cdf[i + j + 1] += neighbor_pdf[i] * neighbor_cdf[j] / 2.0;
 		}
 	}
-	
+
 	// to avoid rounding errors
 	for (int i = 0; i <= pDFSlots; i++)
-	{	
+	{
 		neighbor_hop_cdf[i] = round(neighbor_hop_cdf[i] * 1000000.0) / 1000000.0;
 	}
 }
 
 void PLR::sendProbe(int address)
 {
-	PLRPacket *netPacket =
-	    new PLRPacket("PLR probe packet", NETWORK_LAYER_PACKET);
-	netPacket->setPLRPacketKind(PLR_PROBE_PACKET);
-	netPacket->setSource(SELF_NETWORK_ADDRESS);
-	netPacket->setDestination("none");
-	netPacket->setSequenceNumber(currentSequenceNumber);
-	netPacket->setByteLength(packetSize + 22);
-	currentSequenceNumber++;
-	// trace() << "toMacLayer(PLR_PROBE_PACKET, " << address << ");"  << " size " << netPacket->getByteLength();
-	monitoring_probeTo[address][(int) (getClock().dbl()/simTime * monitoring_slots)]++;
-	monitoring_sentProbes[(int) (getClock().dbl()/simTime * monitoring_slots)]++;
-	toMacLayer(netPacket, address);
-}	
-	
-void PLR::fromApplicationLayer(cPacket * pkt, const char *destination)
+	// PLRPacket *netPacket =
+	// 	new PLRPacket("PLR probe packet", NETWORK_LAYER_PACKET);
+	// netPacket->setPLRPacketKind(PLR_PROBE_PACKET);
+	// netPacket->setSource(SELF_NETWORK_ADDRESS);
+	// netPacket->setDestination("none");
+	// netPacket->setSequenceNumber(currentSequenceNumber);
+	// netPacket->setByteLength(packetSize + 22);
+	// currentSequenceNumber++;
+	// // trace() << "toMacLayer(PLR_PROBE_PACKET, " << address << ");"  << " size " << netPacket->getByteLength();
+	// monitoring_probeTo[address][(int)(getClock().dbl() / simTime * monitoring_slots)]++;
+	// monitoring_sentProbes[(int)(getClock().dbl() / simTime * monitoring_slots)]++;
+	// // toMacLayer(netPacket, address);
+}
+
+void PLR::fromApplicationLayer(cPacket *pkt, const char *destination)
 {
 	if (isSink == true)
 	{
 		return;
 	}
 	string dst(destination);
-		
-	DeadlinePacket *dlPacket = dynamic_cast <DeadlinePacket*>(pkt);
+
+	DeadlinePacket *dlPacket = dynamic_cast<DeadlinePacket *>(pkt);
 	if (!dlPacket)
 	{
 		return;
 	}
-	
+
 	PLRPacket *netPacket = new PLRPacket("PLR data packet", NETWORK_LAYER_PACKET);
 	netPacket->setPLRPacketKind(PLR_DATA_PACKET);
 	netPacket->setSource(SELF_NETWORK_ADDRESS);
@@ -457,39 +477,36 @@ void PLR::fromApplicationLayer(cPacket * pkt, const char *destination)
 	currentSequenceNumber++;
 	encapsulatePacket(netPacket, pkt);
 
-	monitoring_receivedFrom[-1][(int) (getClock().dbl()/simTime * monitoring_slots)]++;
-	
+	monitoring_receivedFrom[-1][(int)(getClock().dbl() / simTime * monitoring_slots)]++;
+
 	if (netPacket->getDeadline() > toNanoseconds(getClock().dbl()))
 	{
 		long long ttl = netPacket->getDeadline() - toNanoseconds(getClock().dbl());
 		int nh = getNextHop(ttl);
-		
-		monitoring_forwardedTo[nh][(int) (getClock().dbl()/simTime * monitoring_slots)]++;
-		if (not (nh == -1))
+
+		monitoring_forwardedTo[nh][(int)(getClock().dbl() / simTime * monitoring_slots)]++;
+		if (not(nh == -1))
 		{
 			toMacLayer(netPacket, nh);
-			monitoring_sentData[(int) (getClock().dbl()/simTime * monitoring_slots)]++;
-			
-			
+			monitoring_sentData[(int)(getClock().dbl() / simTime * monitoring_slots)]++;
 		}
 		else
 		{
-			monitoring_droppedData[(int) (getClock().dbl()/simTime * monitoring_slots)]++;
-			
+			monitoring_droppedData[(int)(getClock().dbl() / simTime * monitoring_slots)]++;
+
 			int sourceInt = std::stoi(netPacket->getSource());
 			// trace() << "no next hop = " << sourceInt <<","<<netPacket->getSequenceNumber()<<","<<ttl;
 		}
 	}
 	else
 	{
-
 	}
 }
 
-void PLR::fromMacLayer(cPacket * pkt, int macAddress, double rssi, double lqi)
+void PLR::fromMacLayer(cPacket *pkt, int macAddress, double rssi, double lqi)
 {
 	// create new neighbor table entry, if missing
-	if (neighbors.find(macAddress) == neighbors.end()) 
+	if (neighbors.find(macAddress) == neighbors.end())
 	{
 		neighbors.insert(macAddress);
 		monitoring_forwardedTo.insert({macAddress, new int[monitoring_slots_1]{0}});
@@ -498,136 +515,140 @@ void PLR::fromMacLayer(cPacket * pkt, int macAddress, double rssi, double lqi)
 		monitoring_probeFrom.insert({macAddress, new int[monitoring_slots_1]{0}});
 
 		neighbor_avgNodeDelays.insert({macAddress, 99999});
-		neighbor_avgLinkDelays.insert({macAddress, 99999});
-		neighbor_avgLinkDelays_fixed.insert({macAddress, 99999});
+		neighbor_avgLinkDelays.insert({macAddress, 1});
+		neighbor_avgLinkDelays_fixed.insert({macAddress, 1});
 		neighbor_avgHopDelays.insert({macAddress, 99999});
 		neighbor_avgLinkDelaysCounter.insert({macAddress, 0});
 
-		neighbor_cdfs.insert({macAddress, new double[pDFSlots+1]{0}});
-		neighbor_pdfs.insert({macAddress, new double[pDFSlots+1]{0}});
-		neighbor_hop_cdfs.insert({macAddress, new double[pDFSlots+2]{0}});
-		neighbor_histograms.insert({macAddress, new int[pDFSlots+1]{0}});
+		neighbor_cdfs.insert({macAddress, new double[pDFSlots + 1]{0}});
+		neighbor_pdfs.insert({macAddress, new double[pDFSlots + 1]{0}});
+		neighbor_hop_cdfs.insert({macAddress, new double[pDFSlots + 2]{0}});
+		neighbor_histograms.insert({macAddress, new int[pDFSlots + 1]{0}});
 	}
 
-	PLRPacket *netPacket = dynamic_cast <PLRPacket*>(pkt);
+	PLRPacket *netPacket = dynamic_cast<PLRPacket *>(pkt);
 	if (!netPacket)
 	{
 		return;
 	}
-		
-	switch (netPacket->getPLRPacketKind()) 
+
+	switch (netPacket->getPLRPacketKind())
 	{
-		case PLR_PROBE_PACKET:
+	case PLR_PROBE_PACKET:
+	{
+		monitoring_probeFrom[macAddress][(int)(getClock().dbl() / simTime * monitoring_slots)]++;
+		monitoring_receivedProbes[(int)(getClock().dbl() / simTime * monitoring_slots)]++;
+		break;
+	}
+	case PLR_DATA_PACKET:
+	{
+		int sourceInt = std::stoi(netPacket->getSource());
+		long long ttl = netPacket->getDeadline() - toNanoseconds(getClock().dbl());
+
+		if (seenPackets.find(sourceInt) == seenPackets.end())
 		{
-			monitoring_probeFrom[macAddress][(int) (getClock().dbl()/simTime * monitoring_slots)]++;
-			monitoring_receivedProbes[(int) (getClock().dbl()/simTime * monitoring_slots)]++;
-			break;
+			std::set<int> a;
+			seenPackets[sourceInt] = a;
 		}
-		case PLR_DATA_PACKET:
+		if ((seenPackets[sourceInt]).find(netPacket->getSequenceNumber()) == (seenPackets[sourceInt]).end())
 		{
-			int sourceInt = std::stoi(netPacket->getSource());
-			long long ttl = netPacket->getDeadline() - toNanoseconds(getClock().dbl());
+			(seenPackets[sourceInt]).insert(netPacket->getSequenceNumber());
+			monitoring_receivedFrom[macAddress][(int)(getClock().dbl() / simTime * monitoring_slots)]++;
 
-			
-			if ( seenPackets.find(sourceInt) == seenPackets.end() ) {
-				std::set<int> a;
-				seenPackets[sourceInt] = a;
-			}
-			if ((seenPackets[sourceInt]).find(netPacket->getSequenceNumber()) == (seenPackets[sourceInt]).end()){
-				(seenPackets[sourceInt]).insert(netPacket->getSequenceNumber()); 
-				monitoring_receivedFrom[macAddress][(int) (getClock().dbl()/simTime * monitoring_slots)]++;
-				
-				if (isSink)
+			if (isSink)
+			{
+				long long ttl = netPacket->getDeadline() - toNanoseconds(getClock().dbl());
+				if (netPacket->getDeadline() > toNanoseconds(getClock().dbl()))
 				{
-					long long ttl = netPacket->getDeadline() - toNanoseconds(getClock().dbl());
-					if (netPacket->getDeadline() > toNanoseconds(getClock().dbl()))
-					{
-						monitoring_receivedPacketsInTime++; //monitoring
-						monitoring_forwardedTo[0][(int) (getClock().dbl()/simTime * monitoring_slots)]++;
+					monitoring_receivedPacketsInTime++; // monitoring
+					monitoring_forwardedTo[0][(int)(getClock().dbl() / simTime * monitoring_slots)]++;
 
-						stringstream strValue; strValue << netPacket->getSource(); unsigned int source; strValue >> source; 
-						if (monitoring_SourceOfsuccessfullyDeliveredPackets.find(source) == monitoring_SourceOfsuccessfullyDeliveredPackets.end())
-						{
-							monitoring_SourceOfsuccessfullyDeliveredPackets.insert({source, new int[pDFSlots+1]{0}});
-						}
-						monitoring_SourceOfsuccessfullyDeliveredPackets[source][(int) (getClock().dbl()/simTime * monitoring_slots)]++;
-					}
-					else
+					stringstream strValue;
+					strValue << netPacket->getSource();
+					unsigned int source;
+					strValue >> source;
+					if (monitoring_SourceOfsuccessfullyDeliveredPackets.find(source) == monitoring_SourceOfsuccessfullyDeliveredPackets.end())
 					{
-						// trace() << "expired TTL = " << sourceInt <<","<<netPacket->getSequenceNumber()<<","<<ttl;
-						monitoring_forwardedTo[-1][(int) (getClock().dbl()/simTime * monitoring_slots)]++;
+						monitoring_SourceOfsuccessfullyDeliveredPackets.insert({source, new int[pDFSlots + 1]{0}});
 					}
+					monitoring_SourceOfsuccessfullyDeliveredPackets[source][(int)(getClock().dbl() / simTime * monitoring_slots)]++;
 				}
 				else
-				{	
-					if (netPacket->getDeadline() > toNanoseconds(getClock().dbl()))
-					{
-						int nh = getNextHop(ttl);
-						monitoring_forwardedTo[nh][(int) (getClock().dbl()/simTime * monitoring_slots)]++;
-						if (not (nh == -1))
-						{
-							PLRPacket *dupPacket = netPacket->dup();
-							dupPacket->setSequenceNumber(currentSequenceNumber);
-							currentSequenceNumber++;
-							
-							toMacLayer(dupPacket, nh);
-							monitoring_sentData[(int) (getClock().dbl()/simTime * monitoring_slots)]++;
-						}
-						else
-						{
-							// trace() << "no next hop = " << sourceInt <<","<<netPacket->getSequenceNumber()<<","<<ttl;
-							monitoring_droppedData[(int) (getClock().dbl()/simTime * monitoring_slots)]++;
-						}
-					}
-					else
-					{
-						// trace() << "expired TTL = " << sourceInt <<","<<netPacket->getSequenceNumber()<<","<<ttl;
-					}
+				{
+					// trace() << "expired TTL = " << sourceInt <<","<<netPacket->getSequenceNumber()<<","<<ttl;
+					monitoring_forwardedTo[-1][(int)(getClock().dbl() / simTime * monitoring_slots)]++;
 				}
 			}
 			else
 			{
-				// trace() << "seen twice: source,id,ttl = " << sourceInt <<","<<netPacket->getSequenceNumber()<<","<<ttl;
-				//hier ist ein drop wegen loop, oder verlorengegangenem ACK...
-			}
-			monitoring_receivedData[(int) (getClock().dbl()/simTime * monitoring_slots)]++;
-			break;
-		}
-		case PLR_CDF_PACKET:
-		{
-			monitoring_receivedCDFs[(int) (getClock().dbl()/simTime * monitoring_slots)]++;
-			/*
-			- prüfe, ob neue runde
-			*/
-			if (currentRound < netPacket->getRound() && !isSink)
-			{
-				currentRound = netPacket->getRound();
-				nextRound();
-			}
-			if (currentRound == netPacket->getRound() && !isSink)
-			{
-				/*
-				- speichere das empfangene cdf
-				*/
-				double received_delay = netPacket->getAvgDelay();
-				neighbor_avgNodeDelays[macAddress] = netPacket->getAvgDelay();
-	
-				for (int i = 0; i <= pDFSlots; i++)
-				{	
-					neighbor_cdfs[macAddress][i] = netPacket->getNodeCDF().getCDF()[i];
+				if (netPacket->getDeadline() > toNanoseconds(getClock().dbl()))
+				{
+					int nh = getNextHop(ttl);
+					monitoring_forwardedTo[nh][(int)(getClock().dbl() / simTime * monitoring_slots)]++;
+					if (not(nh == -1))
+					{
+						PLRPacket *dupPacket = netPacket->dup();
+						dupPacket->setSequenceNumber(currentSequenceNumber);
+						currentSequenceNumber++;
+
+						toMacLayer(dupPacket, nh);
+						monitoring_sentData[(int)(getClock().dbl() / simTime * monitoring_slots)]++;
+					}
+					else
+					{
+						// trace() << "no next hop = " << sourceInt <<","<<netPacket->getSequenceNumber()<<","<<ttl;
+						monitoring_droppedData[(int)(getClock().dbl() / simTime * monitoring_slots)]++;
+					}
 				}
-				/*
-				- berechne neues CDF
-				*/
-				convoluteCDF(macAddress);
-				addMaxToCDF();	
+				else
+				{
+					// trace() << "expired TTL = " << sourceInt <<","<<netPacket->getSequenceNumber()<<","<<ttl;
+				}
 			}
-			break;
 		}
-		case PLR_DELAY_PACKET:
+		else
 		{
-			break;
+			// trace() << "seen twice: source,id,ttl = " << sourceInt <<","<<netPacket->getSequenceNumber()<<","<<ttl;
+			// hier ist ein drop wegen loop, oder verlorengegangenem ACK...
 		}
+		monitoring_receivedData[(int)(getClock().dbl() / simTime * monitoring_slots)]++;
+		break;
+	}
+	case PLR_CDF_PACKET:
+	{
+		monitoring_receivedCDFs[(int)(getClock().dbl() / simTime * monitoring_slots)]++;
+		/*
+		- prüfe, ob neue runde
+		*/
+		if (currentRound < netPacket->getRound() && !isSink)
+		{
+			currentRound = netPacket->getRound();
+			nextRound();
+		}
+		if (currentRound == netPacket->getRound() && !isSink)
+		{
+			/*
+			- speichere das empfangene cdf
+			*/
+			double received_delay = netPacket->getAvgDelay();
+			neighbor_avgNodeDelays[macAddress] = netPacket->getAvgDelay();
+
+			for (int i = 0; i <= pDFSlots; i++)
+			{
+				neighbor_cdfs[macAddress][i] = netPacket->getNodeCDF().getCDF()[i];
+			}
+			/*
+			- berechne neues CDF
+			*/
+			convoluteCDF(macAddress);
+			addMaxToCDF();
+		}
+		break;
+	}
+	case PLR_DELAY_PACKET:
+	{
+		break;
+	}
 	}
 }
 
@@ -637,7 +658,7 @@ void PLR::nextRound()
 	- set neighbor-delays to 99999
 	- fix link avg delays
 	*/
-	for ( int addr : neighbors) 
+	for (int addr : neighbors)
 	{
 		neighbor_avgNodeDelays[addr] = 99999;
 		neighbor_avgLinkDelays_fixed[addr] = neighbor_avgLinkDelays[addr];
@@ -647,14 +668,22 @@ void PLR::nextRound()
 	- delete next hop
 	*/
 	avgDelay = 99999;
-	nextHop = nextHop_calc;	
+	nextHop = nextHop_calc;
 	nextHop_calc = -1;
+
+	// copying multicastReceiversCalc into multicastReceivers
+	multicastReceivers.clear();
+	for (int address : multicastReceiversCalc)
+	{
+		multicastReceivers.push_back(address);
+	}
+	multicastReceiversCalc.clear();
 
 	/*
 	- set hop cdfs 0
 	- fix link pdfs
 	*/
-	for ( int addr : neighbors) 
+	for (int addr : neighbors)
 	{
 		for (int i = 0; i < pDFSlots; i++)
 		{
@@ -668,33 +697,12 @@ void PLR::nextRound()
 	- lösche routing-table
 	*/
 	for (int i = 0; i <= pDFSlots; i++)
-	{	
-		cdf[i]=0;
+	{
+		cdf[i] = 0;
 		routingTable[i] = routingTable_calc[i];
 		routingTable_calc[i] = -1;
 	}
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 void PLR::finish()
 {
@@ -702,7 +710,7 @@ void PLR::finish()
 	// output, general information
 	if (isSink)
 	{
-		
+
 		if (useAverageDelay)
 		{
 			trace() << "Algorithm: Avg";
@@ -717,29 +725,25 @@ void PLR::finish()
 			{
 				trace() << "Algorithm: PLR";
 			}
-			
 		}
-
 		trace() << "appSendInterval(ms):\t" << appSendInterval;
 		trace() << "appMaxTTD(ms):\t" << appMaxTTD;
 		trace() << "riceK:\t" << riceK;
-		
-		if (! collectReducedTraceInfo)
+
+		if (!collectReducedTraceInfo)
 		{
-			trace() << "result time per slot:    " << (simTime/monitoring_slots) << "s";
+			trace() << "result time per slot:    " << (simTime / monitoring_slots) << "s";
 		}
 		// trace() << "receivedPacketsInTime:	" << monitoring_receivedPacketsInTime;
 	}
 
-	
-	
 	// output, where packets where forwarded to
-	for ( const auto &keyVal : monitoring_forwardedTo) 
+	for (const auto &keyVal : monitoring_forwardedTo)
 	{
 		s1 = "";
-		int* vals = keyVal.second;
+		int *vals = keyVal.second;
 		int sum = 0;
-		for (int i = 0; i < (monitoring_slots_1-1); i++)
+		for (int i = 0; i < (monitoring_slots_1 - 1); i++)
 		{
 			sum += vals[i];
 		}
@@ -748,7 +752,7 @@ void PLR::finish()
 			if (keyVal.first == 0 && isSink) // 0 means, the packet arrived in time
 			{
 				s1 += "received at sink in time:\t";
-				for (int i = 0; i < (monitoring_slots_1-1); i++)
+				for (int i = 0; i < (monitoring_slots_1 - 1); i++)
 				{
 					s1 += std::to_string(vals[i]) + "\t";
 				}
@@ -757,25 +761,24 @@ void PLR::finish()
 			if (!isSink)
 			{
 				s1 += "forwardedTo:\t" + std::to_string(keyVal.first) + ":\t";
-				for (int i = 0; i < (monitoring_slots_1-1); i++)
+				for (int i = 0; i < (monitoring_slots_1 - 1); i++)
 				{
 					s1 += std::to_string(vals[i]) + "\t";
 				}
 				trace() << s1;
 			}
-		}	
+		}
 	}
-	
-	
+
 	// output, how many packets where created at this node
 	s1 = "";
-	for ( const auto &keyVal : monitoring_receivedFrom) 
+	for (const auto &keyVal : monitoring_receivedFrom)
 	{
 		if (keyVal.first == -1 && !isSink) // -1 means, a packet comes from app
 		{
-			int* vals = keyVal.second;
+			int *vals = keyVal.second;
 			int sum = 0;
-			for (int i = 0; i < (monitoring_slots_1-1); i++)
+			for (int i = 0; i < (monitoring_slots_1 - 1); i++)
 			{
 				sum += vals[i];
 			}
@@ -786,105 +789,100 @@ void PLR::finish()
 				unsigned int intValue;
 				strValue >> intValue;
 				s1 += "created packets:\t";
-				for (int i = 0; i < (monitoring_slots_1-1); i++)
+				for (int i = 0; i < (monitoring_slots_1 - 1); i++)
 				{
 					s1 += std::to_string(vals[i]) + "\t";
 				}
 				trace() << s1;
-			}	
-			
+			}
 		}
 	}
-	
+
 	// output source of packets received at sink successfully
 	if (isSink)
 	{
-		for ( const auto &keyVal : monitoring_SourceOfsuccessfullyDeliveredPackets) 
+		for (const auto &keyVal : monitoring_SourceOfsuccessfullyDeliveredPackets)
 		{
 			s1 = "";
-			int * vals = keyVal.second;
+			int *vals = keyVal.second;
 			s1 += "delivered source:\t" + std::to_string(keyVal.first) + ":\t";
-			for (int i = 0; i < (monitoring_slots_1-1); i++)
+			for (int i = 0; i < (monitoring_slots_1 - 1); i++)
 			{
 				s1 += std::to_string(vals[i]) + "\t";
 			}
 			trace() << s1;
 		}
 	}
-	
-	
-	
+
 	// output, where data came from
-	for ( const auto &keyVal : monitoring_receivedFrom) 
+	for (const auto &keyVal : monitoring_receivedFrom)
 	{
 		s1 = "";
-		int* vals = keyVal.second;
+		int *vals = keyVal.second;
 		int sum = 0;
-		for (int i = 0; i < (monitoring_slots_1-1); i++)
+		for (int i = 0; i < (monitoring_slots_1 - 1); i++)
 		{
 			sum += vals[i];
 		}
 		if (sum > 0)
 		{
 			s1 += "receivedFrom:\t" + std::to_string(keyVal.first) + ":\t";
-			for (int i = 0; i < (monitoring_slots_1-1); i++)
+			for (int i = 0; i < (monitoring_slots_1 - 1); i++)
 			{
 				s1 += std::to_string(vals[i]) + "\t";
 			}
 			trace() << s1;
-		}	
+		}
 	}
-	
-	
-	
+
 	// output, how many cdfs where received
 	s1 = "receivedCDFs:\t";
-	for (int i = 0; i < (monitoring_slots_1-1); i++)
+	for (int i = 0; i < (monitoring_slots_1 - 1); i++)
 	{
 		s1 += std::to_string(monitoring_receivedCDFs[i]) + "\t";
 	}
-	trace() << s1;	
+	trace() << s1;
 
 	// output, how many cdfs where broadcasted
 	s1 = "broadcastedCDFs:\t";
-	for (int i = 0; i < (monitoring_slots_1-1); i++)
+	for (int i = 0; i < (monitoring_slots_1 - 1); i++)
 	{
 		s1 += std::to_string(monitoring_broadcastedCDFs[i]) + "\t";
 	}
 	trace() << s1;
-	
+
 	// output, how many probes where sent
 	s1 = "sentProbes:\t";
-	for (int i = 0; i < (monitoring_slots_1-1); i++)
+	for (int i = 0; i < (monitoring_slots_1 - 1); i++)
 	{
 		s1 += std::to_string(monitoring_sentProbes[i]) + "\t";
 	}
 	trace() << s1;
-	
+
 	// output, how many probes where received
 	s1 = "receivedProbes:\t";
-	for (int i = 0; i < (monitoring_slots_1-1); i++)
+	for (int i = 0; i < (monitoring_slots_1 - 1); i++)
 	{
 		s1 += std::to_string(monitoring_receivedProbes[i]) + "\t";
 	}
 	trace() << s1;
-	
+
 	// output, how many data where sent
 	s1 = "sentData: \t";
-	for (int i = 0; i < (monitoring_slots_1-1); i++)
+	for (int i = 0; i < (monitoring_slots_1 - 1); i++)
 	{
 		s1 += std::to_string(monitoring_sentData[i]) + "\t";
 	}
 	trace() << s1;
-	
+
 	// output, how many data where received
 	s1 = "receivedData:\t";
-	for (int i = 0; i < (monitoring_slots_1-1); i++)
+	for (int i = 0; i < (monitoring_slots_1 - 1); i++)
 	{
 		s1 += std::to_string(monitoring_receivedData[i]) + "\t";
 	}
 	trace() << s1;
-	
+
 	// output neighbours
 	s1 = "neighbours:\t";
 	for (int i : neighbors)
@@ -892,37 +890,30 @@ void PLR::finish()
 		s1 += std::to_string(i) + "\t";
 	}
 	trace() << s1;
-	
-	
-	
-	
-	
-	
-	
-	
-	if (!isSink){
+
+	if (!isSink)
+	{
 		// output: routing table; node-cdf; link-cdfs
 		string s = "";
 		for (int i = 0; i < 25; i++)
 		{
-			s = s + std::to_string(routingTable[i*pDFSlots/25]) + "\t";
+			s = s + std::to_string(routingTable[i * pDFSlots / 25]) + "\t";
 		}
 		s = s + std::to_string(routingTable[pDFSlots]);
-		trace() << "routingTable: \n" << s ;
-		
-		
+		trace() << "routingTable: \n"
+				<< s;
+
 		s = "";
 		for (int i = 0; i <= pDFSlots; i++)
 		{
 			s = s + std::to_string(cdf[i]) + "\t";
 		}
-		trace() << "nodes cdf: \n" << s ;	
-		
-		
-		
-		for ( const auto &keyVal : neighbor_pdfs) 
+		trace() << "nodes cdf: \n"
+				<< s;
+
+		for (const auto &keyVal : neighbor_pdfs)
 		{
-			double* pdf = neighbor_pdfs[keyVal.first];
+			double *pdf = neighbor_pdfs[keyVal.first];
 			s = "";
 			double sum = 0;
 			for (int i = 0; i < pDFSlots; i++)
@@ -930,49 +921,46 @@ void PLR::finish()
 				sum += pdf[i];
 				s = s + std::to_string(sum) + "\t";
 			}
-			trace() << "cdf for link to " << keyVal.first <<":\n"<< s ;	
+			trace() << "cdf for link to " << keyVal.first << ":\n"
+					<< s;
 		}
-		
-		for ( const auto &keyVal : neighbor_hop_cdfs) 
+
+		for (const auto &keyVal : neighbor_hop_cdfs)
 		{
-			double* hop_cdf = neighbor_hop_cdfs[keyVal.first];
+			double *hop_cdf = neighbor_hop_cdfs[keyVal.first];
 			s = "";
 			for (int i = 0; i < pDFSlots; i++)
 			{
 				s = s + std::to_string(hop_cdf[i]) + "\t";
 			}
-			trace() << "cdf for hop to " << keyVal.first <<":\n"<< s ;	
+			trace() << "cdf for hop to " << keyVal.first << ":\n"
+					<< s;
 		}
-		
-		
-		
+
 		// output nexthop; node-avg delay; and avg delays
 		trace() << "nextHop:  " << nextHop;
 		trace() << "avgDelay: " << std::to_string(avgDelay);
-		for ( const auto &keyVal : neighbor_avgLinkDelays) 
+		for (const auto &keyVal : neighbor_avgLinkDelays)
 		{
-			trace() << "avg for link to " << keyVal.first <<":\n"<< std::to_string(neighbor_avgLinkDelays[keyVal.first]);	
+			trace() << "avg for link to " << keyVal.first << ":\n"
+					<< std::to_string(neighbor_avgLinkDelays[keyVal.first]);
 		}
-		
-		for ( const auto &keyVal : neighbor_avgHopDelays) 
+
+		for (const auto &keyVal : neighbor_avgHopDelays)
 		{
-			trace() << "avg for hop to " << keyVal.first <<":\n"<< std::to_string(neighbor_avgHopDelays[keyVal.first]);	
+			trace() << "avg for hop to " << keyVal.first << ":\n"
+					<< std::to_string(neighbor_avgHopDelays[keyVal.first]);
 		}
 	}
-	
-	
-	
-	
+
 	return;
-	
-	
-	
-	/*	
+
+	/*
 	// output source of packets received at sink successfully
 	if (isSink)
 	{
 		s1 = "";
-		for ( const auto &keyVal : monitoring_SourceOfsuccessfullyDeliveredPackets) 
+		for ( const auto &keyVal : monitoring_SourceOfsuccessfullyDeliveredPackets)
 		{
 			int val = keyVal.second;
 			int source = keyVal.first;
@@ -993,12 +981,12 @@ void PLR::finish()
 			s1 = s1 + std::to_string(cdf[i*pDFSlots/25]) + "\t";
 		}
 		s1 = s1 + std::to_string(cdf[pDFSlots]);
-		trace() << "cdf: \t" << s1 ;	
+		trace() << "cdf: \t" << s1 ;
 	}
 
 	// output, how many packets where created at this node
 	s1 = "";
-	for ( const auto &keyVal : monitoring_receivedFrom) 
+	for ( const auto &keyVal : monitoring_receivedFrom)
 	{
 		if (keyVal.first == -1 && !isSink) // -1 means, a packet comes from app
 		{
@@ -1020,10 +1008,10 @@ void PLR::finish()
 					s1 += std::to_string(vals[i]) + "\t";
 				}
 				trace() << s1;
-			}	
+			}
 		}
 	}
-	
+
 	// output, routing table (or nexthop); and nexthop-cdfs (or avg delays)
 	if (!isSink)
 	{
@@ -1031,31 +1019,31 @@ void PLR::finish()
 		{
 			trace() << "nextHop:  " << nextHop;
 			trace() << "avgDelay: " << std::to_string(avgDelay);
-			for ( const auto &keyVal : neighbor_avgLinkDelays) 
+			for ( const auto &keyVal : neighbor_avgLinkDelays)
 			{
 				double avg = neighbor_avgLinkDelays[keyVal.first];
-				trace() << "avg for link to " << keyVal.first <<": ["<< std::to_string(neighbor_avgLinkDelays[keyVal.first]) << "] + avg of that node: [" << std::to_string(neighbor_avgNodeDelays[keyVal.first]) << "] = hop delay: [" << std::to_string(neighbor_avgHopDelays[keyVal.first]) << "]";	
-	    	}
+				trace() << "avg for link to " << keyVal.first <<": ["<< std::to_string(neighbor_avgLinkDelays[keyVal.first]) << "] + avg of that node: [" << std::to_string(neighbor_avgNodeDelays[keyVal.first]) << "] = hop delay: [" << std::to_string(neighbor_avgHopDelays[keyVal.first]) << "]";
+			}
 		}
 		else
 		{
 			string s = "";
-			
+
 			for (int i = 0; i < 25; i++)
 			{
 				s = s + std::to_string(routingTable[i*pDFSlots/25]) + "\t";
 			}
 			s = s + std::to_string(routingTable[pDFSlots]);
 			trace() << "routingTable: \n" << s ;
-			
+
 			s = "";
 			for (int i = 0; i < 25; i++)
 			{
 				s = s + std::to_string(cdf[i*pDFSlots/25]) + "\t";
 			}
 			s = s + std::to_string(cdf[pDFSlots]);
-			trace() << "cdf: \n" << s ;	
-			for ( const auto &keyVal : neighbor_pdfs) 
+			trace() << "cdf: \n" << s ;
+			for ( const auto &keyVal : neighbor_pdfs)
 			{
 				double* pdf = neighbor_pdfs[keyVal.first];
 				s = "";
@@ -1068,13 +1056,13 @@ void PLR::finish()
 						s = s + std::to_string(sum) + "\t";
 					}
 				}
-				trace() << "cdf for link to " << keyVal.first <<":\n"<< s ;	
-	    		}
+				trace() << "cdf for link to " << keyVal.first <<":\n"<< s ;
+				}
 		}
 	}
 
 	// output, where data came from
-	for ( const auto &keyVal : monitoring_receivedFrom) 
+	for ( const auto &keyVal : monitoring_receivedFrom)
 	{
 		s1 = "";
 		int* vals = keyVal.second;
@@ -1091,11 +1079,11 @@ void PLR::finish()
 				s1 += std::to_string(vals[i]) + "\t";
 			}
 			trace() << s1;
-		}	
+		}
 	}
-	
+
 	// output, where probes where sent to
-	for ( const auto &keyVal : monitoring_probeTo) 
+	for ( const auto &keyVal : monitoring_probeTo)
 	{
 		s1 = "";
 		int* vals = keyVal.second;
@@ -1111,14 +1099,14 @@ void PLR::finish()
 			{
 				s1 += std::to_string(vals[i]) + "\t";
 			}
-			trace() << s1;	
+			trace() << s1;
 		}
 	}
-	
-	
-	
+
+
+
 	// output, where probes came from
-	for ( const auto &keyVal : monitoring_probeFrom) 
+	for ( const auto &keyVal : monitoring_probeFrom)
 	{
 		s1 = "";
 		int* vals = keyVal.second;
@@ -1135,7 +1123,7 @@ void PLR::finish()
 				s1 += std::to_string(vals[i]) + "\t";
 			}
 			trace() << s1;
-		}	
+		}
 	}
 
 	// output, how many cdfs where received
@@ -1144,7 +1132,7 @@ void PLR::finish()
 	{
 		s1 += std::to_string(monitoring_receivedCDFs[i]) + "\t";
 	}
-	trace() << s1;	
+	trace() << s1;
 
 	// output, how many cdfs where broadcasted
 	s1 = "broadcastedCDFs:\t";
@@ -1153,7 +1141,7 @@ void PLR::finish()
 		s1 += std::to_string(monitoring_broadcastedCDFs[i]) + "\t";
 	}
 	trace() << s1;
-	
+
 	// output, how many probes where sent
 	s1 = "sentProbes:\t";
 	for (int i = 0; i < (monitoring_slots_1-1); i++)
@@ -1161,7 +1149,7 @@ void PLR::finish()
 		s1 += std::to_string(monitoring_sentProbes[i]) + "\t";
 	}
 	trace() << s1;
-	
+
 	// output, how many probes where received
 	s1 = "receivedProbes:\t";
 	for (int i = 0; i < (monitoring_slots_1-1); i++)
@@ -1169,7 +1157,7 @@ void PLR::finish()
 		s1 += std::to_string(monitoring_receivedProbes[i]) + "\t";
 	}
 	trace() << s1;
-	
+
 	// output, how many data where sent
 	s1 = "sentData: \t";
 	for (int i = 0; i < (monitoring_slots_1-1); i++)
@@ -1177,7 +1165,7 @@ void PLR::finish()
 		s1 += std::to_string(monitoring_sentData[i]) + "\t";
 	}
 	trace() << s1;
-	
+
 	// output, how many data where received
 	s1 = "receivedData:\t";
 	for (int i = 0; i < (monitoring_slots_1-1); i++)
@@ -1185,7 +1173,7 @@ void PLR::finish()
 		s1 += std::to_string(monitoring_receivedData[i]) + "\t";
 	}
 	trace() << s1;
-	
+
 	// output, how many data where dropped due to no routing table entry
 	s1 = "droppedData:\t";
 	for (int i = 0; i < (monitoring_slots_1-1); i++)
@@ -1195,16 +1183,3 @@ void PLR::finish()
 	trace() << s1;
 	*/
 }
-
-
-
-
-
-
-
-
-
-
-
-
-

@@ -7,7 +7,7 @@
  *                                                                          *
  *      NICTA, Locked Bag 9013, Alexandria, NSW 1435, Australia             *
  *      Attention:  License Inquiry.                                        *
- *                                                                          *  
+ *                                                                          *
  ****************************************************************************/
 
 #ifndef __CHANNELMODEL_H
@@ -26,8 +26,9 @@
 #define CORR_TIME "Correlation times (msec)"
 #define COH_TIME "Coherence time (msec)"
 
-struct PDFLayerType {
-	//This and any further reference to 'value' means a value of signal variation
+struct PDFLayerType
+{
+	// This and any further reference to 'value' means a value of signal variation
 	float *values;
 	int *sublayers;
 	int numOfTotalElements;
@@ -36,35 +37,38 @@ struct PDFLayerType {
 	char id;
 };
 
-struct PDFType {
+struct PDFType
+{
 	PDFLayerType *layers;
 	int numOfLayers;
 };
 
-struct correlationTimeType {
+struct correlationTimeType
+{
 	PDFType *pdfs;
 	double time;
 };
 
-class channelTemporalModel {
- private:
-	//the following parameters are read from the channel model file, parameter 'Signal Variability'
+class channelTemporalModel
+{
+private:
+	// the following parameters are read from the channel model file, parameter 'Signal Variability'
 	float minSignalVariation;
 	float maxSignalVariation;
 	float signalVariationResolution;
 
-	//the following are the dimensions of our PDF matrix. That is we expect one PDF for 
-	//every combination of discrete signal value and correlation time interval
-	int numOfSignalVariationValues;	//this value is calculated based on 'Signal Variability' parameter
-	int numOfCorrelationTimes;		//this is taken directly from 'Correlation times' parameter
+	// the following are the dimensions of our PDF matrix. That is we expect one PDF for
+	// every combination of discrete signal value and correlation time interval
+	int numOfSignalVariationValues; // this value is calculated based on 'Signal Variability' parameter
+	int numOfCorrelationTimes;		// this is taken directly from 'Correlation times' parameter
 
-	int rngNum;						//random number generator to use
+	int rngNum; // random number generator to use
 
-	double coherenceTime;			//value of time that needs to be exceeded in order to draw from coherencePDF
+	double coherenceTime; // value of time that needs to be exceeded in order to draw from coherencePDF
 
-	correlationTimeType *correlationTime;	//this is the main matrix of PDFs
-	PDFType *coherencePDF;					//a standalone coherence PDF is used when previous signal level is unknown 
-											//or too old (i.e. time passed > coherenceTime)
+	correlationTimeType *correlationTime; // this is the main matrix of PDFs
+	PDFType *coherencePDF;				  // a standalone coherence PDF is used when previous signal level is unknown
+						   // or too old (i.e. time passed > coherenceTime)
 
 	float drawFromPDF(PDFType *);
 	float parseFloat(const char *);
@@ -74,10 +78,10 @@ class channelTemporalModel {
 	int isValidLayer(const char *);
 	float rice(double);
 
- public:
-	 channelTemporalModel(const char *, int);
+public:
+	channelTemporalModel(const char *, int);
 	~channelTemporalModel();
-	double runTemporalModel(double, float *, float k);
+	double runTemporalModel(double, float *);
 };
 
 #endif

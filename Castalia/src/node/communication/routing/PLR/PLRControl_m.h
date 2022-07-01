@@ -16,7 +16,7 @@
 
 
 /**
- * Enum generated from <tt>src/node/communication/routing/PLR/PLRControl.msg:13</tt> by nedtool.
+ * Enum generated from <tt>src/node/communication/routing/PLR/PLRControl.msg:14</tt> by nedtool.
  * <pre>
  * enum PLRControlDef
  * {
@@ -32,7 +32,7 @@ enum PLRControlDef {
 };
 
 /**
- * Class generated from <tt>src/node/communication/routing/PLR/PLRControl.msg:18</tt> by nedtool.
+ * Class generated from <tt>src/node/communication/routing/PLR/PLRControl.msg:19</tt> by nedtool.
  * <pre>
  * message PLRControlMessage
  * {

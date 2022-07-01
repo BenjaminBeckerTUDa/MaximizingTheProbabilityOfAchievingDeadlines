@@ -7,7 +7,7 @@
  *                                                                          *
  *      NICTA, Locked Bag 9013, Alexandria, NSW 1435, Australia             *
  *      Attention:  License Inquiry.                                        *
- *                                                                          *  
+ *                                                                          *
  ****************************************************************************/
 
 #include "SimpleAggregation.h"
@@ -16,44 +16,50 @@ Define_Module(SimpleAggregation);
 
 void SimpleAggregation::startup()
 {
-	maxTTD =  ((long long) ((long) par("maxTTD"))) * ((long long) 1000);
+	maxTTD = ((long long)((long)par("maxTTD"))) * ((long long)1000);
 	sendInterval = (double)par("sendInterval") / 1000;
 	packetSize = (int)par("packetSize");
 	aggregatedValue = 0.0;
 	waitingTimeForLowerLevelData = 0.0;
 	lastSensedValue = 0.0;
 	totalPackets = 0;
-	
-	stringstream strValue; strValue << SELF_NETWORK_ADDRESS; unsigned int intValue; strValue >> intValue; std::srand(intValue); 	
-	double randomTime = (static_cast <double> (rand()) / static_cast <double> (RAND_MAX)) * sendInterval + sendInterval/2;
+
+	stringstream strValue;
+	strValue << SELF_NETWORK_ADDRESS;
+	unsigned int intValue;
+	strValue >> intValue;
+	std::srand(intValue);
+	double randomTime = (static_cast<double>(rand()) / static_cast<double>(RAND_MAX)) * sendInterval + sendInterval / 2;
 	setTimer(SEND_AGGREGATED_VALUE, randomTime);
-	
-	// seed for random number generator 
+
+	// seed for random number generator
 }
 
 void SimpleAggregation::timerFiredCallback(int index)
 {
-	switch (index) {	
-		case SEND_AGGREGATED_VALUE:{
-			DeadlinePacket *newPacket = new DeadlinePacket("App generic packet", APPLICATION_PACKET);
-			newPacket->setSequenceNumber(totalPackets);
-			newPacket->setByteLength(packetSize);
-			long long fac = 1000000;
-			newPacket->setDeadline(maxTTD + (long long)(getClock().dbl() * fac));
-			
-			toNetworkLayer(newPacket, "sink");
+	switch (index)
+	{
+	case SEND_AGGREGATED_VALUE:
+	{
+		DeadlinePacket *newPacket = new DeadlinePacket("App generic packet", APPLICATION_PACKET);
+		newPacket->setSequenceNumber(totalPackets);
+		newPacket->setByteLength(packetSize);
+		long long fac = 10000;
+		newPacket->setDeadline(maxTTD + (long long)(getClock().dbl() * fac));
 
-			totalPackets++;
-			double randomTime = (static_cast <double> (rand()) / static_cast <double> (RAND_MAX)) * sendInterval + sendInterval/2;
-			trace() << "application: toNetworkLayer; next in " << randomTime;
-			setTimer(SEND_AGGREGATED_VALUE, randomTime);
-			break;
-		}
+		toNetworkLayer(newPacket, "sink");
+
+		totalPackets++;
+		double randomTime = (static_cast<double>(rand()) / static_cast<double>(RAND_MAX)) * sendInterval + sendInterval / 2;
+		// trace() << "application: toNetworkLayer; next in " << randomTime;
+		setTimer(SEND_AGGREGATED_VALUE, randomTime);
+		break;
+	}
 	}
 }
 
-void SimpleAggregation::fromNetworkLayer(ApplicationPacket * rcvPacket, 
-		const char *source, double rssi, double lqi)
+void SimpleAggregation::fromNetworkLayer(ApplicationPacket *rcvPacket,
+										 const char *source, double rssi, double lqi)
 {
 	double theData = rcvPacket->getData();
 
@@ -64,15 +70,14 @@ void SimpleAggregation::fromNetworkLayer(ApplicationPacket * rcvPacket,
 		trace() << "application: fromNetworkLayer from " << source << "received value " << theData;
 }
 
-void SimpleAggregation::handleSensorReading(SensorReadingMessage * rcvReading)
+void SimpleAggregation::handleSensorReading(SensorReadingMessage *rcvReading)
 {
 	string sensType(rcvReading->getSensorType());
 	double sensValue = rcvReading->getSensedValue();
 	lastSensedValue = sensValue;
 }
 
-void SimpleAggregation::handleNeworkControlMessage(cMessage * msg)
+void SimpleAggregation::handleNeworkControlMessage(cMessage *msg)
 {
 	trace() << "application: handleNeworkControlMessage " << msg->getKind();
 }
-
