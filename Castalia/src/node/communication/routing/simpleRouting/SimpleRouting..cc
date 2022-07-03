@@ -41,19 +41,28 @@ void SimpleRouting::timerFiredCallback(int timer)
 void SimpleRouting::fromApplicationLayer(cPacket *pkt, const char *destination)
 {
     if (isSink || receivers.empty())
+    {
+        trace() << "receiver list is empty";
         return;
+    }
+
+    // trace() << "received packet from app layer";
 
     ApplicationPacket *appPkt = check_and_cast<ApplicationPacket *>(pkt);
     // create unique data packet ID
     unsigned int packetId = appPkt->getSequenceNumber() * 100000 + atoi(SELF_NETWORK_ADDRESS);
+    ReceiversContainer receiversContainer;
+    receiversContainer.setReceivers(this->receivers);
 
     SimpleRoutingPacket *netPacket = new SimpleRoutingPacket("SimpleRouting packet", NETWORK_LAYER_PACKET);
     netPacket->setSource(SELF_NETWORK_ADDRESS);
     netPacket->setDestination(destination);
     netPacket->setSimpleRoutingKind(SIMPLE_ROUTING_DATA_PACKET);
     netPacket->setPacketId(packetId);
+    netPacket->setReceiversContainer(receiversContainer);
     encapsulatePacket(netPacket, pkt);
-    toMacLayer(netPacket, resolveNetworkAddress(SELF_NETWORK_ADDRESS));
+    toMacLayer(netPacket, BROADCAST_MAC_ADDRESS);
+    // trace() << " send to MAC";
 }
 
 void SimpleRouting::fromMacLayer(cPacket *pkt, int srcMacAddress, double rssi, double lqi)
@@ -73,7 +82,7 @@ void SimpleRouting::fromMacLayer(cPacket *pkt, int srcMacAddress, double rssi, d
         case SIMPLE_ROUTING_DATA_PACKET:
         {
 
-            trace() << "received pacekt from MAC";
+            // trace() << "received pacekt from MAC";
             if (isSink)
             {
                 toApplicationLayer(decapsulatePacket(pkt));
@@ -81,7 +90,9 @@ void SimpleRouting::fromMacLayer(cPacket *pkt, int srcMacAddress, double rssi, d
             }
             else
             {
-                toMacLayer(netPacket, resolveNetworkAddress(SELF_NETWORK_ADDRESS));
+                SimpleRoutingPacket *dupPacket = netPacket->dup();
+                dupPacket->setSequenceNumber(currentSequenceNumber++);
+                // toMacLayer(dupPacket, BROADCAST_MAC_ADDRESS);
             }
             break;
         }
@@ -90,7 +101,6 @@ void SimpleRouting::fromMacLayer(cPacket *pkt, int srcMacAddress, double rssi, d
         {
             int srcHopCount = netPacket->getHopcount();
             neighborHopCounts[srcMacAddress] = srcHopCount;
-            // TODO add src to receiver list, when srcHopCount = hopCount - 1?
             if (srcHopCount < hopCount)
             {
                 hopCount = srcHopCount + 1;
@@ -121,9 +131,10 @@ void SimpleRouting::handleNetworkControlCommand(cMessage *pkt)
         ReceiversContainer receiversContainer;
         receiversContainer.setReceivers(this->receivers);
 
-        OMacControl *controlPacketToMac = new OMacControl("Simple Routing receivers list to MAC", MAC_CONTROL_COMMAND);
-        controlPacketToMac->setReceiversContainer(receiversContainer);
-        toMacLayer(controlPacketToMac);
+        OMacControl *controlPacketToOMac = new OMacControl("Simple Routing receivers list to MAC", MAC_CONTROL_COMMAND);
+        controlPacketToOMac->setOMacControlKind(OMAC_RECEIVERS_LIST_REPLY);
+        controlPacketToOMac->setReceiversContainer(receiversContainer);
+        toMacLayer(controlPacketToOMac);
         // trace() << "send receivers to mac layer ";
         break;
     }

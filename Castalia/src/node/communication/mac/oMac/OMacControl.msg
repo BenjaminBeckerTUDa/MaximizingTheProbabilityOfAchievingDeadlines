@@ -24,7 +24,7 @@ class noncobject ReceiversContainer;
 
 
 enum OMacControl_type {
-    OMAC_RECEIVER_REPLY = 1;
+    OMAC_RECEIVERS_LIST_REPLY = 1;
 }
 
 packet OMacControl extends MacPacket {

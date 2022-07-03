@@ -11,6 +11,8 @@
  ****************************************************************************/
 
 #include "SimpleMac.h"
+#include "SimpleRoutingPacket_m.h"
+#include "OMacPacket_m.h"
 
 Define_Module(SimpleMac);
 
@@ -18,10 +20,10 @@ Define_Module(SimpleMac);
  * We need to create a MAC packet, (here it can just be the generic MacPacket)
  * and encapsulate the received network packet before forwarding it to RadioLayer
  */
-void SimpleMac::fromNetworkLayer(cPacket *pkt, int destination)
+void SimpleMac::fromNetworkLayer(cPacket *netPkt, int destination)
 {
     MacPacket *macFrame = new MacPacket("BypassRouting packet", MAC_LAYER_PACKET);
-    encapsulatePacket(macFrame, pkt);
+    encapsulatePacket(macFrame, netPkt);
     macFrame->setSource(SELF_MAC_ADDRESS);
     macFrame->setDestination(destination);
     toRadioLayer(macFrame);

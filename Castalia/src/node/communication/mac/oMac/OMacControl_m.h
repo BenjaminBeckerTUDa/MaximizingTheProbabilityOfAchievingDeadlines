@@ -26,12 +26,12 @@
  * enum OMacControl_type
  * {
  * 
- *     OMAC_RECEIVER_REPLY = 1;
+ *     OMAC_RECEIVERS_LIST_REPLY = 1;
  * }
  * </pre>
  */
 enum OMacControl_type {
-    OMAC_RECEIVER_REPLY = 1
+    OMAC_RECEIVERS_LIST_REPLY = 1
 };
 
 /**

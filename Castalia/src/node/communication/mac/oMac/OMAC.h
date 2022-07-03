@@ -60,8 +60,8 @@ class OMAC : public VirtualMac
 private:
     /*---  ---*/
     map<unsigned int, list<int>> overheardAcks;
-    ReceiversContainer receiversContainer; // store receivers list from network layer
-    list<int> receiversListFromRadio;      // store receivers list from radio layer
+    ReceiversContainer receiversListContainer; // store receivers list from network layer
+    list<int> receiversListFromRadio;          // store receivers list from radio layer
     set<unsigned int> sentPackets;
     set<unsigned int> ackedPackets;
     queue<OMacPacket *> ackBuffer;
@@ -105,22 +105,25 @@ protected:
     void fromRadioLayer(cPacket *, double, double);
     void fromNetworkLayer(cPacket *, int);
 
-    int handleControlCommand(cMessage *msg);
+    int handleControlCommand(cMessage *);
     int handleRadioControlMessage(cMessage *);
 
+    void resetDefaultState(const char *descr = NULL);
+    void setMacState(int, const char *);
+
+    void sendDataPacket();
+    void sendReceiversListRequest();
+
+    void performCarrierSense(int, simtime_t delay = 0);
     void carrierIsClear();
     void carrierIsBusy();
 
-    void resetDefaultState(const char *descr = NULL);
-    void setMacState(int newState, const char *descr);
-    void sendDataPacket();
-    void sendReceiversRequest();
-    void performCarrierSense(int newState, simtime_t delay = 0);
     void checkTxBuffer();
     void popTxBuffer();
 
     void updateReceiversLists(ReceiversContainer);
     void updateOverheardAcks(unsigned int, int);
+
     int getIndexInReceiversList();
 
     bool checkInReceiversList();

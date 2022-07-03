@@ -65,8 +65,6 @@ Register_Class(SimpleRoutingPacket);
 SimpleRoutingPacket::SimpleRoutingPacket(const char *name, int kind) : ::RoutingPacket(name,kind)
 {
     this->SimpleRoutingKind_var = 0;
-    this->source_var = 0;
-    this->destination_var = 0;
     this->hopcount_var = 0;
     this->packetId_var = 0;
 }
@@ -91,30 +89,27 @@ SimpleRoutingPacket& SimpleRoutingPacket::operator=(const SimpleRoutingPacket& o
 void SimpleRoutingPacket::copy(const SimpleRoutingPacket& other)
 {
     this->SimpleRoutingKind_var = other.SimpleRoutingKind_var;
-    this->source_var = other.source_var;
-    this->destination_var = other.destination_var;
     this->hopcount_var = other.hopcount_var;
     this->packetId_var = other.packetId_var;
+    this->receiversContainer_var = other.receiversContainer_var;
 }
 
 void SimpleRoutingPacket::parsimPack(cCommBuffer *b)
 {
     ::RoutingPacket::parsimPack(b);
     doPacking(b,this->SimpleRoutingKind_var);
-    doPacking(b,this->source_var);
-    doPacking(b,this->destination_var);
     doPacking(b,this->hopcount_var);
     doPacking(b,this->packetId_var);
+    doPacking(b,this->receiversContainer_var);
 }
 
 void SimpleRoutingPacket::parsimUnpack(cCommBuffer *b)
 {
     ::RoutingPacket::parsimUnpack(b);
     doUnpacking(b,this->SimpleRoutingKind_var);
-    doUnpacking(b,this->source_var);
-    doUnpacking(b,this->destination_var);
     doUnpacking(b,this->hopcount_var);
     doUnpacking(b,this->packetId_var);
+    doUnpacking(b,this->receiversContainer_var);
 }
 
 int SimpleRoutingPacket::getSimpleRoutingKind() const
@@ -125,26 +120,6 @@ int SimpleRoutingPacket::getSimpleRoutingKind() const
 void SimpleRoutingPacket::setSimpleRoutingKind(int SimpleRoutingKind)
 {
     this->SimpleRoutingKind_var = SimpleRoutingKind;
-}
-
-const char * SimpleRoutingPacket::getSource() const
-{
-    return source_var.c_str();
-}
-
-void SimpleRoutingPacket::setSource(const char * source)
-{
-    this->source_var = source;
-}
-
-const char * SimpleRoutingPacket::getDestination() const
-{
-    return destination_var.c_str();
-}
-
-void SimpleRoutingPacket::setDestination(const char * destination)
-{
-    this->destination_var = destination;
 }
 
 int SimpleRoutingPacket::getHopcount() const
@@ -165,6 +140,16 @@ unsigned int SimpleRoutingPacket::getPacketId() const
 void SimpleRoutingPacket::setPacketId(unsigned int packetId)
 {
     this->packetId_var = packetId;
+}
+
+ReceiversContainer& SimpleRoutingPacket::getReceiversContainer()
+{
+    return receiversContainer_var;
+}
+
+void SimpleRoutingPacket::setReceiversContainer(const ReceiversContainer& receiversContainer)
+{
+    this->receiversContainer_var = receiversContainer;
 }
 
 class SimpleRoutingPacketDescriptor : public cClassDescriptor
@@ -214,7 +199,7 @@ const char *SimpleRoutingPacketDescriptor::getProperty(const char *propertyname)
 int SimpleRoutingPacketDescriptor::getFieldCount(void *object) const
 {
     cClassDescriptor *basedesc = getBaseClassDescriptor();
-    return basedesc ? 5+basedesc->getFieldCount(object) : 5;
+    return basedesc ? 4+basedesc->getFieldCount(object) : 4;
 }
 
 unsigned int SimpleRoutingPacketDescriptor::getFieldTypeFlags(void *object, int field) const
@@ -229,10 +214,9 @@ unsigned int SimpleRoutingPacketDescriptor::getFieldTypeFlags(void *object, int 
         FD_ISEDITABLE,
         FD_ISEDITABLE,
         FD_ISEDITABLE,
-        FD_ISEDITABLE,
-        FD_ISEDITABLE,
+        FD_ISCOMPOUND,
     };
-    return (field>=0 && field<5) ? fieldTypeFlags[field] : 0;
+    return (field>=0 && field<4) ? fieldTypeFlags[field] : 0;
 }
 
 const char *SimpleRoutingPacketDescriptor::getFieldName(void *object, int field) const
@@ -245,12 +229,11 @@ const char *SimpleRoutingPacketDescriptor::getFieldName(void *object, int field)
     }
     static const char *fieldNames[] = {
         "SimpleRoutingKind",
-        "source",
-        "destination",
         "hopcount",
         "packetId",
+        "receiversContainer",
     };
-    return (field>=0 && field<5) ? fieldNames[field] : NULL;
+    return (field>=0 && field<4) ? fieldNames[field] : NULL;
 }
 
 int SimpleRoutingPacketDescriptor::findField(void *object, const char *fieldName) const
@@ -258,10 +241,9 @@ int SimpleRoutingPacketDescriptor::findField(void *object, const char *fieldName
     cClassDescriptor *basedesc = getBaseClassDescriptor();
     int base = basedesc ? basedesc->getFieldCount(object) : 0;
     if (fieldName[0]=='S' && strcmp(fieldName, "SimpleRoutingKind")==0) return base+0;
-    if (fieldName[0]=='s' && strcmp(fieldName, "source")==0) return base+1;
-    if (fieldName[0]=='d' && strcmp(fieldName, "destination")==0) return base+2;
-    if (fieldName[0]=='h' && strcmp(fieldName, "hopcount")==0) return base+3;
-    if (fieldName[0]=='p' && strcmp(fieldName, "packetId")==0) return base+4;
+    if (fieldName[0]=='h' && strcmp(fieldName, "hopcount")==0) return base+1;
+    if (fieldName[0]=='p' && strcmp(fieldName, "packetId")==0) return base+2;
+    if (fieldName[0]=='r' && strcmp(fieldName, "receiversContainer")==0) return base+3;
     return basedesc ? basedesc->findField(object, fieldName) : -1;
 }
 
@@ -275,12 +257,11 @@ const char *SimpleRoutingPacketDescriptor::getFieldTypeString(void *object, int 
     }
     static const char *fieldTypeStrings[] = {
         "int",
-        "string",
-        "string",
         "int",
         "unsigned int",
+        "ReceiversContainer",
     };
-    return (field>=0 && field<5) ? fieldTypeStrings[field] : NULL;
+    return (field>=0 && field<4) ? fieldTypeStrings[field] : NULL;
 }
 
 const char *SimpleRoutingPacketDescriptor::getFieldProperty(void *object, int field, const char *propertyname) const
@@ -324,10 +305,9 @@ std::string SimpleRoutingPacketDescriptor::getFieldAsString(void *object, int fi
     SimpleRoutingPacket *pp = (SimpleRoutingPacket *)object; (void)pp;
     switch (field) {
         case 0: return long2string(pp->getSimpleRoutingKind());
-        case 1: return oppstring2string(pp->getSource());
-        case 2: return oppstring2string(pp->getDestination());
-        case 3: return long2string(pp->getHopcount());
-        case 4: return ulong2string(pp->getPacketId());
+        case 1: return long2string(pp->getHopcount());
+        case 2: return ulong2string(pp->getPacketId());
+        case 3: {std::stringstream out; out << pp->getReceiversContainer(); return out.str();}
         default: return "";
     }
 }
@@ -343,10 +323,8 @@ bool SimpleRoutingPacketDescriptor::setFieldAsString(void *object, int field, in
     SimpleRoutingPacket *pp = (SimpleRoutingPacket *)object; (void)pp;
     switch (field) {
         case 0: pp->setSimpleRoutingKind(string2long(value)); return true;
-        case 1: pp->setSource((value)); return true;
-        case 2: pp->setDestination((value)); return true;
-        case 3: pp->setHopcount(string2long(value)); return true;
-        case 4: pp->setPacketId(string2ulong(value)); return true;
+        case 1: pp->setHopcount(string2long(value)); return true;
+        case 2: pp->setPacketId(string2ulong(value)); return true;
         default: return false;
     }
 }
@@ -360,6 +338,7 @@ const char *SimpleRoutingPacketDescriptor::getFieldStructName(void *object, int 
         field -= basedesc->getFieldCount(object);
     }
     switch (field) {
+        case 3: return opp_typename(typeid(ReceiversContainer));
         default: return NULL;
     };
 }
@@ -374,6 +353,7 @@ void *SimpleRoutingPacketDescriptor::getFieldStructPointer(void *object, int fie
     }
     SimpleRoutingPacket *pp = (SimpleRoutingPacket *)object; (void)pp;
     switch (field) {
+        case 3: return (void *)(&pp->getReceiversContainer()); break;
         default: return NULL;
     }
 }

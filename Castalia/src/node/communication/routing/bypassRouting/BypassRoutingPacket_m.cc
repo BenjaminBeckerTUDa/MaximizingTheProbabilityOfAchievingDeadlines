@@ -1,5 +1,5 @@
 //
-// Generated file, do not edit! Created by nedtool 4.6 from src/node/communication/mac/oMac/OMacControl.msg.
+// Generated file, do not edit! Created by nedtool 4.6 from src/node/communication/routing/bypassRouting/BypassRoutingPacket.msg.
 //
 
 // Disable warnings about unused variables, empty switch stmts, etc:
@@ -10,7 +10,7 @@
 
 #include <iostream>
 #include <sstream>
-#include "OMacControl_m.h"
+#include "BypassRoutingPacket_m.h"
 
 USING_NAMESPACE
 
@@ -53,81 +53,76 @@ inline std::ostream& operator<<(std::ostream& out, const std::vector<T,A>& vec)
 template<typename T>
 inline std::ostream& operator<<(std::ostream& out,const T&) {return out;}
 
-EXECUTE_ON_STARTUP(
-    cEnum *e = cEnum::find("OMacControl_type");
-    if (!e) enums.getInstance()->add(e = new cEnum("OMacControl_type"));
-    e->insert(OMAC_RECEIVERS_LIST_REPLY, "OMAC_RECEIVERS_LIST_REPLY");
-);
+Register_Class(BypassRoutingPacket);
 
-Register_Class(OMacControl);
-
-OMacControl::OMacControl(const char *name, int kind) : ::MacPacket(name,kind)
+BypassRoutingPacket::BypassRoutingPacket(const char *name, int kind) : ::RoutingPacket(name,kind)
 {
-    this->OMacControlKind_var = 0;
+    this->source_var = 0;
+    this->destination_var = 0;
 }
 
-OMacControl::OMacControl(const OMacControl& other) : ::MacPacket(other)
+BypassRoutingPacket::BypassRoutingPacket(const BypassRoutingPacket& other) : ::RoutingPacket(other)
 {
     copy(other);
 }
 
-OMacControl::~OMacControl()
+BypassRoutingPacket::~BypassRoutingPacket()
 {
 }
 
-OMacControl& OMacControl::operator=(const OMacControl& other)
+BypassRoutingPacket& BypassRoutingPacket::operator=(const BypassRoutingPacket& other)
 {
     if (this==&other) return *this;
-    ::MacPacket::operator=(other);
+    ::RoutingPacket::operator=(other);
     copy(other);
     return *this;
 }
 
-void OMacControl::copy(const OMacControl& other)
+void BypassRoutingPacket::copy(const BypassRoutingPacket& other)
 {
-    this->OMacControlKind_var = other.OMacControlKind_var;
-    this->receiversContainer_var = other.receiversContainer_var;
+    this->source_var = other.source_var;
+    this->destination_var = other.destination_var;
 }
 
-void OMacControl::parsimPack(cCommBuffer *b)
+void BypassRoutingPacket::parsimPack(cCommBuffer *b)
 {
-    ::MacPacket::parsimPack(b);
-    doPacking(b,this->OMacControlKind_var);
-    doPacking(b,this->receiversContainer_var);
+    ::RoutingPacket::parsimPack(b);
+    doPacking(b,this->source_var);
+    doPacking(b,this->destination_var);
 }
 
-void OMacControl::parsimUnpack(cCommBuffer *b)
+void BypassRoutingPacket::parsimUnpack(cCommBuffer *b)
 {
-    ::MacPacket::parsimUnpack(b);
-    doUnpacking(b,this->OMacControlKind_var);
-    doUnpacking(b,this->receiversContainer_var);
+    ::RoutingPacket::parsimUnpack(b);
+    doUnpacking(b,this->source_var);
+    doUnpacking(b,this->destination_var);
 }
 
-int OMacControl::getOMacControlKind() const
+const char * BypassRoutingPacket::getSource() const
 {
-    return OMacControlKind_var;
+    return source_var.c_str();
 }
 
-void OMacControl::setOMacControlKind(int OMacControlKind)
+void BypassRoutingPacket::setSource(const char * source)
 {
-    this->OMacControlKind_var = OMacControlKind;
+    this->source_var = source;
 }
 
-ReceiversContainer& OMacControl::getReceiversContainer()
+const char * BypassRoutingPacket::getDestination() const
 {
-    return receiversContainer_var;
+    return destination_var.c_str();
 }
 
-void OMacControl::setReceiversContainer(const ReceiversContainer& receiversContainer)
+void BypassRoutingPacket::setDestination(const char * destination)
 {
-    this->receiversContainer_var = receiversContainer;
+    this->destination_var = destination;
 }
 
-class OMacControlDescriptor : public cClassDescriptor
+class BypassRoutingPacketDescriptor : public cClassDescriptor
 {
   public:
-    OMacControlDescriptor();
-    virtual ~OMacControlDescriptor();
+    BypassRoutingPacketDescriptor();
+    virtual ~BypassRoutingPacketDescriptor();
 
     virtual bool doesSupport(cObject *obj) const;
     virtual const char *getProperty(const char *propertyname) const;
@@ -146,34 +141,34 @@ class OMacControlDescriptor : public cClassDescriptor
     virtual void *getFieldStructPointer(void *object, int field, int i) const;
 };
 
-Register_ClassDescriptor(OMacControlDescriptor);
+Register_ClassDescriptor(BypassRoutingPacketDescriptor);
 
-OMacControlDescriptor::OMacControlDescriptor() : cClassDescriptor("OMacControl", "MacPacket")
+BypassRoutingPacketDescriptor::BypassRoutingPacketDescriptor() : cClassDescriptor("BypassRoutingPacket", "RoutingPacket")
 {
 }
 
-OMacControlDescriptor::~OMacControlDescriptor()
+BypassRoutingPacketDescriptor::~BypassRoutingPacketDescriptor()
 {
 }
 
-bool OMacControlDescriptor::doesSupport(cObject *obj) const
+bool BypassRoutingPacketDescriptor::doesSupport(cObject *obj) const
 {
-    return dynamic_cast<OMacControl *>(obj)!=NULL;
+    return dynamic_cast<BypassRoutingPacket *>(obj)!=NULL;
 }
 
-const char *OMacControlDescriptor::getProperty(const char *propertyname) const
+const char *BypassRoutingPacketDescriptor::getProperty(const char *propertyname) const
 {
     cClassDescriptor *basedesc = getBaseClassDescriptor();
     return basedesc ? basedesc->getProperty(propertyname) : NULL;
 }
 
-int OMacControlDescriptor::getFieldCount(void *object) const
+int BypassRoutingPacketDescriptor::getFieldCount(void *object) const
 {
     cClassDescriptor *basedesc = getBaseClassDescriptor();
     return basedesc ? 2+basedesc->getFieldCount(object) : 2;
 }
 
-unsigned int OMacControlDescriptor::getFieldTypeFlags(void *object, int field) const
+unsigned int BypassRoutingPacketDescriptor::getFieldTypeFlags(void *object, int field) const
 {
     cClassDescriptor *basedesc = getBaseClassDescriptor();
     if (basedesc) {
@@ -183,12 +178,12 @@ unsigned int OMacControlDescriptor::getFieldTypeFlags(void *object, int field) c
     }
     static unsigned int fieldTypeFlags[] = {
         FD_ISEDITABLE,
-        FD_ISCOMPOUND,
+        FD_ISEDITABLE,
     };
     return (field>=0 && field<2) ? fieldTypeFlags[field] : 0;
 }
 
-const char *OMacControlDescriptor::getFieldName(void *object, int field) const
+const char *BypassRoutingPacketDescriptor::getFieldName(void *object, int field) const
 {
     cClassDescriptor *basedesc = getBaseClassDescriptor();
     if (basedesc) {
@@ -197,22 +192,22 @@ const char *OMacControlDescriptor::getFieldName(void *object, int field) const
         field -= basedesc->getFieldCount(object);
     }
     static const char *fieldNames[] = {
-        "OMacControlKind",
-        "receiversContainer",
+        "source",
+        "destination",
     };
     return (field>=0 && field<2) ? fieldNames[field] : NULL;
 }
 
-int OMacControlDescriptor::findField(void *object, const char *fieldName) const
+int BypassRoutingPacketDescriptor::findField(void *object, const char *fieldName) const
 {
     cClassDescriptor *basedesc = getBaseClassDescriptor();
     int base = basedesc ? basedesc->getFieldCount(object) : 0;
-    if (fieldName[0]=='O' && strcmp(fieldName, "OMacControlKind")==0) return base+0;
-    if (fieldName[0]=='r' && strcmp(fieldName, "receiversContainer")==0) return base+1;
+    if (fieldName[0]=='s' && strcmp(fieldName, "source")==0) return base+0;
+    if (fieldName[0]=='d' && strcmp(fieldName, "destination")==0) return base+1;
     return basedesc ? basedesc->findField(object, fieldName) : -1;
 }
 
-const char *OMacControlDescriptor::getFieldTypeString(void *object, int field) const
+const char *BypassRoutingPacketDescriptor::getFieldTypeString(void *object, int field) const
 {
     cClassDescriptor *basedesc = getBaseClassDescriptor();
     if (basedesc) {
@@ -221,13 +216,13 @@ const char *OMacControlDescriptor::getFieldTypeString(void *object, int field) c
         field -= basedesc->getFieldCount(object);
     }
     static const char *fieldTypeStrings[] = {
-        "int",
-        "ReceiversContainer",
+        "string",
+        "string",
     };
     return (field>=0 && field<2) ? fieldTypeStrings[field] : NULL;
 }
 
-const char *OMacControlDescriptor::getFieldProperty(void *object, int field, const char *propertyname) const
+const char *BypassRoutingPacketDescriptor::getFieldProperty(void *object, int field, const char *propertyname) const
 {
     cClassDescriptor *basedesc = getBaseClassDescriptor();
     if (basedesc) {
@@ -236,14 +231,11 @@ const char *OMacControlDescriptor::getFieldProperty(void *object, int field, con
         field -= basedesc->getFieldCount(object);
     }
     switch (field) {
-        case 0:
-            if (!strcmp(propertyname,"enum")) return "OMacControl_type";
-            return NULL;
         default: return NULL;
     }
 }
 
-int OMacControlDescriptor::getArraySize(void *object, int field) const
+int BypassRoutingPacketDescriptor::getArraySize(void *object, int field) const
 {
     cClassDescriptor *basedesc = getBaseClassDescriptor();
     if (basedesc) {
@@ -251,13 +243,13 @@ int OMacControlDescriptor::getArraySize(void *object, int field) const
             return basedesc->getArraySize(object, field);
         field -= basedesc->getFieldCount(object);
     }
-    OMacControl *pp = (OMacControl *)object; (void)pp;
+    BypassRoutingPacket *pp = (BypassRoutingPacket *)object; (void)pp;
     switch (field) {
         default: return 0;
     }
 }
 
-std::string OMacControlDescriptor::getFieldAsString(void *object, int field, int i) const
+std::string BypassRoutingPacketDescriptor::getFieldAsString(void *object, int field, int i) const
 {
     cClassDescriptor *basedesc = getBaseClassDescriptor();
     if (basedesc) {
@@ -265,15 +257,15 @@ std::string OMacControlDescriptor::getFieldAsString(void *object, int field, int
             return basedesc->getFieldAsString(object,field,i);
         field -= basedesc->getFieldCount(object);
     }
-    OMacControl *pp = (OMacControl *)object; (void)pp;
+    BypassRoutingPacket *pp = (BypassRoutingPacket *)object; (void)pp;
     switch (field) {
-        case 0: return long2string(pp->getOMacControlKind());
-        case 1: {std::stringstream out; out << pp->getReceiversContainer(); return out.str();}
+        case 0: return oppstring2string(pp->getSource());
+        case 1: return oppstring2string(pp->getDestination());
         default: return "";
     }
 }
 
-bool OMacControlDescriptor::setFieldAsString(void *object, int field, int i, const char *value) const
+bool BypassRoutingPacketDescriptor::setFieldAsString(void *object, int field, int i, const char *value) const
 {
     cClassDescriptor *basedesc = getBaseClassDescriptor();
     if (basedesc) {
@@ -281,14 +273,15 @@ bool OMacControlDescriptor::setFieldAsString(void *object, int field, int i, con
             return basedesc->setFieldAsString(object,field,i,value);
         field -= basedesc->getFieldCount(object);
     }
-    OMacControl *pp = (OMacControl *)object; (void)pp;
+    BypassRoutingPacket *pp = (BypassRoutingPacket *)object; (void)pp;
     switch (field) {
-        case 0: pp->setOMacControlKind(string2long(value)); return true;
+        case 0: pp->setSource((value)); return true;
+        case 1: pp->setDestination((value)); return true;
         default: return false;
     }
 }
 
-const char *OMacControlDescriptor::getFieldStructName(void *object, int field) const
+const char *BypassRoutingPacketDescriptor::getFieldStructName(void *object, int field) const
 {
     cClassDescriptor *basedesc = getBaseClassDescriptor();
     if (basedesc) {
@@ -297,12 +290,11 @@ const char *OMacControlDescriptor::getFieldStructName(void *object, int field) c
         field -= basedesc->getFieldCount(object);
     }
     switch (field) {
-        case 1: return opp_typename(typeid(ReceiversContainer));
         default: return NULL;
     };
 }
 
-void *OMacControlDescriptor::getFieldStructPointer(void *object, int field, int i) const
+void *BypassRoutingPacketDescriptor::getFieldStructPointer(void *object, int field, int i) const
 {
     cClassDescriptor *basedesc = getBaseClassDescriptor();
     if (basedesc) {
@@ -310,9 +302,8 @@ void *OMacControlDescriptor::getFieldStructPointer(void *object, int field, int 
             return basedesc->getFieldStructPointer(object, field, i);
         field -= basedesc->getFieldCount(object);
     }
-    OMacControl *pp = (OMacControl *)object; (void)pp;
+    BypassRoutingPacket *pp = (BypassRoutingPacket *)object; (void)pp;
     switch (field) {
-        case 1: return (void *)(&pp->getReceiversContainer()); break;
         default: return NULL;
     }
 }

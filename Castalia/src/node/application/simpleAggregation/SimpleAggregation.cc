@@ -51,7 +51,7 @@ void SimpleAggregation::timerFiredCallback(int index)
 
 		totalPackets++;
 		double randomTime = (static_cast<double>(rand()) / static_cast<double>(RAND_MAX)) * sendInterval + sendInterval / 2;
-		// trace() << "application: toNetworkLayer; next in " << randomTime;
+		trace() << "application: toNetworkLayer; next in " << randomTime;
 		setTimer(SEND_AGGREGATED_VALUE, randomTime);
 		break;
 	}

@@ -26,16 +26,16 @@
  * enum OMacPacket_type
  * {
  * 
- *     DATA_OMAC_PACKET = 1;
- *     ACK_OMAC_PACKET = 2;
- *     HOPCOUNT_OMAC_PACKET = 3;
+ *     OMAC_DATA_PACKET = 1;
+ *     OMAC_ACK_PACKET = 2;
+ *     OMAC_HOPCOUNT_PACKET = 3;
  * }
  * </pre>
  */
 enum OMacPacket_type {
-    DATA_OMAC_PACKET = 1,
-    ACK_OMAC_PACKET = 2,
-    HOPCOUNT_OMAC_PACKET = 3
+    OMAC_DATA_PACKET = 1,
+    OMAC_ACK_PACKET = 2,
+    OMAC_HOPCOUNT_PACKET = 3
 };
 
 /**

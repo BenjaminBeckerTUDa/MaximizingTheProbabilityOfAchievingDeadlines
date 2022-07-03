@@ -12,9 +12,11 @@
 
 cplusplus {{
 #include "RoutingPacket_m.h"
+#include "ReceiversContainer.h"
 }}
 
 class RoutingPacket;
+class noncobject ReceiversContainer;
 
 enum SimpleRoutingPacket_type {
 	SIMPLE_ROUTING_DATA_PACKET = 1;
@@ -24,10 +26,7 @@ enum SimpleRoutingPacket_type {
 packet SimpleRoutingPacket extends RoutingPacket {
 	int SimpleRoutingKind enum (SimpleRoutingPacket_type);
 
-	string source;
-	string destination;
-
 	int hopcount;
 	unsigned int packetId;
-
+    ReceiversContainer receiversContainer;
 }

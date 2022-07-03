@@ -56,9 +56,9 @@ inline std::ostream& operator<<(std::ostream& out,const T&) {return out;}
 EXECUTE_ON_STARTUP(
     cEnum *e = cEnum::find("OMacPacket_type");
     if (!e) enums.getInstance()->add(e = new cEnum("OMacPacket_type"));
-    e->insert(DATA_OMAC_PACKET, "DATA_OMAC_PACKET");
-    e->insert(ACK_OMAC_PACKET, "ACK_OMAC_PACKET");
-    e->insert(HOPCOUNT_OMAC_PACKET, "HOPCOUNT_OMAC_PACKET");
+    e->insert(OMAC_DATA_PACKET, "OMAC_DATA_PACKET");
+    e->insert(OMAC_ACK_PACKET, "OMAC_ACK_PACKET");
+    e->insert(OMAC_HOPCOUNT_PACKET, "OMAC_HOPCOUNT_PACKET");
 );
 
 Register_Class(OMacPacket);
