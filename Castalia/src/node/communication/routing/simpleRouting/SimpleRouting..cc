@@ -42,7 +42,7 @@ void SimpleRouting::fromApplicationLayer(cPacket *pkt, const char *destination)
 {
     if (isSink || receivers.empty())
     {
-        trace() << "receiver list is empty";
+        // trace() << "receiver list is empty";
         return;
     }
 
@@ -169,6 +169,8 @@ void SimpleRouting::broadcastHopCount()
 
 void SimpleRouting::finish()
 {
+    trace() << "----------------------Network monitoring infos----------------------";
+
     string str = "";
     trace() << "broadcast hop count " << hopCount;
 

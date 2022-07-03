@@ -33,7 +33,6 @@ enum OMacStates
     MAC_STATE_IN_TX = 104,
     MAC_CARRIER_SENSE_FOR_TX_DATA = 111,
 
-    MAC_STATE_WAIT_FOR_DATA = 120,
     MAC_STATE_WAIT_FOR_ACK = 122,
 
     MAC_STATE_WAIT_FOR_RECEIVER_LIST = 130,
@@ -58,24 +57,22 @@ typedef list<OverherdAcksInfo> list_overheardAcks;
 class OMAC : public VirtualMac
 {
 private:
+    /*--- A map from int value of state to its description (used in debug) ---*/
+    map<int, string> stateDescr;
+
     /*---  ---*/
-    map<unsigned int, list<int>> overheardAcks;
+    map<unsigned int, set<int>> overheardAcks;
     ReceiversContainer receiversListContainer; // store receivers list from network layer
-    list<int> receiversListFromRadio;          // store receivers list from radio layer
     set<unsigned int> sentPackets;
     set<unsigned int> ackedPackets;
     queue<OMacPacket *> ackBuffer;
-
-    // unsigned int packetId;
-
-    /*---  ACK parameters ---*/
-    // int ackDst;
-    // int sourceOfReceivedData; // used to check if this node in overheard ack list
+    queue<OMacPacket *> pktToNetBuffer;
 
     /*--- channel monitoring ---*/
     int channelBusy;
     int channelClear;
     int dataTransmissions;
+    int hopCountTransmission;
     map<int, int> overheardPackets;
 
     /*--- The .ned file's parameters ---*/
