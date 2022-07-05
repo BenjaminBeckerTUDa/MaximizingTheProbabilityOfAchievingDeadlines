@@ -93,6 +93,7 @@ private:
     int txRetries;
 
     /*--- OMAC packet pointers (sometimes packet is created not immediately before sending) ---*/
+    OMacPacket *macFromRadio;
 
 protected:
     void startup();

@@ -194,16 +194,16 @@ void OMAC::fromNetworkLayer(cPacket *netPkt, int destination)
 
 void OMAC::fromRadioLayer(cPacket *pkt, double RSSI, double LQI)
 {
-    OMacPacket *macFrame = check_and_cast<OMacPacket *>(pkt);
-    int source = macFrame->getSource();
-    int destination = macFrame->getDestination();
+    macFromRadio = check_and_cast<OMacPacket *>(pkt);
+    int source = macFromRadio->getSource();
+    int destination = macFromRadio->getDestination();
 
-    switch (macFrame->getOMacPacketKind())
+    switch (macFromRadio->getOMacPacketKind())
     {
     case OMAC_DATA_PACKET:
     {
-        unsigned int packetId = macFrame->getPacketId();
-        receiversListContainer = macFrame->getReceiversContainer();
+        unsigned int packetId = macFromRadio->getPacketId();
+        receiversListContainer = macFromRadio->getReceiversContainer();
         int indexInReceiversList = getIndexInReceiversList();
 
         // check if this packet has been sent before
@@ -217,6 +217,8 @@ void OMAC::fromRadioLayer(cPacket *pkt, double RSSI, double LQI)
         {
             if (!overheardAcks.at(packetId).count(source))
             {
+                trace() << "Packet ID " << packetId << "     not in the overheard ack list. Ignore it"
+                        << " (node " << SELF_MAC_ADDRESS << ")";
                 return;
             }
         }
@@ -233,7 +235,6 @@ void OMAC::fromRadioLayer(cPacket *pkt, double RSSI, double LQI)
         ackPkt->setDestination(source);
         ackPkt->setPacketId(packetId);
         ackBuffer.push(ackPkt);
-        pktToNetBuffer.push(macFrame);
 
         setTimer(HANDLE_SEND_ACK, indexInReceiversList * waitTimeout);
         break;
@@ -242,13 +243,13 @@ void OMAC::fromRadioLayer(cPacket *pkt, double RSSI, double LQI)
     case OMAC_ACK_PACKET:
     {
 
-        unsigned int packetId = macFrame->getPacketId();
+        unsigned int packetId = macFromRadio->getPacketId();
 
         if (destination == SELF_MAC_ADDRESS)
         {
             if (macState == MAC_STATE_WAIT_FOR_ACK && !ackedPackets.count(packetId))
             {
-                trace() << "Packet ID " << packetId << "     received ACK from " << source;
+                trace() << "Packet ID " << packetId << "     received ACK from " << source << " (node " << SELF_MAC_ADDRESS << " )";
                 cancelTimer(TRANSMISSION_TIMEOUT);
                 popTxBuffer();
                 sentPackets.insert(packetId);
@@ -257,7 +258,7 @@ void OMAC::fromRadioLayer(cPacket *pkt, double RSSI, double LQI)
         }
         else
         {
-            trace() << "Packet ID " << packetId << "     overheard ACK from " << source;
+            trace() << "Packet ID " << packetId << "     overheard ACK from " << source << " (node " << SELF_MAC_ADDRESS << " )";
             updateOverheardAcks(packetId, source);
         }
         break;
@@ -265,8 +266,8 @@ void OMAC::fromRadioLayer(cPacket *pkt, double RSSI, double LQI)
 
     case OMAC_HOPCOUNT_PACKET:
     {
-        if (isNotDuplicatePacket(macFrame))
-            toNetworkLayer(decapsulatePacket(macFrame));
+        if (isNotDuplicatePacket(macFromRadio))
+            toNetworkLayer(decapsulatePacket(macFromRadio));
         break;
     }
 
@@ -279,34 +280,29 @@ void OMAC::handleSendAck()
 {
     while (!ackBuffer.empty())
     {
-        /*         trace() << "ack buffer " << ackBuffer.size();
-                trace() << "pkt to net buffer " << pktToNetBuffer.size(); */
         OMacPacket *ackPkt = ackBuffer.front();
         unsigned int packetId = ackPkt->getPacketId();
 
         if (overheardAcks.count(packetId))
         {
-            trace() << "Packet ID " << packetId << "     heard ACK of this packet";
-            /*             if (overheardAcks.at(packetId).size())
-            {
-                cancelAndDelete(ackBuffer.front());
-                cancelAndDelete(pktToNetBuffer.front());
-                ackBuffer.pop();
-                pktToNetBuffer.pop();
-                return;
-            }
-            */
+            trace() << "Packet ID " << packetId << "     heard ACK of this packet before. Ignore it"
+                    << " (node " << SELF_MAC_ADDRESS << " )";
+
+            delete ackBuffer.front();
+            ackBuffer.pop();
+            return;
         }
 
         toRadioLayer(ackPkt);
         toRadioLayer(createRadioCommand(SET_STATE, TX));
         ackBuffer.pop();
         setMacState(MAC_STATE_IN_TX, "transmitting ACK packet");
+        if (macFromRadio)
+        {
 
+            trace() << "Packet ID " << packetId << "     send packet to network layer";
+        }
         trace() << "Packet ID " << packetId << "     send ACK from " << ackPkt->getSource() << " to " << ackPkt->getDestination();
-
-        /*     toNetworkLayer(decapsulatePacket(pktToNetBuffer.front()));
-            pktToNetBuffer.pop(); */
     }
 }
 
