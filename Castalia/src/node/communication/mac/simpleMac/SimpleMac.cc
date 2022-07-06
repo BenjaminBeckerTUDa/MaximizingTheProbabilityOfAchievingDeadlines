@@ -16,6 +16,23 @@
 
 Define_Module(SimpleMac);
 
+void SimpleMac::timerFiredCallback(int timer)
+{
+
+    switch (timer)
+    {
+    case 1:
+    {
+        trace() << "reached the timerCallback";
+        sendData();
+        break;
+    }
+
+    default:
+        break;
+    }
+}
+
 /* Handle packet received from upper (network) layer.
  * We need to create a MAC packet, (here it can just be the generic MacPacket)
  * and encapsulate the received network packet before forwarding it to RadioLayer
@@ -28,7 +45,7 @@ void SimpleMac::fromNetworkLayer(cPacket *netPkt, int destination)
     macFrame->setDestination(destination);
     toRadioLayer(macFrame);
     toRadioLayer(createRadioCommand(SET_STATE, TX));
-    trace() << "MAC source: " << SELF_MAC_ADDRESS << " destination: " << destination;
+    // trace() << "MAC source: " << SELF_MAC_ADDRESS << " destination: " << destination;
 }
 
 /* Handle packet received from lower (radio) layer.
@@ -41,11 +58,32 @@ void SimpleMac::fromNetworkLayer(cPacket *netPkt, int destination)
 void SimpleMac::fromRadioLayer(cPacket *pkt, double rssi, double lqi)
 {
     MacPacket *macPkt = dynamic_cast<MacPacket *>(pkt);
+    MacPacket *newMac = new MacPacket("test", MAC_LAYER_PACKET);
+    cPacket *simplePkt = decapsulatePacket(macPkt);
+    encapsulatePacket(newMac, simplePkt);
+    newMac->setSource(macPkt->getSource());
+    newMac->setDestination(macPkt->getDestination());
+    newMac->setSequenceNumber(macPkt->getSequenceNumber());
+
     if (macPkt == NULL)
         return;
     if (macPkt->getDestination() == SELF_MAC_ADDRESS ||
         macPkt->getDestination() == BROADCAST_MAC_ADDRESS)
     {
-        toNetworkLayer(decapsulatePacket(macPkt));
+        buffer.push(newMac);
+        setTimer(1, 0.005);
+        trace() << "set timer";
     }
+}
+
+void SimpleMac::sendData()
+{
+    toNetworkLayer(decapsulatePacket(buffer.front()));
+    buffer.pop();
+    trace() << "sent data to net";
+}
+
+void SimpleMac::finishSpecific()
+{
+    trace() << "---------------------------MAC finished---------------------------";
 }

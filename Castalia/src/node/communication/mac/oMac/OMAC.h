@@ -62,7 +62,7 @@ private:
 
     /*---  ---*/
     map<unsigned int, set<int>> overheardAcks;
-    ReceiversContainer receiversListContainer; // store receivers list from network layer
+    // ReceiversContainer receiversListContainer; // store receivers list from network layer
     set<unsigned int> sentPackets;
     set<unsigned int> ackedPackets;
     queue<OMacPacket *> ackBuffer;
@@ -93,7 +93,7 @@ private:
     int txRetries;
 
     /*--- OMAC packet pointers (sometimes packet is created not immediately before sending) ---*/
-    OMacPacket *macFromRadio;
+    // OMacPacket *macFromRadio;
 
 protected:
     void startup();
@@ -119,23 +119,16 @@ protected:
     void checkTxBuffer();
     void popTxBuffer();
 
-    void updateReceiversLists(ReceiversContainer);
+    // void updateReceiversLists(ReceiversContainer);
     void updateOverheardAcks(unsigned int, int);
+    void updateOverheardPackets(int);
 
-    int getIndexInReceiversList();
-
-    bool checkInReceiversList();
-    bool checkSentPackets(unsigned int);
-    bool checkAckedPackets(unsigned int);
-
-    bool overheardAckOfPkt(unsigned int);
-    bool inOverheardAckList(unsigned int, int);
-    bool overheardAckFromOtherNode(unsigned int, int);
+    int getIndexInReceiversList(list<int>);
 
     void sendAck();
     void handleSendAck();
 
-    string displayReceiverList();
+    string displayReceiverList(list<int>);
 };
 
 #endif

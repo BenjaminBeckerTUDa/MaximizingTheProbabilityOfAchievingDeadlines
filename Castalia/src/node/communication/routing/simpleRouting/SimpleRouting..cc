@@ -67,6 +67,7 @@ void SimpleRouting::fromApplicationLayer(cPacket *pkt, const char *destination)
 
 void SimpleRouting::fromMacLayer(cPacket *pkt, int srcMacAddress, double rssi, double lqi)
 {
+
     if (neighbors.find(srcMacAddress) == neighbors.end())
     {
         neighbors.insert(srcMacAddress);
@@ -81,18 +82,22 @@ void SimpleRouting::fromMacLayer(cPacket *pkt, int srcMacAddress, double rssi, d
         {
         case SIMPLE_ROUTING_DATA_PACKET:
         {
-
-            // trace() << "received pacekt from MAC";
             if (isSink)
             {
                 toApplicationLayer(decapsulatePacket(pkt));
-                // trace() << "To application layer";
+                trace() << "Packet ID " << netPacket->getPacketId() << "     send to app layer";
             }
             else
             {
+                ReceiversContainer receiversContainer;
+                receiversContainer.setReceivers(this->receivers);
+
                 SimpleRoutingPacket *dupPacket = netPacket->dup();
+                dupPacket->setSource(SELF_NETWORK_ADDRESS);
                 dupPacket->setSequenceNumber(currentSequenceNumber++);
-                // toMacLayer(dupPacket, BROADCAST_MAC_ADDRESS);
+                dupPacket->setReceiversContainer(receiversContainer);
+                toMacLayer(dupPacket, BROADCAST_MAC_ADDRESS);
+                trace() << "Packet ID " << netPacket->getPacketId() << "     send to next hop";
             }
             break;
         }

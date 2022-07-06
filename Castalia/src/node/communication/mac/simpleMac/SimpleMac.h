@@ -12,9 +12,17 @@ class SimpleMac : public VirtualMac
      * functions: one to handle a packet received from the layer above (routing),
      * and one to handle a packet from the layer below (radio)
      */
+
+private:
+    queue<MacPacket *> buffer;
+
 protected:
     void fromRadioLayer(cPacket *, double, double);
     void fromNetworkLayer(cPacket *, int);
+    void timerFiredCallback(int);
+    void sendData();
+
+    virtual void finishSpecific();
 };
 
 #endif
