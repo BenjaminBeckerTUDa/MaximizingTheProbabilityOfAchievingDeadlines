@@ -46,8 +46,6 @@ void SimpleRouting::fromApplicationLayer(cPacket *pkt, const char *destination)
         return;
     }
 
-    // trace() << "received packet from app layer";
-
     ApplicationPacket *appPkt = check_and_cast<ApplicationPacket *>(pkt);
     // create unique data packet ID
     unsigned int packetId = appPkt->getSequenceNumber() * 100000 + atoi(SELF_NETWORK_ADDRESS);
@@ -97,7 +95,7 @@ void SimpleRouting::fromMacLayer(cPacket *pkt, int srcMacAddress, double rssi, d
                 dupPacket->setSequenceNumber(currentSequenceNumber++);
                 dupPacket->setReceiversContainer(receiversContainer);
                 toMacLayer(dupPacket, BROADCAST_MAC_ADDRESS);
-                trace() << "Packet ID " << netPacket->getPacketId() << "     send to next hop";
+                // trace() << "Packet ID " << netPacket->getPacketId() << "     send to next hop";
             }
             break;
         }

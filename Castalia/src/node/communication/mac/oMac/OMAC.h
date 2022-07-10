@@ -92,6 +92,12 @@ private:
     int txAddr;
     int txRetries;
 
+    /*--- output string ---*/
+    string dataStr = "   DATA   ";
+    string ackStr = "   ACK   ";
+    string dropStr = "   DROP   ";
+    string bufferStr = "   BUFFER   ";
+
     /*--- OMAC packet pointers (sometimes packet is created not immediately before sending) ---*/
     // OMacPacket *macFromRadio;
 

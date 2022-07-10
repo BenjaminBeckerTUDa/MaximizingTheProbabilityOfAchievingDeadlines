@@ -115,6 +115,10 @@ void OMAC::resetDefaultState(const char *descr)
     {
         if (txRetries <= 0)
         {
+            unsigned int packetId = check_and_cast<OMacPacket *>(TXBuffer.front())->getPacketId();
+            trace() << "Packet ID " << packetId << "          " << SELF_MAC_ADDRESS << "-> "
+                    << "   DROP   "
+                    << "reached MAX retries";
             popTxBuffer();
         }
         else
@@ -156,9 +160,8 @@ void OMAC::fromNetworkLayer(cPacket *netPkt, int destination)
         unsigned int packetId = simpleNetPkt->getPacketId();
         ReceiversContainer receiversListContainer = simpleNetPkt->getReceiversContainer();
 
-        trace() << "Packet ID " << packetId << "     received pkt from NET "
-                << " (node " << SELF_MAC_ADDRESS << ")";
-        // displayReceiverList();
+        // trace() << "Packet ID " << packetId << "     received pkt from NET "
+        //        << " (node " << SELF_MAC_ADDRESS << ")";
 
         macFrame->setOMacPacketKind(OMAC_DATA_PACKET);
         macFrame->setPacketId(packetId);
@@ -215,6 +218,8 @@ void OMAC::fromRadioLayer(cPacket *pkt, double RSSI, double LQI)
         // check if this packet has been sent before
         if (sentPackets.count(packetId))
         {
+            trace() << "Packet ID " << packetId << "   DATA   " << source << "->" << SELF_MAC_ADDRESS << "   DROP   "
+                    << "sent before";
             return;
         }
 
@@ -223,14 +228,14 @@ void OMAC::fromRadioLayer(cPacket *pkt, double RSSI, double LQI)
         {
             if (!overheardAcks.at(packetId).count(source))
             {
-                string str = " ";
+                string str = "";
                 for (int node : overheardAcks.at(packetId))
                 {
                     str = str + " " + std::to_string(node);
                 }
 
-                trace() << "Packet ID " << packetId << "     not in the overheard ack list " << str << "Ignore it"
-                        << " (node " << SELF_MAC_ADDRESS << ")";
+                trace() << "Packet ID " << packetId << "   DATA   " << source << "->" << SELF_MAC_ADDRESS << "   DROP   "
+                        << "not in the overheard ACK list" << str;
                 return;
             }
         }
@@ -273,7 +278,8 @@ void OMAC::fromRadioLayer(cPacket *pkt, double RSSI, double LQI)
         {
             if (macState == MAC_STATE_WAIT_FOR_ACK && !ackedPackets.count(packetId))
             {
-                trace() << "Packet ID " << packetId << "     received ACK from " << source << " (node " << SELF_MAC_ADDRESS << " )";
+                trace() << "Packet ID " << packetId << "   ACK    " << source << "->" << SELF_MAC_ADDRESS << "   ACCEPT   ";
+
                 cancelTimer(TRANSMISSION_TIMEOUT);
                 popTxBuffer();
                 sentPackets.insert(packetId);
@@ -281,12 +287,13 @@ void OMAC::fromRadioLayer(cPacket *pkt, double RSSI, double LQI)
             }
             else
             {
-                trace() << "Packet ID " << packetId << "     received ACK from " << source << " again. Ignore this ACK. (node " << SELF_MAC_ADDRESS << " )";
+                trace() << "Packet ID " << packetId << "   ACK    " << source << "->" << SELF_MAC_ADDRESS << "   DROP   "
+                        << "received ACK before";
             }
         }
         else
         {
-            trace() << "Packet ID " << packetId << "     overheard ACK from " << source << " (node " << SELF_MAC_ADDRESS << " )";
+            trace() << "Packet ID " << packetId << "   ACK    " << source << "->" << destination << "   OVERHEARD   ";
             updateOverheardAcks(packetId, source);
         }
         break;
@@ -313,10 +320,10 @@ void OMAC::handleSendAck()
 
         if (overheardAcks.count(packetId))
         {
-            if (!overheardAcks.at(packetId).count(ackPkt->getSource()))
+            if (!overheardAcks.at(packetId).count(ackPkt->getDestination()))
             {
-                trace() << "Packet ID " << packetId << "     heard ACK of this packet from " << ackPkt->getSource() << " Ignore it"
-                        << " (node " << SELF_MAC_ADDRESS << " )";
+                trace() << "Packet ID " << packetId << "   ACK    " << ackPkt->getSource() << "->" << ackPkt->getDestination() << "   DROP   "
+                        << "overheard ACK from other node";
 
                 delete ackBuffer.front();
                 ackBuffer.pop();
@@ -334,7 +341,7 @@ void OMAC::handleSendAck()
         toNetworkLayer(decapsulatePacket(pktToNetBuffer.front()));
         pktToNetBuffer.pop();
 
-        trace() << "Packet ID " << packetId << "     send ACK from " << ackPkt->getSource() << " to " << ackPkt->getDestination();
+        trace() << "Packet ID " << packetId << "   ACK    " << ackPkt->getSource() << "->" << ackPkt->getDestination() << "   SEND   ";
     }
 }
 
@@ -408,9 +415,8 @@ void OMAC::sendDataPacket()
 
     toRadioLayer(macFrame->dup());
 
-    trace() << "Packet ID " << macFrame->getPacketId()
-            << "     send from " << SELF_MAC_ADDRESS << " (retries " << txRetries << ") "
-            << " to " << displayReceiverList(macFrame->getReceiversContainer().getReceivers());
+    trace() << "Packet ID " << macFrame->getPacketId() << "   DATA    " << macFrame->getSource() << "->" << displayReceiverList(macFrame->getReceiversContainer().getReceivers()) << "   SEND   "
+            << "retries " << txRetries;
 
     double txTime = TX_TIME(macFrame->getByteLength());
 
