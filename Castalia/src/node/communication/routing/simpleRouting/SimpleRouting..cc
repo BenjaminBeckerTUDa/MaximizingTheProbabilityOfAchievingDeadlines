@@ -26,6 +26,7 @@ void SimpleRouting::timerFiredCallback(int timer)
     {
     case BROADCAST_HOPCOUNT:
     {
+        hopCountCount++;
         broadcastHopCount();
         setTimer(BROADCAST_HOPCOUNT, hopCountPeriod);
         break;
@@ -204,7 +205,7 @@ void SimpleRouting::finish()
     trace() << "----------------------Network monitoring infos----------------------";
 
     string str = "";
-    trace() << "broadcast hop count " << hopCount;
+    trace() << "hop count " << hopCount;
 
     str = "neighbors: ";
     for (int neighbor : neighbors)
@@ -218,6 +219,7 @@ void SimpleRouting::finish()
         str = str + " " + std::to_string(receiver);
     trace() << str;
 
+    trace() << "hopcount cout: " << hopCountCount;
     trace() << "sent packets: " << pktCount;
     trace() << "sent packets to App layer: " << pktCountToApp;
 }

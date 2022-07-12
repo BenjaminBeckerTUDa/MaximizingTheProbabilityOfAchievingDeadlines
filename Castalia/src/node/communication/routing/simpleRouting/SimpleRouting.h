@@ -20,19 +20,21 @@ enum SimpleRoutingTimers
 class SimpleRouting : public VirtualRouting
 {
 private:
-    int hopCount;
     list<int> receivers;
-
     set<int> neighbors;
     map<int, int> neighborHopCounts;
 
-    simtime_t hopCountPeriod;
-
+    int hopCount;
     bool isSink;
     unsigned int packetId = 0;
 
+    /*--- Monitoring parameters ---*/
+    int hopCountCount = 0;
     int pktCount = 0;
     int pktCountToApp = 0;
+
+    /*--- The .ned file's parameters ---*/
+    simtime_t hopCountPeriod;
 
 protected:
     void startup();
