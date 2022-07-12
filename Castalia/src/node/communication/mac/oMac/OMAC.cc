@@ -236,10 +236,22 @@ void OMAC::fromRadioLayer(cPacket *pkt, double RSSI, double LQI)
         ReceiversContainer receiversListContainer = macFrame->getReceiversContainer();
         int indexInReceiversList = getIndexInReceiversList(receiversListContainer.getReceivers());
 
+        // check if this packet has been sent before
+        if (sentPackets.count(packetId))
+        {
+            trace() << "Packet ID " << packetId << "   DATA   "
+                    << source << "-> "
+                    << "   DROP   "
+                    << "sent before ";
+            return;
+        }
+
         // if its sink, forward packet to NET layer and send ACK
         if (isSink)
         {
             toNetworkLayer(decapsulatePacket(macFrame));
+            sentPackets.insert(packetId);
+
             OMacPacket *ackPkt = new OMacPacket("OMAC ACK packet", MAC_LAYER_PACKET);
             ackPkt->setOMacPacketKind(OMAC_ACK_PACKET);
             ackPkt->setSource(SELF_MAC_ADDRESS);
@@ -254,23 +266,12 @@ void OMAC::fromRadioLayer(cPacket *pkt, double RSSI, double LQI)
 
             return;
         }
-
         // check if in the receiver list
         if (indexInReceiversList == -1)
         {
 
             // trace() << "Packet ID " << packetId << "   DATA   " << source << "->" << SELF_MAC_ADDRESS << "   DROP   "
             //       << "not in receiver list";
-            return;
-        }
-
-        // check if this packet has been sent before
-        if (sentPackets.count(packetId))
-        {
-            trace() << "Packet ID " << packetId << "   DATA   "
-                    << source << "-> "
-                    << "   DROP   "
-                    << "sent before ";
             return;
         }
 
