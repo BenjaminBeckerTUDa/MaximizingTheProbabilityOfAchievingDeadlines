@@ -58,6 +58,7 @@ EXECUTE_ON_STARTUP(
     if (!e) enums.getInstance()->add(e = new cEnum("SimpleRoutingPacket_type"));
     e->insert(SIMPLE_ROUTING_DATA_PACKET, "SIMPLE_ROUTING_DATA_PACKET");
     e->insert(SIMPLE_ROUTING_HOPCOUNT_PACKET, "SIMPLE_ROUTING_HOPCOUNT_PACKET");
+    e->insert(SIMPLE_ROUTING_HOPCOUNT_ACK_PACKET, "SIMPLE_ROUTING_HOPCOUNT_ACK_PACKET");
 );
 
 Register_Class(SimpleRoutingPacket);

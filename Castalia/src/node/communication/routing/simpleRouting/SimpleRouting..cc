@@ -60,6 +60,7 @@ void SimpleRouting::fromApplicationLayer(cPacket *pkt, const char *destination)
     netPacket->setReceiversContainer(receiversContainer);
     encapsulatePacket(netPacket, pkt);
     toMacLayer(netPacket, BROADCAST_MAC_ADDRESS);
+    pktCount++;
     // trace() << " send to MAC";
 }
 
@@ -83,7 +84,8 @@ void SimpleRouting::fromMacLayer(cPacket *pkt, int srcMacAddress, double rssi, d
             if (isSink)
             {
                 toApplicationLayer(decapsulatePacket(pkt));
-                trace() << "Packet ID " << netPacket->getPacketId() << "     send to app layer";
+                trace() << "Packet ID " << netPacket->getPacketId() << "   SUCCESSFUL";
+                pktCountToApp++;
             }
             else
             {
@@ -95,7 +97,6 @@ void SimpleRouting::fromMacLayer(cPacket *pkt, int srcMacAddress, double rssi, d
                 dupPacket->setSequenceNumber(currentSequenceNumber++);
                 dupPacket->setReceiversContainer(receiversContainer);
                 toMacLayer(dupPacket, BROADCAST_MAC_ADDRESS);
-                // trace() << "Packet ID " << netPacket->getPacketId() << "     send to next hop";
             }
             break;
         }
@@ -188,4 +189,7 @@ void SimpleRouting::finish()
     for (int receiver : receivers)
         str = str + " " + std::to_string(receiver);
     trace() << str;
+
+    trace() << "sent packets: " << pktCount;
+    trace() << "sent packets to App layer: " << pktCountToApp;
 }

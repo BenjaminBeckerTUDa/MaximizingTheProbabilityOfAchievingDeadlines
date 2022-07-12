@@ -31,6 +31,9 @@ private:
     bool isSink;
     unsigned int packetId = 0;
 
+    int pktCount = 0;
+    int pktCountToApp = 0;
+
 protected:
     void startup();
     void timerFiredCallback(int);

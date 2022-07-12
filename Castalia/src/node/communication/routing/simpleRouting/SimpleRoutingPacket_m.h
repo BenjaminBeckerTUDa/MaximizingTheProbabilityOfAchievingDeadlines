@@ -28,16 +28,18 @@
  * 
  *     SIMPLE_ROUTING_DATA_PACKET = 1;
  *     SIMPLE_ROUTING_HOPCOUNT_PACKET = 2;
+ *     SIMPLE_ROUTING_HOPCOUNT_ACK_PACKET = 3;
  * }
  * </pre>
  */
 enum SimpleRoutingPacket_type {
     SIMPLE_ROUTING_DATA_PACKET = 1,
-    SIMPLE_ROUTING_HOPCOUNT_PACKET = 2
+    SIMPLE_ROUTING_HOPCOUNT_PACKET = 2,
+    SIMPLE_ROUTING_HOPCOUNT_ACK_PACKET = 3
 };
 
 /**
- * Class generated from <tt>src/node/communication/routing/simpleRouting/SimpleRoutingPacket.msg:26</tt> by nedtool.
+ * Class generated from <tt>src/node/communication/routing/simpleRouting/SimpleRoutingPacket.msg:27</tt> by nedtool.
  * <pre>
  * packet SimpleRoutingPacket extends RoutingPacket
  * {

@@ -21,6 +21,7 @@ class noncobject ReceiversContainer;
 enum SimpleRoutingPacket_type {
 	SIMPLE_ROUTING_DATA_PACKET = 1;
 	SIMPLE_ROUTING_HOPCOUNT_PACKET = 2;
+	SIMPLE_ROUTING_HOPCOUNT_ACK_PACKET = 3;
 }
 
 packet SimpleRoutingPacket extends RoutingPacket {

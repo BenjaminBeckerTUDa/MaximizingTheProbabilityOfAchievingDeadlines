@@ -73,6 +73,7 @@ private:
     int channelClear;
     int dataTransmissions;
     int hopCountTransmission;
+    int reachedMaxRetriesCount;
     map<int, int> overheardPackets;
 
     /*--- The .ned file's parameters ---*/
@@ -91,6 +92,7 @@ private:
     int macState;
     int txAddr;
     int txRetries;
+    bool isSink;
 
     /*--- output string ---*/
     string dataStr = "   DATA   ";
@@ -109,14 +111,14 @@ protected:
     void fromRadioLayer(cPacket *, double, double);
     void fromNetworkLayer(cPacket *, int);
 
-    int handleControlCommand(cMessage *);
+    // int handleControlCommand(cMessage *);
     int handleRadioControlMessage(cMessage *);
 
     void resetDefaultState(const char *descr = NULL);
     void setMacState(int, const char *);
 
     void sendDataPacket();
-    void sendReceiversListRequest();
+    // void sendReceiversListRequest();
 
     void performCarrierSense(int, simtime_t delay = 0);
     void carrierIsClear();
