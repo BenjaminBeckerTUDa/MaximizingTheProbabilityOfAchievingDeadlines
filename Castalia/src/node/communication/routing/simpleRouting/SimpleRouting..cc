@@ -103,6 +103,16 @@ void SimpleRouting::fromMacLayer(cPacket *pkt, int srcMacAddress, double rssi, d
 
         case SIMPLE_ROUTING_HOPCOUNT_PACKET:
         {
+
+            /*             SimpleRoutingPacket *hopCountAckPacket = new SimpleRoutingPacket("Simple Routing hopcount ack packet", NETWORK_LAYER_PACKET);
+                        hopCountAckPacket->setSimpleRoutingKind(SIMPLE_ROUTING_HOPCOUNT_ACK_PACKET);
+                        hopCountAckPacket->setSource(SELF_NETWORK_ADDRESS);
+                        hopCountAckPacket->setDestination(netPacket->getSource());
+                        hopCountAckPacket->setHopcount(hopCount);
+                        hopCountAckPacket->setSequenceNumber(currentSequenceNumber++);
+                        toMacLayer(hopCountAckPacket, resolveNetworkAddress(netPacket->getSource()));
+                        break; */
+
             int srcHopCount = netPacket->getHopcount();
             neighborHopCounts[srcMacAddress] = srcHopCount;
             if (srcHopCount < hopCount)
@@ -113,6 +123,24 @@ void SimpleRouting::fromMacLayer(cPacket *pkt, int srcMacAddress, double rssi, d
             break;
         }
 
+            /*         case SIMPLE_ROUTING_HOPCOUNT_ACK_PACKET:
+                    {
+
+                        if (!strcmp(netPacket->getDestination(), SELF_NETWORK_ADDRESS))
+                        {
+                            int srcHopCount = netPacket->getHopcount();
+                            trace() << "hop count received " << srcHopCount;
+                            neighborHopCounts[srcMacAddress] = srcHopCount;
+                            if (srcHopCount < hopCount)
+                            {
+                                hopCount = srcHopCount + 1;
+                                updateReceiverList();
+                            }
+                            break;
+                        }
+                        break;
+                    }
+             */
         default:
         {
             break;

@@ -203,6 +203,15 @@ void OMAC::fromNetworkLayer(cPacket *netPkt, int destination)
         break;
     }
 
+        /*     case SIMPLE_ROUTING_HOPCOUNT_ACK_PACKET:
+            {
+                macFrame->setOMacPacketKind(OMAC_HOPCOUNT_PACKET);
+                toRadioLayer(macFrame);
+                toRadioLayer(createRadioCommand(SET_STATE, TX));
+                hopCountTransmission++;
+                break;
+            } */
+
     default:
         break;
     }
