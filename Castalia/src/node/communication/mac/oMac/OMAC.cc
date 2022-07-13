@@ -127,7 +127,7 @@ void OMAC::resetDefaultState(const char *descr)
         if (txRetries <= 0)
         {
             unsigned int packetId = check_and_cast<OMacPacket *>(TXBuffer.front())->getPacketId();
-            trace() << "Packet ID " << packetId << "          " << SELF_MAC_ADDRESS << "->B"
+            trace() << "Packet ID " << packetId << "   DATA   " << SELF_MAC_ADDRESS << "->B"
                     << "   DROP   "
                     << "reached MAX retries";
             popTxBuffer();
@@ -179,26 +179,14 @@ void OMAC::fromNetworkLayer(cPacket *netPkt, int destination)
         macFrame->setPacketId(packetId);
         macFrame->setReceiversContainer(receiversListContainer);
 
-        if (bufferPacket(macFrame))
-        {
-            if (TXBuffer.size() == 1)
-            {
-                checkTxBuffer();
-            }
-            resetDefaultState("add a data frame in buffer");
-        }
-        else
-        {
-            trace() << "Buffer is full";
-        }
         break;
     }
 
     case SIMPLE_ROUTING_HOPCOUNT_PACKET:
     {
         macFrame->setOMacPacketKind(OMAC_HOPCOUNT_PACKET);
-        toRadioLayer(macFrame);
-        toRadioLayer(createRadioCommand(SET_STATE, TX));
+        /*         toRadioLayer(macFrame);
+                toRadioLayer(createRadioCommand(SET_STATE, TX)); */
         hopCountTransmission++;
         break;
     }
@@ -214,6 +202,19 @@ void OMAC::fromNetworkLayer(cPacket *netPkt, int destination)
 
     default:
         break;
+    }
+
+    if (bufferPacket(macFrame))
+    {
+        if (TXBuffer.size() == 1)
+        {
+            checkTxBuffer();
+        }
+        resetDefaultState("add a data frame in buffer");
+    }
+    else
+    {
+        trace() << "Buffer is full";
     }
 }
 
@@ -459,6 +460,16 @@ void OMAC::sendDataPacket()
     }
 
     OMacPacket *macFrame = check_and_cast<OMacPacket *>(TXBuffer.front());
+
+    if (macFrame->getOMacPacketKind() == OMAC_HOPCOUNT_PACKET)
+    {
+        toRadioLayer(macFrame->dup());
+        toRadioLayer(createRadioCommand(SET_STATE, TX));
+        setMacState(MAC_STATE_IN_TX, "sent hop count packet");
+        popTxBuffer();
+        setTimer(TRANSMISSION_TIMEOUT, TX_TIME(macFrame->getByteLength()));
+        return;
+    }
 
     toRadioLayer(macFrame->dup());
 
