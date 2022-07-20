@@ -47,5 +47,6 @@ packet TMacPacket extends MacPacket {
 	// subclass for each packet type
 	simtime_t sync = 0;					// 4 bytes
 	int syncId = 0;						// 4 bytes
+	bool isFirstAck = false;
 }
 

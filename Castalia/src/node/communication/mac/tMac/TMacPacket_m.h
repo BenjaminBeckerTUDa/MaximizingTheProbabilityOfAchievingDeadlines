@@ -70,6 +70,7 @@ enum TmacPacket_type {
  *     // subclass for each packet type
  *     simtime_t sync = 0;					// 4 bytes
  *     int syncId = 0;						// 4 bytes
+ *     bool isFirstAck = false;
  * }
  * </pre>
  */
@@ -80,6 +81,7 @@ class TMacPacket : public ::MacPacket
     simtime_t nav_var;
     simtime_t sync_var;
     int syncId_var;
+    bool isFirstAck_var;
 
   private:
     void copy(const TMacPacket& other);
@@ -106,6 +108,8 @@ class TMacPacket : public ::MacPacket
     virtual void setSync(simtime_t sync);
     virtual int getSyncId() const;
     virtual void setSyncId(int syncId);
+    virtual bool getIsFirstAck() const;
+    virtual void setIsFirstAck(bool isFirstAck);
 };
 
 inline void doPacking(cCommBuffer *b, TMacPacket& obj) {obj.parsimPack(b);}

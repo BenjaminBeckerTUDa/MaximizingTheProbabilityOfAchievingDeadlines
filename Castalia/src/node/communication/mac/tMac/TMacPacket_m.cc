@@ -73,6 +73,7 @@ TMacPacket::TMacPacket(const char *name, int kind) : ::MacPacket(name,kind)
     this->nav_var = 0;
     this->sync_var = 0;
     this->syncId_var = 0;
+    this->isFirstAck_var = false;
 }
 
 TMacPacket::TMacPacket(const TMacPacket& other) : ::MacPacket(other)
@@ -98,6 +99,7 @@ void TMacPacket::copy(const TMacPacket& other)
     this->nav_var = other.nav_var;
     this->sync_var = other.sync_var;
     this->syncId_var = other.syncId_var;
+    this->isFirstAck_var = other.isFirstAck_var;
 }
 
 void TMacPacket::parsimPack(cCommBuffer *b)
@@ -107,6 +109,7 @@ void TMacPacket::parsimPack(cCommBuffer *b)
     doPacking(b,this->nav_var);
     doPacking(b,this->sync_var);
     doPacking(b,this->syncId_var);
+    doPacking(b,this->isFirstAck_var);
 }
 
 void TMacPacket::parsimUnpack(cCommBuffer *b)
@@ -116,6 +119,7 @@ void TMacPacket::parsimUnpack(cCommBuffer *b)
     doUnpacking(b,this->nav_var);
     doUnpacking(b,this->sync_var);
     doUnpacking(b,this->syncId_var);
+    doUnpacking(b,this->isFirstAck_var);
 }
 
 int TMacPacket::getType() const
@@ -156,6 +160,16 @@ int TMacPacket::getSyncId() const
 void TMacPacket::setSyncId(int syncId)
 {
     this->syncId_var = syncId;
+}
+
+bool TMacPacket::getIsFirstAck() const
+{
+    return isFirstAck_var;
+}
+
+void TMacPacket::setIsFirstAck(bool isFirstAck)
+{
+    this->isFirstAck_var = isFirstAck;
 }
 
 class TMacPacketDescriptor : public cClassDescriptor
@@ -205,7 +219,7 @@ const char *TMacPacketDescriptor::getProperty(const char *propertyname) const
 int TMacPacketDescriptor::getFieldCount(void *object) const
 {
     cClassDescriptor *basedesc = getBaseClassDescriptor();
-    return basedesc ? 4+basedesc->getFieldCount(object) : 4;
+    return basedesc ? 5+basedesc->getFieldCount(object) : 5;
 }
 
 unsigned int TMacPacketDescriptor::getFieldTypeFlags(void *object, int field) const
@@ -221,8 +235,9 @@ unsigned int TMacPacketDescriptor::getFieldTypeFlags(void *object, int field) co
         FD_ISEDITABLE,
         FD_ISEDITABLE,
         FD_ISEDITABLE,
+        FD_ISEDITABLE,
     };
-    return (field>=0 && field<4) ? fieldTypeFlags[field] : 0;
+    return (field>=0 && field<5) ? fieldTypeFlags[field] : 0;
 }
 
 const char *TMacPacketDescriptor::getFieldName(void *object, int field) const
@@ -238,8 +253,9 @@ const char *TMacPacketDescriptor::getFieldName(void *object, int field) const
         "nav",
         "sync",
         "syncId",
+        "isFirstAck",
     };
-    return (field>=0 && field<4) ? fieldNames[field] : NULL;
+    return (field>=0 && field<5) ? fieldNames[field] : NULL;
 }
 
 int TMacPacketDescriptor::findField(void *object, const char *fieldName) const
@@ -250,6 +266,7 @@ int TMacPacketDescriptor::findField(void *object, const char *fieldName) const
     if (fieldName[0]=='n' && strcmp(fieldName, "nav")==0) return base+1;
     if (fieldName[0]=='s' && strcmp(fieldName, "sync")==0) return base+2;
     if (fieldName[0]=='s' && strcmp(fieldName, "syncId")==0) return base+3;
+    if (fieldName[0]=='i' && strcmp(fieldName, "isFirstAck")==0) return base+4;
     return basedesc ? basedesc->findField(object, fieldName) : -1;
 }
 
@@ -266,8 +283,9 @@ const char *TMacPacketDescriptor::getFieldTypeString(void *object, int field) co
         "simtime_t",
         "simtime_t",
         "int",
+        "bool",
     };
-    return (field>=0 && field<4) ? fieldTypeStrings[field] : NULL;
+    return (field>=0 && field<5) ? fieldTypeStrings[field] : NULL;
 }
 
 const char *TMacPacketDescriptor::getFieldProperty(void *object, int field, const char *propertyname) const
@@ -314,6 +332,7 @@ std::string TMacPacketDescriptor::getFieldAsString(void *object, int field, int 
         case 1: return double2string(pp->getNav());
         case 2: return double2string(pp->getSync());
         case 3: return long2string(pp->getSyncId());
+        case 4: return bool2string(pp->getIsFirstAck());
         default: return "";
     }
 }
@@ -332,6 +351,7 @@ bool TMacPacketDescriptor::setFieldAsString(void *object, int field, int i, cons
         case 1: pp->setNav(string2double(value)); return true;
         case 2: pp->setSync(string2double(value)); return true;
         case 3: pp->setSyncId(string2long(value)); return true;
+        case 4: pp->setIsFirstAck(string2bool(value)); return true;
         default: return false;
     }
 }

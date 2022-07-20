@@ -116,6 +116,9 @@ class TMAC: public VirtualMac {
 	double lastTransmissionAttempt;
 	std::map<int, double> maxTxRetriesPerReceiver;
 
+	int dupcount;
+	int firstcount;
+
  protected:
 	void startup();
 	void finish();

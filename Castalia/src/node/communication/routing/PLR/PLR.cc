@@ -189,7 +189,12 @@ void PLR::broadcastCDF()
 	currentSequenceNumber++;
 
 	netPacket->setAvgDelay(avgDelay);
-
+	
+	if (useAverageDelay)
+		netPacket->setByteLength(4+1);
+	else
+		netPacket->setByteLength(100+1);
+	
 	double* cdf2;
 	cdf2 = new double[pDFSlots+1]{0};
 	for (int i = 0; i <= pDFSlots; i++)
@@ -893,13 +898,15 @@ void PLR::finish()
 	trace() << s1;
 	
 	
-	
-	
-	
-	
-	
+	string s = "";
+	for (int i = 0; i <= pDFSlots; i++)
+	{
+		s = s + std::to_string(cdf[i]) + "\t";
+	}
+	trace() << "nodeCDF: \t" << s ;
 	
 	if (!isSink){
+		/*
 		// output: routing table; node-cdf; link-cdfs
 		string s = "";
 		for (int i = 0; i < 25; i++)
@@ -924,7 +931,7 @@ void PLR::finish()
 			double* pdf = neighbor_pdfs[keyVal.first];
 			s = "";
 			double sum = 0;
-			for (int i = 0; i < pDFSlots; i++)
+			for (int i = 0; i <= pDFSlots; i++)
 			{
 				sum += pdf[i];
 				s = s + std::to_string(sum) + "\t";
@@ -936,18 +943,19 @@ void PLR::finish()
 		{
 			double* hop_cdf = neighbor_hop_cdfs[keyVal.first];
 			s = "";
-			for (int i = 0; i < pDFSlots; i++)
+			for (int i = 0; i <= pDFSlots; i++)
 			{
 				s = s + std::to_string(hop_cdf[i]) + "\t";
 			}
 			trace() << "cdf for hop to " << keyVal.first <<":\n"<< s ;	
 		}
-		
-		
+		*/
 		
 		// output nexthop; node-avg delay; and avg delays
-		trace() << "nextHop:  " << nextHop;
 		trace() << "avgDelay: " << std::to_string(avgDelay);
+		
+		/*
+		trace() << "nextHop:  " << nextHop;
 		for ( const auto &keyVal : neighbor_avgLinkDelays) 
 		{
 			trace() << "avg for link to " << keyVal.first <<":\n"<< std::to_string(neighbor_avgLinkDelays[keyVal.first]);	
@@ -957,6 +965,7 @@ void PLR::finish()
 		{
 			trace() << "avg for hop to " << keyVal.first <<":\n"<< std::to_string(neighbor_avgHopDelays[keyVal.first]);	
 		}
+		*/
 	}
 	
 	

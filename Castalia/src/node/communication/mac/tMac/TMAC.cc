@@ -33,7 +33,7 @@ void TMAC::startup()
 	simTime = par("simTime");
 	
 	
-	
+
 	
 	disableTAextension = par("disableTAextension");
 	conservativeTA = par("conservativeTA");
@@ -88,8 +88,8 @@ void TMAC::startup()
 	monitoring_queueDelay = new double[monitoring_slots_1]{0};
 	monitoring_queueDelayCounter = new int[monitoring_slots_1]{0};
 	
-	
-	
+	dupcount = 0;
+	firstcount = 0;
 }
 
 void TMAC::timerFiredCallback(int timer)
@@ -388,9 +388,17 @@ void TMAC::fromRadioLayer(cPacket * pkt, double RSSI, double LQI)
 			
 			
 			// Forward the frame to upper layer first
+			bool notDuplicate = false;
 			if (isNotDuplicatePacket(macPkt))
+			{
 				toNetworkLayer(decapsulatePacket(macPkt));
-
+				notDuplicate = true;
+			}	
+			else
+			{
+				notDuplicate = false;
+			}
+			
 			// If the frame was sent to broadcast address, nothing else needs to be done
 			if (destination == BROADCAST_MAC_ADDRESS)
 				break;
@@ -408,6 +416,15 @@ void TMAC::fromRadioLayer(cPacket * pkt, double RSSI, double LQI)
 			ackPacket->setType(ACK_TMAC_PACKET);
 			ackPacket->setByteLength(ackPacketSize);
 			ackPacket->setSequenceNumber(macPkt->getSequenceNumber());
+			if (notDuplicate)
+			{
+				ackPacket->setIsFirstAck(true);
+			}
+			else
+			{
+				ackPacket->setIsFirstAck(false);
+				//ackPacket->setIsFirstAck(true);
+			}
 
 			// Send ACK packet to the radio
 			toRadioLayer(ackPacket);
@@ -440,12 +457,21 @@ void TMAC::fromRadioLayer(cPacket * pkt, double RSSI, double LQI)
 				//"queue+send-Time of " << waitForAck_ << " = " << time_;
 				
 				//"bb: just received ACK for packet with sn [" << waitForAck_ << "] to adress " << source <<" with time: " << time_;
-				PLRControlMessage* plrc = new PLRControlMessage("PLR delay packet", NETWORK_CONTROL_COMMAND);
-				plrc->setDelay(time_);
-				plrc->setPLRControlMessageKind(DELAY);
-				plrc->setTxAddr(source);
-				toNetworkLayer(plrc);
 				
+				bool isFirstAck = macPkt->getIsFirstAck();
+				if (isFirstAck)
+				{
+					PLRControlMessage* plrc = new PLRControlMessage("PLR delay packet", NETWORK_CONTROL_COMMAND);
+					plrc->setDelay(time_);
+					plrc->setPLRControlMessageKind(DELAY);
+					plrc->setTxAddr(source);
+					toNetworkLayer(plrc);
+					firstcount++;
+				}
+				else
+				{
+					dupcount++;
+				}
 				maxTxRetriesPerReceiver[macPkt -> getDestination()] = maxTxRetriesPerReceiver[macPkt -> getDestination()]*2;
 				if (maxTxRetriesPerReceiver[macPkt -> getDestination()] > maxTxRetries){
 					maxTxRetriesPerReceiver[macPkt -> getDestination()] = maxTxRetries;
@@ -758,4 +784,8 @@ void TMAC::finish()
 		s1 += std::to_string(monitoring_queueDelayCounter[i]) + "\t";
 	}
 	trace() << s1;	
+
+	trace() << "dup-count" << dupcount;	
+	trace() << "first-count" << firstcount;	
+	
 }
