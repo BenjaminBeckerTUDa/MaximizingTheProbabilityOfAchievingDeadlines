@@ -23,7 +23,7 @@ simple SimpleAggregation like node.application.iApplication {
 	int packetHeaderOverhead = default (8);	// in bytes
 	int constantDataPayload = default (2);	// in bytes
 	int maxTTD = default (1000);	// in ms
-	int sendInterval = default (1000);	// in ms
+	int sendInterval = default (80000);	// in ms
 	bool isSink = default (false);
 	int packetSize = default(1000); // in bytes
  gates:

@@ -20,13 +20,13 @@ enum SimpleRoutingTimers
 class SimpleRouting : public VirtualRouting
 {
 private:
-    list<int> receivers;
+    list<int> receivers; // current receivers list
     set<int> neighbors;
     map<int, int> neighborHopCounts;
 
     int hopCount;
     bool isSink;
-    unsigned int packetId = 0;
+    unsigned int packetNumber = 0; // sequence number of the pakcet sent from this node
 
     /*--- Monitoring parameters ---*/
     int hopCountCount = 0;
@@ -43,7 +43,7 @@ protected:
     void fromApplicationLayer(cPacket *, const char *);
     void fromMacLayer(cPacket *, int, double, double);
 
-    void handleNetworkControlCommand(cMessage *pkt);
+    // void handleNetworkControlCommand(cMessage *pkt);
 
     void broadcastHopCount();
     void updateReceiverList();

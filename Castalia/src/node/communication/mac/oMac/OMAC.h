@@ -34,8 +34,6 @@ enum OMacStates
     MAC_CARRIER_SENSE_FOR_TX_DATA = 111,
 
     MAC_STATE_WAIT_FOR_ACK = 122,
-
-    MAC_STATE_WAIT_FOR_RECEIVER_LIST = 130,
 };
 
 enum OMacTimers
@@ -46,23 +44,14 @@ enum OMacTimers
     HANDLE_SEND_ACK = 4,
 };
 
-struct OverherdAcksInfo
-{
-    int senderID;
-    unsigned int packetID;
-};
-
-typedef list<OverherdAcksInfo> list_overheardAcks;
-
 class OMAC : public VirtualMac
 {
 private:
     /*--- A map from int value of state to its description (used in debug) ---*/
     map<int, string> stateDescr;
 
-    /*---  ---*/
+    /*--- Buffers ---*/
     map<unsigned int, set<int>> overheardAcks;
-    // ReceiversContainer receiversListContainer; // store receivers list from network layer
     set<unsigned int> sentPackets;
     set<unsigned int> ackedPackets;
     queue<OMacPacket *> ackBuffer;
@@ -84,7 +73,6 @@ private:
     simtime_t phyDelayForValidCS; // delay for valid CS
     simtime_t waitTimeout;
 
-    /*--- General MAC variable ---*/
     int phyLayerOverhead;
     double phyDataRate;
 
@@ -94,15 +82,6 @@ private:
     int txRetries;
     bool isSink;
 
-    /*--- output string ---*/
-    string dataStr = "   DATA   ";
-    string ackStr = "   ACK   ";
-    string dropStr = "   DROP   ";
-    string bufferStr = "   BUFFER   ";
-
-    /*--- OMAC packet pointers (sometimes packet is created not immediately before sending) ---*/
-    // OMacPacket *macFromRadio;
-
 protected:
     void startup();
     void timerFiredCallback(int);
@@ -111,14 +90,14 @@ protected:
     void fromRadioLayer(cPacket *, double, double);
     void fromNetworkLayer(cPacket *, int);
 
-    // int handleControlCommand(cMessage *);
     int handleRadioControlMessage(cMessage *);
+
+    void sendDataPacket();
+    void sendAck();
+    void handleSendAck();
 
     void resetDefaultState(const char *descr = NULL);
     void setMacState(int, const char *);
-
-    void sendDataPacket();
-    // void sendReceiversListRequest();
 
     void performCarrierSense(int, simtime_t delay = 0);
     void carrierIsClear();
@@ -127,14 +106,10 @@ protected:
     void checkTxBuffer();
     void popTxBuffer();
 
-    // void updateReceiversLists(ReceiversContainer);
     void updateOverheardAcks(unsigned int, int);
     void updateOverheardPackets(int);
 
     int getIndexInReceiversList(list<int>);
-
-    void sendAck();
-    void handleSendAck();
 
     string displayReceiverList(list<int>);
 };

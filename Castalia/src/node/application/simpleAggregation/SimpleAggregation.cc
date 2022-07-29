@@ -30,7 +30,7 @@ void SimpleAggregation::startup()
 	strValue >> intValue;
 	std::srand(intValue);
 	double randomTime = (static_cast<double>(rand()) / static_cast<double>(RAND_MAX)) * sendInterval + sendInterval / 2;
-	setTimer(SEND_AGGREGATED_VALUE, randomTime);
+	setTimer(SEND_AGGREGATED_VALUE, randomTime + 100);
 
 	// seed for random number generator
 }

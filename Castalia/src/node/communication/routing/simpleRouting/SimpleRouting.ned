@@ -37,7 +37,7 @@ simple SimpleRouting like node.communication.routing.iRouting
 	int netDataFrameOverhead = default (10);	// bytes
 	int netBufferSize = default (32);	// number of messages
 
-	double hopCountPeriod = default(1000); // in msec
+	double hopCountPeriod = default(10000); // in msec
 
  gates:
 	output toCommunicationModule;
