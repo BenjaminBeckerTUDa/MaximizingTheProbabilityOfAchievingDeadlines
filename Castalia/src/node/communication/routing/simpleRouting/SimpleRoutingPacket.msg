@@ -11,12 +11,10 @@
 //****************************************************************************/
 
 cplusplus {{
-#include "RoutingPacket_m.h"
-#include "ReceiversContainer.h"
+#include "OMacRoutingPacket_m.h"
 }}
 
-class RoutingPacket;
-class noncobject ReceiversContainer;
+class OMacRoutingPacket;
 
 enum SimpleRoutingPacket_type {
 	SIMPLE_ROUTING_DATA_PACKET = 1;
@@ -24,10 +22,7 @@ enum SimpleRoutingPacket_type {
 	SIMPLE_ROUTING_HOPCOUNT_ACK_PACKET = 3;
 }
 
-packet SimpleRoutingPacket extends RoutingPacket {
+packet SimpleRoutingPacket extends OMacRoutingPacket {
 	int SimpleRoutingKind enum (SimpleRoutingPacket_type);
-
 	int hopcount;
-	unsigned int packetId;
-    ReceiversContainer receiversContainer;
 }

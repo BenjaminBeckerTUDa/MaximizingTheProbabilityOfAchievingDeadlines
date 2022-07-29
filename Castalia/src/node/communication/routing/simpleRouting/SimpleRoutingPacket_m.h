@@ -16,12 +16,11 @@
 
 
 // cplusplus {{
-#include "RoutingPacket_m.h"
-#include "ReceiversContainer.h"
+#include "OMacRoutingPacket_m.h"
 // }}
 
 /**
- * Enum generated from <tt>src/node/communication/routing/simpleRouting/SimpleRoutingPacket.msg:21</tt> by nedtool.
+ * Enum generated from <tt>src/node/communication/routing/simpleRouting/SimpleRoutingPacket.msg:19</tt> by nedtool.
  * <pre>
  * enum SimpleRoutingPacket_type
  * {
@@ -39,25 +38,20 @@ enum SimpleRoutingPacket_type {
 };
 
 /**
- * Class generated from <tt>src/node/communication/routing/simpleRouting/SimpleRoutingPacket.msg:27</tt> by nedtool.
+ * Class generated from <tt>src/node/communication/routing/simpleRouting/SimpleRoutingPacket.msg:25</tt> by nedtool.
  * <pre>
- * packet SimpleRoutingPacket extends RoutingPacket
+ * packet SimpleRoutingPacket extends OMacRoutingPacket
  * {
  *     int SimpleRoutingKind @enum(SimpleRoutingPacket_type);
- * 
  *     int hopcount;
- *     unsigned int packetId;
- *     ReceiversContainer receiversContainer;
  * }
  * </pre>
  */
-class SimpleRoutingPacket : public ::RoutingPacket
+class SimpleRoutingPacket : public ::OMacRoutingPacket
 {
   protected:
     int SimpleRoutingKind_var;
     int hopcount_var;
-    unsigned int packetId_var;
-    ReceiversContainer receiversContainer_var;
 
   private:
     void copy(const SimpleRoutingPacket& other);
@@ -80,11 +74,6 @@ class SimpleRoutingPacket : public ::RoutingPacket
     virtual void setSimpleRoutingKind(int SimpleRoutingKind);
     virtual int getHopcount() const;
     virtual void setHopcount(int hopcount);
-    virtual unsigned int getPacketId() const;
-    virtual void setPacketId(unsigned int packetId);
-    virtual ReceiversContainer& getReceiversContainer();
-    virtual const ReceiversContainer& getReceiversContainer() const {return const_cast<SimpleRoutingPacket*>(this)->getReceiversContainer();}
-    virtual void setReceiversContainer(const ReceiversContainer& receiversContainer);
 };
 
 inline void doPacking(cCommBuffer *b, SimpleRoutingPacket& obj) {obj.parsimPack(b);}
