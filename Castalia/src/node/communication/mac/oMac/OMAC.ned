@@ -27,7 +27,7 @@ simple OMAC like node.communication.mac.iMac {
 	//OMAC protocol parameters
 	int maxTxRetries = default (2);
 	double contentionPeriod = default (10);	// 10 ms
-	double waitTimeout = default (6);		// timeout for expecting a reply to DATA or RTS packet
+	double waitTimeout = default (6);		// timeout for expecting a reply to DATA
 
 
 	//parameters dependent on physical layer

@@ -153,8 +153,8 @@ void OMAC::setMacState(int newState, const char *descr)
 
 void OMAC::fromNetworkLayer(cPacket *netPkt, int destination)
 {
-    SimpleRoutingPacket *simpleNetPkt = check_and_cast<SimpleRoutingPacket *>(netPkt);
-    if (!simpleNetPkt)
+    OMacRoutingPacket *OMacNetPkt = check_and_cast<OMacRoutingPacket *>(netPkt);
+    if (!OMacNetPkt)
     {
         return;
     }
@@ -164,12 +164,12 @@ void OMAC::fromNetworkLayer(cPacket *netPkt, int destination)
     macFrame->setSource(SELF_MAC_ADDRESS);
     macFrame->setDestination(BROADCAST_MAC_ADDRESS);
 
-    switch (simpleNetPkt->getSimpleRoutingKind())
+    switch (OMacNetPkt->getOMacRoutingKind())
     {
-    case SIMPLE_ROUTING_DATA_PACKET:
+    case OMAC_ROUTING_DATA_PACKET:
     {
-        unsigned int packetId = simpleNetPkt->getPacketId();
-        ReceiversContainer receiversListContainer = simpleNetPkt->getReceiversContainer();
+        unsigned int packetId = OMacNetPkt->getPacketId();
+        ReceiversContainer receiversListContainer = OMacNetPkt->getReceiversContainer();
 
         macFrame->setOMacPacketKind(OMAC_DATA_PACKET);
         macFrame->setPacketId(packetId);
@@ -191,7 +191,7 @@ void OMAC::fromNetworkLayer(cPacket *netPkt, int destination)
         break;
     }
 
-    case SIMPLE_ROUTING_HOPCOUNT_PACKET:
+    case OMAC_ROUTING_HOPCOUNT_PACKET:
     {
         macFrame->setOMacPacketKind(OMAC_HOPCOUNT_PACKET);
         toRadioLayer(macFrame);

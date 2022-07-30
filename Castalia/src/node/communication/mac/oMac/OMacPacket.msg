@@ -33,5 +33,4 @@ packet OMacPacket extends MacPacket {
     int OMacPacketKind enum (OMacPacket_type);
     ReceiversContainer receiversContainer;
     unsigned int packetId;
-    int AckDst;
 }

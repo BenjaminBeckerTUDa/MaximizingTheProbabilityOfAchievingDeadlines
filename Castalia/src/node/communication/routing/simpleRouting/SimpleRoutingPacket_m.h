@@ -27,22 +27,19 @@
  * 
  *     SIMPLE_ROUTING_DATA_PACKET = 1;
  *     SIMPLE_ROUTING_HOPCOUNT_PACKET = 2;
- *     SIMPLE_ROUTING_HOPCOUNT_ACK_PACKET = 3;
  * }
  * </pre>
  */
 enum SimpleRoutingPacket_type {
     SIMPLE_ROUTING_DATA_PACKET = 1,
-    SIMPLE_ROUTING_HOPCOUNT_PACKET = 2,
-    SIMPLE_ROUTING_HOPCOUNT_ACK_PACKET = 3
+    SIMPLE_ROUTING_HOPCOUNT_PACKET = 2
 };
 
 /**
- * Class generated from <tt>src/node/communication/routing/simpleRouting/SimpleRoutingPacket.msg:25</tt> by nedtool.
+ * Class generated from <tt>src/node/communication/routing/simpleRouting/SimpleRoutingPacket.msg:24</tt> by nedtool.
  * <pre>
  * packet SimpleRoutingPacket extends OMacRoutingPacket
  * {
- *     int SimpleRoutingKind @enum(SimpleRoutingPacket_type);
  *     int hopcount;
  * }
  * </pre>
@@ -50,7 +47,6 @@ enum SimpleRoutingPacket_type {
 class SimpleRoutingPacket : public ::OMacRoutingPacket
 {
   protected:
-    int SimpleRoutingKind_var;
     int hopcount_var;
 
   private:
@@ -70,8 +66,6 @@ class SimpleRoutingPacket : public ::OMacRoutingPacket
     virtual void parsimUnpack(cCommBuffer *b);
 
     // field getter/setter methods
-    virtual int getSimpleRoutingKind() const;
-    virtual void setSimpleRoutingKind(int SimpleRoutingKind);
     virtual int getHopcount() const;
     virtual void setHopcount(int hopcount);
 };

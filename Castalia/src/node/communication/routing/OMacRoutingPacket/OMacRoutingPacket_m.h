@@ -21,10 +21,28 @@
 // }}
 
 /**
- * Class generated from <tt>src/node/communication/routing/OMacRoutingPacket/OMacRoutingPacket.msg:21</tt> by nedtool.
+ * Enum generated from <tt>src/node/communication/routing/OMacRoutingPacket/OMacRoutingPacket.msg:21</tt> by nedtool.
+ * <pre>
+ * enum OMacRoutingPacket_type
+ * {
+ * 
+ *     OMAC_ROUTING_DATA_PACKET = 1;
+ *     OMAC_ROUTING_HOPCOUNT_PACKET = 2;
+ * }
+ * </pre>
+ */
+enum OMacRoutingPacket_type {
+    OMAC_ROUTING_DATA_PACKET = 1,
+    OMAC_ROUTING_HOPCOUNT_PACKET = 2
+};
+
+/**
+ * Class generated from <tt>src/node/communication/routing/OMacRoutingPacket/OMacRoutingPacket.msg:26</tt> by nedtool.
  * <pre>
  * packet OMacRoutingPacket extends RoutingPacket
  * {
+ *     int OMacRoutingKind @enum(OMacRoutingPacket_type);
+ * 
  *     unsigned int packetId;
  *     ReceiversContainer receiversContainer;
  * }
@@ -33,6 +51,7 @@
 class OMacRoutingPacket : public ::RoutingPacket
 {
   protected:
+    int OMacRoutingKind_var;
     unsigned int packetId_var;
     ReceiversContainer receiversContainer_var;
 
@@ -53,6 +72,8 @@ class OMacRoutingPacket : public ::RoutingPacket
     virtual void parsimUnpack(cCommBuffer *b);
 
     // field getter/setter methods
+    virtual int getOMacRoutingKind() const;
+    virtual void setOMacRoutingKind(int OMacRoutingKind);
     virtual unsigned int getPacketId() const;
     virtual void setPacketId(unsigned int packetId);
     virtual ReceiversContainer& getReceiversContainer();

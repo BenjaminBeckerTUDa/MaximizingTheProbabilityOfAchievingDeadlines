@@ -17,7 +17,7 @@
 #include <algorithm>
 #include "VirtualMac.h"
 #include "OMacPacket_m.h"
-#include "SimpleRoutingPacket_m.h"
+#include "OMacRoutingPacket_m.h"
 
 using namespace std;
 

@@ -57,7 +57,7 @@ void SimpleRouting::fromApplicationLayer(cPacket *pkt, const char *destination)
     SimpleRoutingPacket *netPacket = new SimpleRoutingPacket("SimpleRouting packet", NETWORK_LAYER_PACKET);
     netPacket->setSource(SELF_NETWORK_ADDRESS);
     netPacket->setDestination(destination);
-    netPacket->setSimpleRoutingKind(SIMPLE_ROUTING_DATA_PACKET);
+    netPacket->setOMacRoutingKind(OMAC_ROUTING_DATA_PACKET);
     netPacket->setPacketId(packetId);
     netPacket->setReceiversContainer(receiversContainer);
     encapsulatePacket(netPacket, pkt);
@@ -78,7 +78,7 @@ void SimpleRouting::fromMacLayer(cPacket *pkt, int srcMacAddress, double rssi, d
 
     if (netPacket)
     {
-        switch (netPacket->getSimpleRoutingKind())
+        switch (netPacket->getOMacRoutingKind())
         {
         case SIMPLE_ROUTING_DATA_PACKET:
         {
@@ -164,7 +164,7 @@ void SimpleRouting::updateReceiverList()
 void SimpleRouting::broadcastHopCount()
 {
     SimpleRoutingPacket *netPacket = new SimpleRoutingPacket("Simple Routing hopcount packet", NETWORK_LAYER_PACKET);
-    netPacket->setSimpleRoutingKind(SIMPLE_ROUTING_HOPCOUNT_PACKET);
+    netPacket->setOMacRoutingKind(OMAC_ROUTING_HOPCOUNT_PACKET);
     netPacket->setSource(SELF_NETWORK_ADDRESS);
     netPacket->setDestination("ALL");
     netPacket->setHopcount(hopCount);

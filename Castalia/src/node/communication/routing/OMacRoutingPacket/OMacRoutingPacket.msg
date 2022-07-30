@@ -18,7 +18,14 @@ cplusplus {{
 class RoutingPacket;
 class noncobject ReceiversContainer;
 
+enum OMacRoutingPacket_type {
+	OMAC_ROUTING_DATA_PACKET = 1;
+	OMAC_ROUTING_HOPCOUNT_PACKET = 2;
+}
+
 packet OMacRoutingPacket extends RoutingPacket {
+	int OMacRoutingKind enum (OMacRoutingPacket_type);
+
 	unsigned int packetId;
     ReceiversContainer receiversContainer;
 }
