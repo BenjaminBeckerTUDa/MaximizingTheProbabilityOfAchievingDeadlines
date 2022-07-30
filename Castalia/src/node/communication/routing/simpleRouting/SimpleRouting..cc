@@ -80,7 +80,7 @@ void SimpleRouting::fromMacLayer(cPacket *pkt, int srcMacAddress, double rssi, d
     {
         switch (netPacket->getOMacRoutingKind())
         {
-        case SIMPLE_ROUTING_DATA_PACKET:
+        case OMAC_ROUTING_DATA_PACKET:
         {
             if (isSink)
             {
@@ -102,7 +102,7 @@ void SimpleRouting::fromMacLayer(cPacket *pkt, int srcMacAddress, double rssi, d
             break;
         }
 
-        case SIMPLE_ROUTING_HOPCOUNT_PACKET:
+        case OMAC_ROUTING_HOPCOUNT_PACKET:
         {
             int srcHopCount = netPacket->getHopcount();
             neighborHopCounts[srcMacAddress] = srcHopCount;

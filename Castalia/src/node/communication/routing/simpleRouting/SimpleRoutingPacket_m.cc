@@ -53,13 +53,6 @@ inline std::ostream& operator<<(std::ostream& out, const std::vector<T,A>& vec)
 template<typename T>
 inline std::ostream& operator<<(std::ostream& out,const T&) {return out;}
 
-EXECUTE_ON_STARTUP(
-    cEnum *e = cEnum::find("SimpleRoutingPacket_type");
-    if (!e) enums.getInstance()->add(e = new cEnum("SimpleRoutingPacket_type"));
-    e->insert(SIMPLE_ROUTING_DATA_PACKET, "SIMPLE_ROUTING_DATA_PACKET");
-    e->insert(SIMPLE_ROUTING_HOPCOUNT_PACKET, "SIMPLE_ROUTING_HOPCOUNT_PACKET");
-);
-
 Register_Class(SimpleRoutingPacket);
 
 SimpleRoutingPacket::SimpleRoutingPacket(const char *name, int kind) : ::OMacRoutingPacket(name,kind)

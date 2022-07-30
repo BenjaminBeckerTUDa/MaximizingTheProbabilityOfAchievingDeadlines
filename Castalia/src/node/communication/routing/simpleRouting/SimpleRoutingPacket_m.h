@@ -20,23 +20,7 @@
 // }}
 
 /**
- * Enum generated from <tt>src/node/communication/routing/simpleRouting/SimpleRoutingPacket.msg:19</tt> by nedtool.
- * <pre>
- * enum SimpleRoutingPacket_type
- * {
- * 
- *     SIMPLE_ROUTING_DATA_PACKET = 1;
- *     SIMPLE_ROUTING_HOPCOUNT_PACKET = 2;
- * }
- * </pre>
- */
-enum SimpleRoutingPacket_type {
-    SIMPLE_ROUTING_DATA_PACKET = 1,
-    SIMPLE_ROUTING_HOPCOUNT_PACKET = 2
-};
-
-/**
- * Class generated from <tt>src/node/communication/routing/simpleRouting/SimpleRoutingPacket.msg:24</tt> by nedtool.
+ * Class generated from <tt>src/node/communication/routing/simpleRouting/SimpleRoutingPacket.msg:19</tt> by nedtool.
  * <pre>
  * packet SimpleRoutingPacket extends OMacRoutingPacket
  * {

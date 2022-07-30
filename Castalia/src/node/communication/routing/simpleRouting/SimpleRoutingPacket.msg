@@ -16,11 +16,6 @@ cplusplus {{
 
 class OMacRoutingPacket;
 
-enum SimpleRoutingPacket_type {
-	SIMPLE_ROUTING_DATA_PACKET = 1;
-	SIMPLE_ROUTING_HOPCOUNT_PACKET = 2;
-}
-
 packet SimpleRoutingPacket extends OMacRoutingPacket {
 	int hopcount;
 }
