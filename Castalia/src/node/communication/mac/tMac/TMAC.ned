@@ -35,6 +35,7 @@ simple TMAC like node.communication.mac.iMac {
 	bool allowSinkSync = default (true);		//This parameter allows sink node to start synchronisation immediately
 	bool useFrts = default (false);		//enable/disable FRTS (Future Request To Send), true value not supported
 	bool useRtsCts = default (true);		//This allows to enable/disable RTS/CTS handshake
+	bool changeTxRetries = default (true);		//This allows to enable/disable RTS/CTS handshake
 	bool disableTAextension = default (false);	//disabling TA extension effectively creates an SMAC protocol
 	bool conservativeTA = default (true);		//conservative activation timeout - will always stay awake for 
 							//atleast 15 ms after any activity on the radio

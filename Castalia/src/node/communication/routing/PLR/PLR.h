@@ -69,6 +69,7 @@ class PLR: public VirtualRouting {
 	int* routingTable;
 	int* routingTable_calc;
 	double* cdf;
+	double* cdf_forTrace;
 	//avg
 	std::map<int, double> neighbor_avgNodeDelays;
 	std::map<int, double> neighbor_avgLinkDelays;
@@ -105,6 +106,9 @@ class PLR: public VirtualRouting {
 	std::map<int, int*> monitoring_probeTo;
 	std::map<int, int*> monitoring_probeFrom;
 	std::map<int, int*> monitoring_SourceOfsuccessfullyDeliveredPackets;
+	std::map<int, double> monitoring_fails;
+	std::map<int, double> monitoring_successes;
+	std::map<int, double> monitoring_pdr;
 	int* monitoring_receivedCDFs;
 	int* monitoring_broadcastedCDFs;
 	int* monitoring_receivedProbes;

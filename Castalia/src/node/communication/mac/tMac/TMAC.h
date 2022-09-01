@@ -91,6 +91,7 @@ class TMAC: public VirtualMac {
 	int macState;
 	int txAddr;			//current communication peer (can be BROADCAST)
 	int txRetries;		//number of transmission attempts to txAddr (when reaches 0 - packet is dropped)
+	bool changeTxRetries;
 	//int txSequenceNum;	// no need for special sequence number, virtualMAC takes care of it
 	bool primaryWakeup;	//used to distinguish between primary and secondary schedules
 	simtime_t currentFrameStart;	//recorded start time of the current frame

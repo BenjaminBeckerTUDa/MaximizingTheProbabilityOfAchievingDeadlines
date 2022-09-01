@@ -31,9 +31,7 @@ void TMAC::startup()
 	useRtsCts = par("useRtsCts");
 	maxTxRetries = par("maxTxRetries");
 	simTime = par("simTime");
-	
-	
-
+	changeTxRetries = par("changeTxRetries");
 	
 	disableTAextension = par("disableTAextension");
 	conservativeTA = par("conservativeTA");
@@ -251,9 +249,13 @@ void TMAC::resetDefaultState(const char *descr)
 				PLRControlMessage* plrc = new PLRControlMessage("PLR delay packet", NETWORK_CONTROL_COMMAND);
 				plrc->setPLRControlMessageKind(FAIL);
 				plrc->setTxAddr(macPkt -> getDestination());
-				maxTxRetriesPerReceiver[macPkt -> getDestination()] = maxTxRetriesPerReceiver[macPkt -> getDestination()]/2;
-				if (maxTxRetriesPerReceiver[macPkt -> getDestination()] == 0){
-					maxTxRetriesPerReceiver[macPkt -> getDestination()] = 1;
+				if (changeTxRetries)
+				{
+					maxTxRetriesPerReceiver[macPkt -> getDestination()] = maxTxRetriesPerReceiver[macPkt -> getDestination()]/2;
+					if (maxTxRetriesPerReceiver[macPkt -> getDestination()] == 0)
+					{
+						maxTxRetriesPerReceiver[macPkt -> getDestination()] = 1;
+					}
 				}
 				toNetworkLayer(plrc);
 				//"bb: delay: inf (max txRetries)" << txAddr;
@@ -451,7 +453,10 @@ void TMAC::fromRadioLayer(cPacket * pkt, double RSSI, double LQI)
 				resetDefaultState("transmission successful (ACK received)");
 				
 				// bb : retrieve timestamp for this ack			
-				double time_ = getClock().dbl() - enqueueTimes[waitForAck_].dbl();
+				double time_ = getClock().dbl() - enqueueTimes[waitForAck_].dbl() - TX_TIME(ackPacketSize);
+				if (time_ < 0.0){
+					time_ = 0.0;
+				}
 				enqueueTimes.erase(waitForAck_);
 				
 				//"queue+send-Time of " << waitForAck_ << " = " << time_;
@@ -472,9 +477,13 @@ void TMAC::fromRadioLayer(cPacket * pkt, double RSSI, double LQI)
 				{
 					dupcount++;
 				}
-				maxTxRetriesPerReceiver[macPkt -> getDestination()] = maxTxRetriesPerReceiver[macPkt -> getDestination()]*2;
-				if (maxTxRetriesPerReceiver[macPkt -> getDestination()] > maxTxRetries){
-					maxTxRetriesPerReceiver[macPkt -> getDestination()] = maxTxRetries;
+				if (changeTxRetries)
+				{
+					maxTxRetriesPerReceiver[macPkt -> getDestination()] = maxTxRetriesPerReceiver[macPkt -> getDestination()]*2;
+					if (maxTxRetriesPerReceiver[macPkt -> getDestination()] > maxTxRetries)
+					{
+						maxTxRetriesPerReceiver[macPkt -> getDestination()] = maxTxRetries;
+					}
 				}
 
 			}

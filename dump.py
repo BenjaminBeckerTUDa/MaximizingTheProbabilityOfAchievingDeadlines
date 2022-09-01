@@ -14,7 +14,7 @@ def getFilesFrom(foldername):
                 if (len(f.split("_")) == 6):
                     if (f.split("_")[0] == "n" and f.split("_")[2] == "d" and f.split("_")[4] == "n"):
                         if(f.split("_")[1].isnumeric() and f.split("_")[3].isnumeric() and f.split("_")[5].isnumeric()):
-                            #if (int(f.split("_")[1])) < 41:
+                            if (int(f.split("_")[1])) < 91:
                                 splitFile(foldername, f)
 
 def pickleDumpAll():
@@ -373,3 +373,7 @@ getFilesFrom(None)
 import time
 time.sleep(5.0)
 pickleDumpAll()
+
+
+cmd = 'zip -r pd.zip pickleDumps'
+os.system(cmd)

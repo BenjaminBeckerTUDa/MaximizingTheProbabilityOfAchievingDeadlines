@@ -9,6 +9,8 @@
  *      Attention:  License Inquiry.                                           *
  *                                                                             *  
  *******************************************************************************/
+#include <algorithm>
+using namespace std;
 
 #include "PLR.h"
 #include "DeadlinePacket_m.h"
@@ -16,6 +18,7 @@
 #include <iostream>
 #include <sstream>
 #include "VirtualMobilityManager.h"
+
 
 Define_Module(PLR);
 
@@ -112,11 +115,13 @@ void PLR::startup()
 	nextHop_calc=-1;
 
 	cdf = new double[pDFSlots+1]{0};
+	cdf_forTrace = new double[pDFSlots+1]{0};
 	if (isSink)
 	{
 		for (int i = 0; i <= pDFSlots; i++)
 		{
 			cdf[i] = 1;
+			cdf_forTrace[i] = 1;
 		}
 	}
 	else
@@ -129,6 +134,9 @@ void PLR::startup()
 			routingTable_calc[i] = -1;
 		}
 	}
+
+	
+
 	
 	
 	// set all timers
@@ -220,14 +228,17 @@ void PLR::handleNetworkControlCommand(cMessage * pkt)
 
 	if (plrc->getPLRControlMessageKind() == FAIL)
 	{
-		updateAverageLinkDelay(maxDelay, plrc -> getTxAddr());
+		monitoring_fails[plrc -> getTxAddr()]++;
+		// updateAverageLinkDelay(maxDelay, plrc -> getTxAddr());
 		insertDelay(maxDelay, plrc -> getTxAddr());
 	}
 	if (plrc->getPLRControlMessageKind() == DELAY)
 	{
+		monitoring_successes[plrc -> getTxAddr()]++;
 		updateAverageLinkDelay(plrc -> getDelay(), plrc -> getTxAddr());
 		insertDelay(toNanoseconds(plrc -> getDelay()), plrc -> getTxAddr());
 	}
+	monitoring_pdr[plrc -> getTxAddr()] = monitoring_successes[plrc -> getTxAddr()] / (monitoring_successes[plrc -> getTxAddr()] + monitoring_fails[plrc -> getTxAddr()]);
 }
 
 long long PLR::toNanoseconds(double delay)
@@ -268,11 +279,39 @@ void PLR::insertDelay(long long delay_, int address)
 
 void PLR::addMaxToCDF()
 {
+	// iterate over all neighbors to find a threshold for pdr
+	int i =0;
+	double pdr_sum = 0;
+	
+	for (int address : neighbors)
+	{
+		pdr_sum += monitoring_pdr[address];
+		i ++;
+	}
+	double pdr_average = pdr_sum / i;
+
+	double* pdrs;
+	pdrs = new double[i]{0};
+	i=0;
+	for (int address : neighbors)
+	{
+		pdrs[i] = monitoring_pdr[address];
+		i ++;
+	}
+
+	// TODO: hier noch mal genau prüfen, ob das mit dem median so klappt
+	int n = sizeof(pdrs) / sizeof(pdrs[0]);
+	sort(pdrs, pdrs+n);
+	double pdr_median = pdrs[n/2];
+
+
 	// iterate over all neighbors to find the one with minimum delay
+	//avgDelay = 99999;
 	for (int address : neighbors)
 	{
 		double neighbor_avg = neighbor_avgHopDelays[address];
-		if (neighbor_avg < avgDelay)
+		double pdr = monitoring_pdr[address];
+		if (neighbor_avg < avgDelay && pdr >= pdr_average)
 		{
 			avgDelay = neighbor_avg;
 			nextHop_calc = address;
@@ -501,6 +540,8 @@ void PLR::fromMacLayer(cPacket * pkt, int macAddress, double rssi, double lqi)
 		monitoring_receivedFrom.insert({macAddress, new int[monitoring_slots_1]{0}});
 		monitoring_probeTo.insert({macAddress, new int[monitoring_slots_1]{0}});
 		monitoring_probeFrom.insert({macAddress, new int[monitoring_slots_1]{0}});
+		monitoring_fails.insert({macAddress, 0});
+		monitoring_successes.insert({macAddress, 0});
 
 		neighbor_avgNodeDelays.insert({macAddress, 99999});
 		neighbor_avgLinkDelays.insert({macAddress, 99999});
@@ -672,9 +713,11 @@ void PLR::nextRound()
 	- setze eigenes cdf auf 0
 	- lösche routing-table
 	*/
+	
 	for (int i = 0; i <= pDFSlots; i++)
 	{	
-		cdf[i]=0;
+		cdf_forTrace[i] = cdf[i];
+		cdf[i] = 0;
 		routingTable[i] = routingTable_calc[i];
 		routingTable_calc[i] = -1;
 	}
@@ -901,7 +944,7 @@ void PLR::finish()
 	string s = "";
 	for (int i = 0; i <= pDFSlots; i++)
 	{
-		s = s + std::to_string(cdf[i]) + "\t";
+		s = s + std::to_string(cdf_forTrace[i]) + "\t";
 	}
 	trace() << "nodeCDF: \t" << s ;
 	
@@ -951,11 +994,18 @@ void PLR::finish()
 		}
 		*/
 		
-		// output nexthop; node-avg delay; and avg delays
-		trace() << "avgDelay: " << std::to_string(avgDelay);
+		// output nexthop and its pdr and delay
+		int nh = 0;
+
+		nh = routingTable[pDFSlots-1];
+		trace() << "PLR nextHop: " << nh  << "; pdr for that link: "<< std::to_string((monitoring_successes[nh] / (monitoring_successes[nh] + monitoring_fails[nh]) ))<< "; hop avgdelay: " << neighbor_avgHopDelays[nh] << "; succ:" << std::to_string(monitoring_successes[nh])<< "; fails:" << std::to_string(monitoring_fails[nh]);	
 		
+		nh = nextHop;
+		trace() << "Avg nextHop: " << nh  << "; pdr for that link: "<< std::to_string((monitoring_successes[nh] / (monitoring_successes[nh] + monitoring_fails[nh]) ))<< "; hop avgdelay: " << neighbor_avgHopDelays[nh] << "; succ:" << std::to_string(monitoring_successes[nh])<< "; fails:" << std::to_string(monitoring_fails[nh]);	
+
+
+
 		/*
-		trace() << "nextHop:  " << nextHop;
 		for ( const auto &keyVal : neighbor_avgLinkDelays) 
 		{
 			trace() << "avg for link to " << keyVal.first <<":\n"<< std::to_string(neighbor_avgLinkDelays[keyVal.first]);	
