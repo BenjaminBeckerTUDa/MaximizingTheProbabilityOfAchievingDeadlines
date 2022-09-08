@@ -57,7 +57,13 @@ void PLR::startup()
 
 	useAverageDelay = par("useAverageDelay");
 	useAvgSecond = par("useAvgSecond");
-	
+
+	if (useAverageDelay)
+	{
+		neighborSelectionStrategy = par("neighborSelectionStrategy"); // 0 = none, 1 = above average; 2 = above median; 3 = above threshold
+		neighborSelectionStrategy_value = par("neighborSelectionStrategy_value");
+	}
+
 	pDFSlots = par("pDFSlots");
 	pDFMessageTimes = par("pDFMessageTimes");
 	
@@ -279,30 +285,50 @@ void PLR::insertDelay(long long delay_, int address)
 
 void PLR::addMaxToCDF()
 {
-	// iterate over all neighbors to find a threshold for pdr
-	int i =0;
-	double pdr_sum = 0;
-	
-	for (int address : neighbors)
-	{
-		pdr_sum += monitoring_pdr[address];
-		i ++;
-	}
-	double pdr_average = pdr_sum / i;
 
-	double* pdrs;
-	pdrs = new double[i]{0};
-	i=0;
-	for (int address : neighbors)
-	{
-		pdrs[i] = monitoring_pdr[address];
-		i ++;
+	// neighborSelectionStrategy_value = default(0.0);
+	// neighborSelectionStrategy = default(0); // 0 = none, 1 = above average; 2 = above median; 3 = above threshold
+
+	double pdr_min = 0.0;
+	if (neighborSelectionStrategy == 0){
+		pdr_min = 0.0;
+	}
+	if (neighborSelectionStrategy == 1){
+		// iterate over all neighbors to find a threshold for pdr
+		double i = 0.0;
+		double pdr_sum = 0.0;
+		
+		for (int address : neighbors)
+		{
+			pdr_sum += monitoring_pdr[address];
+			i ++;
+		}
+		pdr_min = pdr_sum / i;
+	}
+	if (neighborSelectionStrategy == 2){
+		int i=0;
+		for (int address : neighbors)
+		{
+			i ++;
+		}
+		double* pdrs;
+		pdrs = new double[i]{0};
+		i=0;
+		for (int address : neighbors)
+		{
+			pdrs[i] = monitoring_pdr[address];
+			i ++;
+		}
+
+		// TODO: hier noch mal genau prüfen, ob das mit dem median so klappt
+		int n = sizeof(pdrs) / sizeof(pdrs[0]);
+		sort(pdrs, pdrs+n);
+		pdr_min = pdrs[n/2];
+	}
+	if (neighborSelectionStrategy == 3){
+		pdr_min = neighborSelectionStrategy_value;
 	}
 
-	// TODO: hier noch mal genau prüfen, ob das mit dem median so klappt
-	int n = sizeof(pdrs) / sizeof(pdrs[0]);
-	sort(pdrs, pdrs+n);
-	double pdr_median = pdrs[n/2];
 
 
 	// iterate over all neighbors to find the one with minimum delay
@@ -311,7 +337,7 @@ void PLR::addMaxToCDF()
 	{
 		double neighbor_avg = neighbor_avgHopDelays[address];
 		double pdr = monitoring_pdr[address];
-		if (neighbor_avg < avgDelay && pdr >= pdr_average)
+		if (neighbor_avg < avgDelay && pdr >= pdr_min)
 		{
 			avgDelay = neighbor_avg;
 			nextHop_calc = address;
@@ -754,6 +780,18 @@ void PLR::finish()
 		if (useAverageDelay)
 		{
 			trace() << "Algorithm: Avg";
+			// 0 = none, 1 = above average; 2 = above median; 3 = above threshold
+			if (neighborSelectionStrategy == 0)
+				trace() << "neighborSelectionStrategy:\tnone";
+			if (neighborSelectionStrategy == 1)
+				trace() << "neighborSelectionStrategy:\taverage";
+			if (neighborSelectionStrategy == 2)
+				trace() << "neighborSelectionStrategy:\tmedian";
+			if (neighborSelectionStrategy == 3)
+			{
+				trace() << "neighborSelectionStrategy:\tthreshold";
+				trace() << "neighborSelectionStrategy_value:\t" << neighborSelectionStrategy_value;
+			}
 		}
 		else
 		{

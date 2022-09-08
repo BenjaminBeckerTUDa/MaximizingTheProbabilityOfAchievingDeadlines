@@ -50,6 +50,9 @@ class PLR: public VirtualRouting {
 	double newRoundInterval;
 	double riceK;
 	bool collectReducedTraceInfo;
+
+	int neighborSelectionStrategy; // 0 = none, 1 = above average; 2 = above median; 3 = above threshold
+	double neighborSelectionStrategy_value;
 	
 	int appMaxTTD;
 	int appSendInterval;

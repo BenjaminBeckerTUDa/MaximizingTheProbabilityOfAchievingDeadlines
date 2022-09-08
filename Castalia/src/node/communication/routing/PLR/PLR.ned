@@ -30,6 +30,8 @@ simple PLR like node.communication.routing.iRouting {
 	
 	bool useAverageDelay = default (true);	
 	bool useAvgSecond = default (false);
+	neighborSelectionStrategy_value = default(0.0);
+	neighborSelectionStrategy = default(0); // 0 = none, 1 = above average; 2 = above median; 3 = above threshold
 	double simTime = default(800.0);
 	double probeInterval = default(60.0);
 	double cdfBroadcastInterval = default(5.0);
