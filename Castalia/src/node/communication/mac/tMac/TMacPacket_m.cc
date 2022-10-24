@@ -71,9 +71,11 @@ TMacPacket::TMacPacket(const char *name, int kind) : ::MacPacket(name,kind)
 {
     this->type_var = 0;
     this->nav_var = 0;
+    this->startTime_var = 0;
     this->sync_var = 0;
     this->syncId_var = 0;
     this->isFirstAck_var = false;
+    this->receivedCount_var = 0;
 }
 
 TMacPacket::TMacPacket(const TMacPacket& other) : ::MacPacket(other)
@@ -97,9 +99,11 @@ void TMacPacket::copy(const TMacPacket& other)
 {
     this->type_var = other.type_var;
     this->nav_var = other.nav_var;
+    this->startTime_var = other.startTime_var;
     this->sync_var = other.sync_var;
     this->syncId_var = other.syncId_var;
     this->isFirstAck_var = other.isFirstAck_var;
+    this->receivedCount_var = other.receivedCount_var;
 }
 
 void TMacPacket::parsimPack(cCommBuffer *b)
@@ -107,9 +111,11 @@ void TMacPacket::parsimPack(cCommBuffer *b)
     ::MacPacket::parsimPack(b);
     doPacking(b,this->type_var);
     doPacking(b,this->nav_var);
+    doPacking(b,this->startTime_var);
     doPacking(b,this->sync_var);
     doPacking(b,this->syncId_var);
     doPacking(b,this->isFirstAck_var);
+    doPacking(b,this->receivedCount_var);
 }
 
 void TMacPacket::parsimUnpack(cCommBuffer *b)
@@ -117,9 +123,11 @@ void TMacPacket::parsimUnpack(cCommBuffer *b)
     ::MacPacket::parsimUnpack(b);
     doUnpacking(b,this->type_var);
     doUnpacking(b,this->nav_var);
+    doUnpacking(b,this->startTime_var);
     doUnpacking(b,this->sync_var);
     doUnpacking(b,this->syncId_var);
     doUnpacking(b,this->isFirstAck_var);
+    doUnpacking(b,this->receivedCount_var);
 }
 
 int TMacPacket::getType() const
@@ -140,6 +148,16 @@ simtime_t TMacPacket::getNav() const
 void TMacPacket::setNav(simtime_t nav)
 {
     this->nav_var = nav;
+}
+
+simtime_t TMacPacket::getStartTime() const
+{
+    return startTime_var;
+}
+
+void TMacPacket::setStartTime(simtime_t startTime)
+{
+    this->startTime_var = startTime;
 }
 
 simtime_t TMacPacket::getSync() const
@@ -170,6 +188,16 @@ bool TMacPacket::getIsFirstAck() const
 void TMacPacket::setIsFirstAck(bool isFirstAck)
 {
     this->isFirstAck_var = isFirstAck;
+}
+
+int TMacPacket::getReceivedCount() const
+{
+    return receivedCount_var;
+}
+
+void TMacPacket::setReceivedCount(int receivedCount)
+{
+    this->receivedCount_var = receivedCount;
 }
 
 class TMacPacketDescriptor : public cClassDescriptor
@@ -219,7 +247,7 @@ const char *TMacPacketDescriptor::getProperty(const char *propertyname) const
 int TMacPacketDescriptor::getFieldCount(void *object) const
 {
     cClassDescriptor *basedesc = getBaseClassDescriptor();
-    return basedesc ? 5+basedesc->getFieldCount(object) : 5;
+    return basedesc ? 7+basedesc->getFieldCount(object) : 7;
 }
 
 unsigned int TMacPacketDescriptor::getFieldTypeFlags(void *object, int field) const
@@ -236,8 +264,10 @@ unsigned int TMacPacketDescriptor::getFieldTypeFlags(void *object, int field) co
         FD_ISEDITABLE,
         FD_ISEDITABLE,
         FD_ISEDITABLE,
+        FD_ISEDITABLE,
+        FD_ISEDITABLE,
     };
-    return (field>=0 && field<5) ? fieldTypeFlags[field] : 0;
+    return (field>=0 && field<7) ? fieldTypeFlags[field] : 0;
 }
 
 const char *TMacPacketDescriptor::getFieldName(void *object, int field) const
@@ -251,11 +281,13 @@ const char *TMacPacketDescriptor::getFieldName(void *object, int field) const
     static const char *fieldNames[] = {
         "type",
         "nav",
+        "startTime",
         "sync",
         "syncId",
         "isFirstAck",
+        "receivedCount",
     };
-    return (field>=0 && field<5) ? fieldNames[field] : NULL;
+    return (field>=0 && field<7) ? fieldNames[field] : NULL;
 }
 
 int TMacPacketDescriptor::findField(void *object, const char *fieldName) const
@@ -264,9 +296,11 @@ int TMacPacketDescriptor::findField(void *object, const char *fieldName) const
     int base = basedesc ? basedesc->getFieldCount(object) : 0;
     if (fieldName[0]=='t' && strcmp(fieldName, "type")==0) return base+0;
     if (fieldName[0]=='n' && strcmp(fieldName, "nav")==0) return base+1;
-    if (fieldName[0]=='s' && strcmp(fieldName, "sync")==0) return base+2;
-    if (fieldName[0]=='s' && strcmp(fieldName, "syncId")==0) return base+3;
-    if (fieldName[0]=='i' && strcmp(fieldName, "isFirstAck")==0) return base+4;
+    if (fieldName[0]=='s' && strcmp(fieldName, "startTime")==0) return base+2;
+    if (fieldName[0]=='s' && strcmp(fieldName, "sync")==0) return base+3;
+    if (fieldName[0]=='s' && strcmp(fieldName, "syncId")==0) return base+4;
+    if (fieldName[0]=='i' && strcmp(fieldName, "isFirstAck")==0) return base+5;
+    if (fieldName[0]=='r' && strcmp(fieldName, "receivedCount")==0) return base+6;
     return basedesc ? basedesc->findField(object, fieldName) : -1;
 }
 
@@ -282,10 +316,12 @@ const char *TMacPacketDescriptor::getFieldTypeString(void *object, int field) co
         "int",
         "simtime_t",
         "simtime_t",
+        "simtime_t",
         "int",
         "bool",
+        "int",
     };
-    return (field>=0 && field<5) ? fieldTypeStrings[field] : NULL;
+    return (field>=0 && field<7) ? fieldTypeStrings[field] : NULL;
 }
 
 const char *TMacPacketDescriptor::getFieldProperty(void *object, int field, const char *propertyname) const
@@ -330,9 +366,11 @@ std::string TMacPacketDescriptor::getFieldAsString(void *object, int field, int 
     switch (field) {
         case 0: return long2string(pp->getType());
         case 1: return double2string(pp->getNav());
-        case 2: return double2string(pp->getSync());
-        case 3: return long2string(pp->getSyncId());
-        case 4: return bool2string(pp->getIsFirstAck());
+        case 2: return double2string(pp->getStartTime());
+        case 3: return double2string(pp->getSync());
+        case 4: return long2string(pp->getSyncId());
+        case 5: return bool2string(pp->getIsFirstAck());
+        case 6: return long2string(pp->getReceivedCount());
         default: return "";
     }
 }
@@ -349,9 +387,11 @@ bool TMacPacketDescriptor::setFieldAsString(void *object, int field, int i, cons
     switch (field) {
         case 0: pp->setType(string2long(value)); return true;
         case 1: pp->setNav(string2double(value)); return true;
-        case 2: pp->setSync(string2double(value)); return true;
-        case 3: pp->setSyncId(string2long(value)); return true;
-        case 4: pp->setIsFirstAck(string2bool(value)); return true;
+        case 2: pp->setStartTime(string2double(value)); return true;
+        case 3: pp->setSync(string2double(value)); return true;
+        case 4: pp->setSyncId(string2long(value)); return true;
+        case 5: pp->setIsFirstAck(string2bool(value)); return true;
+        case 6: pp->setReceivedCount(string2long(value)); return true;
         default: return false;
     }
 }

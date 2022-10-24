@@ -26,6 +26,7 @@ def pickleDumpAll():
 def splitFile(folder, filename):
     appMaxTTD = "100"
     appSendInterval = "10000"
+    txRetries = "2"
     Algorithm = ""
     riceK = -1.0
 
@@ -44,15 +45,18 @@ def splitFile(folder, filename):
             Algorithm = line.split(":")[1].strip()
             if Algorithm == "PLR; Avg secondary":
                 Algorithm = "PLR;Avgsec"
+            
         if "appSendInterval" in line:
             appSendInterval = line.split(":")[1].strip()
         if "riceK" in line:
             riceK = line.split(":")[1].strip()
         if "appMaxTTD" in line:
             appMaxTTD = line.split(":")[1].strip()
+        if "txRetries" in line:
+            txRetries = line.split(":")[1].strip()
         if "received at sink in time" in line and "SN.node[0]" in line:
             new_filename = False
-            new_path = "testfolder" + os.sep+Algorithm+"_interval_"+appSendInterval+"_ttd_"+appMaxTTD + "_nodes_"+nodes+"_density_"+density+"_nr_"+number+"_riceK_"+riceK
+            new_path = "testfolder" + os.sep+Algorithm+"_interval_"+appSendInterval+"_ttd_"+appMaxTTD + "_nodes_"+nodes+"_density_"+density+"_nr_"+number+"_riceK_"+riceK+"_tx_"+txRetries
             if os.path.exists(new_path):
                 raw_file_split_date = os.path.getmtime(new_path)
                 if (raw_file_split_date > raw_file_date):
@@ -95,8 +99,13 @@ def createPickle(filename):
         riceK = filename.split("_")[12]
     else:
         riceK = "-1"
+    
+    if len(filename.split("_")) > 12:
+        txRetries = filename.split("_")[14]
+    else:
+        txRetries = "-1"
 
-    path = "testfolder" + os.sep + Algorithm + "_interval_" + appSendInterval + "_ttd_" + appMaxTTD + "_nodes_" + nodes + "_density_" + density + "_nr_" + number + "_riceK_" + riceK
+    path = "testfolder" + os.sep + Algorithm + "_interval_" + appSendInterval + "_ttd_" + appMaxTTD + "_nodes_" + nodes + "_density_" + density + "_nr_" + number + "_riceK_" + riceK+"_tx_"+txRetries
 
     file = open(path, "r")
 

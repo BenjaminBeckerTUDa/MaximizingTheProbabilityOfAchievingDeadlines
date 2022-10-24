@@ -68,6 +68,7 @@ PLRPacket::PLRPacket(const char *name, int kind) : ::RoutingPacket(name,kind)
 {
     this->PLRPacketKind_var = 0;
     this->avgDelay_var = 0;
+    this->receivedPackets_var = 0;
     this->round_var = 0;
     this->deadline_var = 0;
 }
@@ -94,6 +95,7 @@ void PLRPacket::copy(const PLRPacket& other)
     this->PLRPacketKind_var = other.PLRPacketKind_var;
     this->nodeCDF_var = other.nodeCDF_var;
     this->avgDelay_var = other.avgDelay_var;
+    this->receivedPackets_var = other.receivedPackets_var;
     this->round_var = other.round_var;
     this->deadline_var = other.deadline_var;
 }
@@ -104,6 +106,7 @@ void PLRPacket::parsimPack(cCommBuffer *b)
     doPacking(b,this->PLRPacketKind_var);
     doPacking(b,this->nodeCDF_var);
     doPacking(b,this->avgDelay_var);
+    doPacking(b,this->receivedPackets_var);
     doPacking(b,this->round_var);
     doPacking(b,this->deadline_var);
 }
@@ -114,6 +117,7 @@ void PLRPacket::parsimUnpack(cCommBuffer *b)
     doUnpacking(b,this->PLRPacketKind_var);
     doUnpacking(b,this->nodeCDF_var);
     doUnpacking(b,this->avgDelay_var);
+    doUnpacking(b,this->receivedPackets_var);
     doUnpacking(b,this->round_var);
     doUnpacking(b,this->deadline_var);
 }
@@ -146,6 +150,16 @@ double PLRPacket::getAvgDelay() const
 void PLRPacket::setAvgDelay(double avgDelay)
 {
     this->avgDelay_var = avgDelay;
+}
+
+double PLRPacket::getReceivedPackets() const
+{
+    return receivedPackets_var;
+}
+
+void PLRPacket::setReceivedPackets(double receivedPackets)
+{
+    this->receivedPackets_var = receivedPackets;
 }
 
 int PLRPacket::getRound() const
@@ -215,7 +229,7 @@ const char *PLRPacketDescriptor::getProperty(const char *propertyname) const
 int PLRPacketDescriptor::getFieldCount(void *object) const
 {
     cClassDescriptor *basedesc = getBaseClassDescriptor();
-    return basedesc ? 5+basedesc->getFieldCount(object) : 5;
+    return basedesc ? 6+basedesc->getFieldCount(object) : 6;
 }
 
 unsigned int PLRPacketDescriptor::getFieldTypeFlags(void *object, int field) const
@@ -232,8 +246,9 @@ unsigned int PLRPacketDescriptor::getFieldTypeFlags(void *object, int field) con
         FD_ISEDITABLE,
         FD_ISEDITABLE,
         FD_ISEDITABLE,
+        FD_ISEDITABLE,
     };
-    return (field>=0 && field<5) ? fieldTypeFlags[field] : 0;
+    return (field>=0 && field<6) ? fieldTypeFlags[field] : 0;
 }
 
 const char *PLRPacketDescriptor::getFieldName(void *object, int field) const
@@ -248,10 +263,11 @@ const char *PLRPacketDescriptor::getFieldName(void *object, int field) const
         "PLRPacketKind",
         "nodeCDF",
         "avgDelay",
+        "receivedPackets",
         "round",
         "deadline",
     };
-    return (field>=0 && field<5) ? fieldNames[field] : NULL;
+    return (field>=0 && field<6) ? fieldNames[field] : NULL;
 }
 
 int PLRPacketDescriptor::findField(void *object, const char *fieldName) const
@@ -261,8 +277,9 @@ int PLRPacketDescriptor::findField(void *object, const char *fieldName) const
     if (fieldName[0]=='P' && strcmp(fieldName, "PLRPacketKind")==0) return base+0;
     if (fieldName[0]=='n' && strcmp(fieldName, "nodeCDF")==0) return base+1;
     if (fieldName[0]=='a' && strcmp(fieldName, "avgDelay")==0) return base+2;
-    if (fieldName[0]=='r' && strcmp(fieldName, "round")==0) return base+3;
-    if (fieldName[0]=='d' && strcmp(fieldName, "deadline")==0) return base+4;
+    if (fieldName[0]=='r' && strcmp(fieldName, "receivedPackets")==0) return base+3;
+    if (fieldName[0]=='r' && strcmp(fieldName, "round")==0) return base+4;
+    if (fieldName[0]=='d' && strcmp(fieldName, "deadline")==0) return base+5;
     return basedesc ? basedesc->findField(object, fieldName) : -1;
 }
 
@@ -278,10 +295,11 @@ const char *PLRPacketDescriptor::getFieldTypeString(void *object, int field) con
         "int",
         "CDF",
         "double",
+        "double",
         "int",
         "long",
     };
-    return (field>=0 && field<5) ? fieldTypeStrings[field] : NULL;
+    return (field>=0 && field<6) ? fieldTypeStrings[field] : NULL;
 }
 
 const char *PLRPacketDescriptor::getFieldProperty(void *object, int field, const char *propertyname) const
@@ -327,8 +345,9 @@ std::string PLRPacketDescriptor::getFieldAsString(void *object, int field, int i
         case 0: return long2string(pp->getPLRPacketKind());
         case 1: {std::stringstream out; out << pp->getNodeCDF(); return out.str();}
         case 2: return double2string(pp->getAvgDelay());
-        case 3: return long2string(pp->getRound());
-        case 4: return long2string(pp->getDeadline());
+        case 3: return double2string(pp->getReceivedPackets());
+        case 4: return long2string(pp->getRound());
+        case 5: return long2string(pp->getDeadline());
         default: return "";
     }
 }
@@ -345,8 +364,9 @@ bool PLRPacketDescriptor::setFieldAsString(void *object, int field, int i, const
     switch (field) {
         case 0: pp->setPLRPacketKind(string2long(value)); return true;
         case 2: pp->setAvgDelay(string2double(value)); return true;
-        case 3: pp->setRound(string2long(value)); return true;
-        case 4: pp->setDeadline(string2long(value)); return true;
+        case 3: pp->setReceivedPackets(string2double(value)); return true;
+        case 4: pp->setRound(string2long(value)); return true;
+        case 5: pp->setDeadline(string2long(value)); return true;
         default: return false;
     }
 }

@@ -48,6 +48,7 @@ enum PLRPacketDef {
  *     int PLRPacketKind @enum(PLRPacketDef);
  *     CDF nodeCDF;
  *     double avgDelay;
+ *     double receivedPackets;
  *     int round;
  *     long deadline;
  * }
@@ -59,6 +60,7 @@ class PLRPacket : public ::RoutingPacket
     int PLRPacketKind_var;
     CDF nodeCDF_var;
     double avgDelay_var;
+    double receivedPackets_var;
     int round_var;
     long deadline_var;
 
@@ -86,6 +88,8 @@ class PLRPacket : public ::RoutingPacket
     virtual void setNodeCDF(const CDF& nodeCDF);
     virtual double getAvgDelay() const;
     virtual void setAvgDelay(double avgDelay);
+    virtual double getReceivedPackets() const;
+    virtual void setReceivedPackets(double receivedPackets);
     virtual int getRound() const;
     virtual void setRound(int round);
     virtual long getDeadline() const;

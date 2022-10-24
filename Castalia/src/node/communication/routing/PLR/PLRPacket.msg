@@ -29,6 +29,7 @@ packet PLRPacket extends RoutingPacket {
 	int PLRPacketKind enum (PLRPacketDef);
 	CDF nodeCDF;
 	double avgDelay;
+	double receivedPackets;
 	int round;
 	long deadline;
 }

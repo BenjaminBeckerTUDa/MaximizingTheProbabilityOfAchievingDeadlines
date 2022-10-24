@@ -35,6 +35,8 @@ packet TMacPacket extends MacPacket {
 	// RTS and CTS frames also contain nav field, bringing their size to 13 bytes
 	simtime_t nav = 0;					// 4 bytes
 
+	simtime_t startTime = 0; // for testing purpose only
+
 	// Sequence number is essential for ACK and DATA frames, but they do not 
 	// contain NAV field, therefore the size of ACK packet and MAC 
 	// layer overhead in general is 11 bytes. We use the field in the
@@ -48,5 +50,6 @@ packet TMacPacket extends MacPacket {
 	simtime_t sync = 0;					// 4 bytes
 	int syncId = 0;						// 4 bytes
 	bool isFirstAck = false;
+	int receivedCount = 0;
 }
 

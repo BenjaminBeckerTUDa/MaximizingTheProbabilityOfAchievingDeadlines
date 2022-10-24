@@ -50,12 +50,11 @@ class PLR: public VirtualRouting {
 	double newRoundInterval;
 	double riceK;
 	bool collectReducedTraceInfo;
-
 	int neighborSelectionStrategy; // 0 = none, 1 = above average; 2 = above median; 3 = above threshold
 	double neighborSelectionStrategy_value;
-	
 	int appMaxTTD;
 	int appSendInterval;
+	int txRetries;
 	
 	
 	// PLR-related member variables
@@ -69,6 +68,11 @@ class PLR: public VirtualRouting {
 	std::map<int, double*> neighbor_pdfs_fixed;
 	std::map<int, double*> neighbor_hop_cdfs;
 	std::map<int, int*> neighbor_histograms;
+
+
+	std::map<int,double> sendCount;
+	std::map<int,double> receiveCount;
+
 	int* routingTable;
 	int* routingTable_calc;
 	double* cdf;
@@ -119,7 +123,8 @@ class PLR: public VirtualRouting {
 	int* monitoring_receivedData;
 	int* monitoring_sentData;
 	int* monitoring_droppedData;
-	
+ public:
+	int test();
 
  protected:
  	void insertDelay(long long, int);

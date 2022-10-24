@@ -25,13 +25,12 @@ simple PLR like node.communication.routing.iRouting {
 	//*******************************************************************************/
  	//* Specific for PLR                                                             *
 	//*******************************************************************************/
+	int neighborSelectionStrategy = default(0); // 0 = none, 1 = above average; 2 = above median; 3 = above threshold
+	double neighborSelectionStrategy_value = default(0.0);
 	int pDFSlots = default (1000);					// The number of timeslots for PDFs and CDFs	
 	int pDFMessageTimes = default (20);					// The number of slots for PDFs in messages
-	
 	bool useAverageDelay = default (true);	
 	bool useAvgSecond = default (false);
-	neighborSelectionStrategy_value = default(0.0);
-	neighborSelectionStrategy = default(0); // 0 = none, 1 = above average; 2 = above median; 3 = above threshold
 	double simTime = default(800.0);
 	double probeInterval = default(60.0);
 	double cdfBroadcastInterval = default(5.0);

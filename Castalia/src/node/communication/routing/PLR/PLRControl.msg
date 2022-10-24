@@ -13,11 +13,13 @@
 enum PLRControlDef {
 	DELAY = 1;
 	FAIL = 2;
+	PDR = 3;
 }
 
 message PLRControlMessage {
 	int PLRControlMessageKind enum (PLRControlDef);
 	double delay;
+	double pdr;
 	int txAddr;
 }
 

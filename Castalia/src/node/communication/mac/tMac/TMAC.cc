@@ -36,6 +36,9 @@ void TMAC::startup()
 	disableTAextension = par("disableTAextension");
 	conservativeTA = par("conservativeTA");
 	collisionResolution = par("collisionResolution");
+
+	monitoring_start = 9;
+	monitoring_destination = 0;
 	
 	
 	
@@ -166,32 +169,26 @@ int TMAC::handleRadioControlMessage(cMessage * msg)
 
 void TMAC::fromNetworkLayer(cPacket * netPkt, int destination)
 {
-	/*
-	PLRPacket *netPacket = dynamic_cast <PLRPacket*>(netPkt);
-	if (netPacket)
-	{
-		switch (netPacket->getPLRPacketKind()) 
-		{
-			case PLR_DATA_PACKET:
-			{
-				int sourceInt = std::stoi(netPacket->getSource());
-				
-				if (sourceInt == 18)
-				{
-					trace() << "mac from net = source, sn, buffersize " << sourceInt <<","<<netPacket->getSequenceNumber()<<","<<TXBuffer.size();
-				}
-			}
-		}
-	}
-	*/
-	
-	
 	// Create a new MAC frame from the received packet and buffer it (if possible)
 	TMacPacket *macPkt = new TMacPacket("TMAC data packet", MAC_LAYER_PACKET);
 	encapsulatePacket(macPkt, netPkt);
 	macPkt->setType(DATA_TMAC_PACKET);
 	macPkt->setSource(SELF_MAC_ADDRESS);
 	macPkt->setDestination(destination);
+	macPkt->setStartTime(getClock());
+
+
+	if (destination != BROADCAST_MAC_ADDRESS){
+		if (transmissionCount.find(destination) == transmissionCount.end())
+		{
+			transmissionCount.insert({destination, 1});
+		}
+		else
+		{
+			transmissionCount[destination]++;
+		}
+	}
+
 	//macPkt->setSequenceNumber(txSequenceNum); no need for TMAC specific seq number, virtualMAC takes care of this 
 	if (bufferPacket(macPkt)) 
 	{	// this is causing problems
@@ -211,11 +208,10 @@ void TMAC::fromNetworkLayer(cPacket * netPkt, int destination)
 		if (destination != BROADCAST_MAC_ADDRESS)
 		{
 			// bb : send a control message to upper layer 
-			//"bb: delay: inf (full buffer)" << macPkt->getSequenceNumber();		
 			PLRControlMessage* plrc = new PLRControlMessage("PLR delay packet", NETWORK_CONTROL_COMMAND);
 			plrc->setPLRControlMessageKind(FAIL);
 			plrc->setTxAddr(destination);
-			toNetworkLayer(plrc);	
+			toNetworkLayer(plrc);				
 		}
 		
 
@@ -248,6 +244,7 @@ void TMAC::resetDefaultState(const char *descr)
 				enqueueTimes.erase(macPkt -> getSequenceNumber());
 				PLRControlMessage* plrc = new PLRControlMessage("PLR delay packet", NETWORK_CONTROL_COMMAND);
 				plrc->setPLRControlMessageKind(FAIL);
+
 				plrc->setTxAddr(macPkt -> getDestination());
 				if (changeTxRetries)
 				{
@@ -368,31 +365,13 @@ void TMAC::fromRadioLayer(cPacket * pkt, double RSSI, double LQI)
 			
 			
 			
-			/*
-			PLRPacket *netPacket = dynamic_cast <PLRPacket*>(decapsulatePacket(macPkt));
-			if (netPacket)
-			{
-				switch (netPacket->getPLRPacketKind()) 
-				{
-					case PLR_DATA_PACKET:
-					{
-						int sourceInt = std::stoi(netPacket->getSource());
-						
-						if (sourceInt == 18)
-						{
-							trace() << "mac received = source, sn " << sourceInt <<","<<netPacket->getSequenceNumber();
-						}
-					}
-				}
-			}
-			*/
 			
 			
 			
 			// Forward the frame to upper layer first
 			bool notDuplicate = false;
 			if (isNotDuplicatePacket(macPkt))
-			{
+			{			
 				toNetworkLayer(decapsulatePacket(macPkt));
 				notDuplicate = true;
 			}	
@@ -404,6 +383,18 @@ void TMAC::fromRadioLayer(cPacket * pkt, double RSSI, double LQI)
 			// If the frame was sent to broadcast address, nothing else needs to be done
 			if (destination == BROADCAST_MAC_ADDRESS)
 				break;
+
+			if (notDuplicate)
+			{
+				if (receivedCount.find(source) == receivedCount.end())
+				{
+					receivedCount.insert({source, 1});
+				}
+				else
+				{
+					receivedCount[source]++;
+				}
+			}
 
 			// If MAC was expecting this frame, clear the timeout
 			if (macState == MAC_STATE_WAIT_FOR_DATA)
@@ -418,6 +409,7 @@ void TMAC::fromRadioLayer(cPacket * pkt, double RSSI, double LQI)
 			ackPacket->setType(ACK_TMAC_PACKET);
 			ackPacket->setByteLength(ackPacketSize);
 			ackPacket->setSequenceNumber(macPkt->getSequenceNumber());
+			ackPacket->setReceivedCount(receivedCount[source]);
 			if (notDuplicate)
 			{
 				ackPacket->setIsFirstAck(true);
@@ -425,7 +417,6 @@ void TMAC::fromRadioLayer(cPacket * pkt, double RSSI, double LQI)
 			else
 			{
 				ackPacket->setIsFirstAck(false);
-				//ackPacket->setIsFirstAck(true);
 			}
 
 			// Send ACK packet to the radio
@@ -453,17 +444,28 @@ void TMAC::fromRadioLayer(cPacket * pkt, double RSSI, double LQI)
 				resetDefaultState("transmission successful (ACK received)");
 				
 				// bb : retrieve timestamp for this ack			
-				double time_ = getClock().dbl() - enqueueTimes[waitForAck_].dbl() - TX_TIME(ackPacketSize);
+				double time_ = (getClock().dbl() - enqueueTimes[waitForAck_].dbl()) - TX_TIME(ackPacketSize);
 				if (time_ < 0.0){
 					time_ = 0.0;
 				}
 				enqueueTimes.erase(waitForAck_);
 				
+				
+				
 				//"queue+send-Time of " << waitForAck_ << " = " << time_;
 				
 				//"bb: just received ACK for packet with sn [" << waitForAck_ << "] to adress " << source <<" with time: " << time_;
+
+				// wie viele fails wurden falsch eingetragen???
+				// verhältnismäßig doch so viele, wie secondACKs gekommen sind...
+
 				
+				
+
 				bool isFirstAck = macPkt->getIsFirstAck();
+				// are measurements accurate?
+				
+
 				if (isFirstAck)
 				{
 					PLRControlMessage* plrc = new PLRControlMessage("PLR delay packet", NETWORK_CONTROL_COMMAND);
@@ -477,6 +479,15 @@ void TMAC::fromRadioLayer(cPacket * pkt, double RSSI, double LQI)
 				{
 					dupcount++;
 				}
+
+				PLRControlMessage* plrc = new PLRControlMessage("PLR delay packet", NETWORK_CONTROL_COMMAND);
+				plrc->setPLRControlMessageKind(PDR);
+				plrc->setPdr(((double)(macPkt->getReceivedCount())) / ((double)(transmissionCount[source])));
+				plrc->setTxAddr(source);
+				toNetworkLayer(plrc);	
+
+
+
 				if (changeTxRetries)
 				{
 					maxTxRetriesPerReceiver[macPkt -> getDestination()] = maxTxRetriesPerReceiver[macPkt -> getDestination()]*2;
@@ -498,68 +509,7 @@ void TMAC::fromRadioLayer(cPacket * pkt, double RSSI, double LQI)
 
 void TMAC::carrierIsBusy()
 {
-	/* Since we are hearing some communication on the radio we need to do two things:
-	 * 2 - set MAC state to MAC_STATE_ACTIVE_SILENT unless we are actually expecting to receive
-	 *     something 
-	 */
 
-	/*
-	if (TXBuffer.empty()) {
-	}
-	else
-	{
-		switch (macState) {
-			case MAC_CARRIER_SENSE_FOR_TX_RTS:{
-				MacPacket *macPacket1 = dynamic_cast <MacPacket*>(TXBuffer.front());
-				MacPacket *macPacket2 = macPacket1->dup();
-				PLRPacket *netPacket = dynamic_cast <PLRPacket*>(decapsulatePacket(macPacket2));
-				if (netPacket)
-				{
-					switch (netPacket->getPLRPacketKind()) 
-					{
-						case PLR_DATA_PACKET:
-						{
-							int sourceInt = std::stoi(netPacket->getSource());
-							
-							if (sourceInt == 18)
-							{
-								trace() << "mac carrier busy; cannot tx rts = source, sn " << sourceInt <<","<<netPacket->getSequenceNumber();
-							}
-						}
-					}
-				}
-				break;
-			}
-
-			case MAC_CARRIER_SENSE_FOR_TX_DATA:{
-				MacPacket *macPacket1 = dynamic_cast <MacPacket*>(TXBuffer.front());
-				MacPacket *macPacket2 = macPacket1->dup();
-				PLRPacket *netPacket = dynamic_cast <PLRPacket*>(decapsulatePacket(macPacket2));
-				if (netPacket)
-				{
-					switch (netPacket->getPLRPacketKind()) 
-					{
-						case PLR_DATA_PACKET:
-						{
-							int sourceInt = std::stoi(netPacket->getSource());
-							
-							if (sourceInt == 18)
-							{
-								trace() << "mac carrier busy; cannot tx data = source, sn " << sourceInt <<","<<netPacket->getSequenceNumber();
-							}
-						}
-					}
-				}
-				break;
-			}
-		}
-	}
-	*/
-	
-	
-	
-	
-	
 	
 	
 	if (collisionResolution == 0) {
@@ -583,32 +533,7 @@ void TMAC::carrierIsClear()
 	switch (macState) {
 		/* MAC requested carrier sense to transmit an RTS packet */
 		case MAC_CARRIER_SENSE_FOR_TX_RTS:{
-			/*
-			if (TXBuffer.empty()) {
-			}
-			else
-			{
-				MacPacket *macPacket1 = dynamic_cast <MacPacket*>(TXBuffer.front());
-				MacPacket *macPacket2 = macPacket1->dup();
-				PLRPacket *netPacket = dynamic_cast <PLRPacket*>(decapsulatePacket(macPacket2));
-				if (netPacket)
-				{
-					switch (netPacket->getPLRPacketKind()) 
-					{
-						case PLR_DATA_PACKET:
-						{
-							int sourceInt = std::stoi(netPacket->getSource());
-							
-							if (sourceInt == 18)
-							{
-								trace() << "mac tx rts = source, sn " << sourceInt <<","<<netPacket->getSequenceNumber();
-							}
-						}
-					}
-				}
-			}
-			*/
-			
+						
 			if (TXBuffer.empty()) {
 				//"WARNING! BUFFER_IS_EMPTY in MAC_CARRIER_SENSE_FOR_TX_RTS, will reset state";
 				resetDefaultState("empty transmission buffer");
@@ -643,32 +568,6 @@ void TMAC::carrierIsClear()
 		/* MAC requested carrier sense to transmit DATA packet */
 		case MAC_CARRIER_SENSE_FOR_TX_DATA:
 		{
-			/*
-			if (TXBuffer.empty()) {
-			}
-			else
-			{
-				MacPacket *macPacket1 = dynamic_cast <MacPacket*>(TXBuffer.front());
-				MacPacket *macPacket2 = macPacket1->dup();
-				PLRPacket *netPacket = dynamic_cast <PLRPacket*>(decapsulatePacket(macPacket2));
-				if (netPacket)
-				{
-					switch (netPacket->getPLRPacketKind()) 
-					{
-						case PLR_DATA_PACKET:
-						{
-							int sourceInt = std::stoi(netPacket->getSource());
-							
-							if (sourceInt == 18)
-							{
-								trace() << "mac tx data = source, sn " << sourceInt <<","<<netPacket->getSequenceNumber();
-							}
-						}
-					}
-				}
-			}
-			*/
-	
 			sendDataPacket();
 			break;
 		}

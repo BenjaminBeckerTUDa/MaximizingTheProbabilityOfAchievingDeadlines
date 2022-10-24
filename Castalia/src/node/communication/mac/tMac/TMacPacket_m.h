@@ -58,6 +58,8 @@ enum TmacPacket_type {
  *     // RTS and CTS frames also contain nav field, bringing their size to 13 bytes
  *     simtime_t nav = 0;					// 4 bytes
  * 
+ *     simtime_t startTime = 0; // for testing purpose only
+ * 
  * 	// Sequence number is essential for ACK and DATA frames, but they do not 
  * 	// contain NAV field, therefore the size of ACK packet and MAC 
  * 	// layer overhead in general is 11 bytes. We use the field in the
@@ -71,6 +73,7 @@ enum TmacPacket_type {
  *     simtime_t sync = 0;					// 4 bytes
  *     int syncId = 0;						// 4 bytes
  *     bool isFirstAck = false;
+ *     int receivedCount = 0;
  * }
  * </pre>
  */
@@ -79,9 +82,11 @@ class TMacPacket : public ::MacPacket
   protected:
     int type_var;
     simtime_t nav_var;
+    simtime_t startTime_var;
     simtime_t sync_var;
     int syncId_var;
     bool isFirstAck_var;
+    int receivedCount_var;
 
   private:
     void copy(const TMacPacket& other);
@@ -104,12 +109,16 @@ class TMacPacket : public ::MacPacket
     virtual void setType(int type);
     virtual simtime_t getNav() const;
     virtual void setNav(simtime_t nav);
+    virtual simtime_t getStartTime() const;
+    virtual void setStartTime(simtime_t startTime);
     virtual simtime_t getSync() const;
     virtual void setSync(simtime_t sync);
     virtual int getSyncId() const;
     virtual void setSyncId(int syncId);
     virtual bool getIsFirstAck() const;
     virtual void setIsFirstAck(bool isFirstAck);
+    virtual int getReceivedCount() const;
+    virtual void setReceivedCount(int receivedCount);
 };
 
 inline void doPacking(cCommBuffer *b, TMacPacket& obj) {obj.parsimPack(b);}

@@ -58,6 +58,7 @@ EXECUTE_ON_STARTUP(
     if (!e) enums.getInstance()->add(e = new cEnum("PLRControlDef"));
     e->insert(DELAY, "DELAY");
     e->insert(FAIL, "FAIL");
+    e->insert(PDR, "PDR");
 );
 
 Register_Class(PLRControlMessage);
@@ -66,6 +67,7 @@ PLRControlMessage::PLRControlMessage(const char *name, int kind) : ::cMessage(na
 {
     this->PLRControlMessageKind_var = 0;
     this->delay_var = 0;
+    this->pdr_var = 0;
     this->txAddr_var = 0;
 }
 
@@ -90,6 +92,7 @@ void PLRControlMessage::copy(const PLRControlMessage& other)
 {
     this->PLRControlMessageKind_var = other.PLRControlMessageKind_var;
     this->delay_var = other.delay_var;
+    this->pdr_var = other.pdr_var;
     this->txAddr_var = other.txAddr_var;
 }
 
@@ -98,6 +101,7 @@ void PLRControlMessage::parsimPack(cCommBuffer *b)
     ::cMessage::parsimPack(b);
     doPacking(b,this->PLRControlMessageKind_var);
     doPacking(b,this->delay_var);
+    doPacking(b,this->pdr_var);
     doPacking(b,this->txAddr_var);
 }
 
@@ -106,6 +110,7 @@ void PLRControlMessage::parsimUnpack(cCommBuffer *b)
     ::cMessage::parsimUnpack(b);
     doUnpacking(b,this->PLRControlMessageKind_var);
     doUnpacking(b,this->delay_var);
+    doUnpacking(b,this->pdr_var);
     doUnpacking(b,this->txAddr_var);
 }
 
@@ -127,6 +132,16 @@ double PLRControlMessage::getDelay() const
 void PLRControlMessage::setDelay(double delay)
 {
     this->delay_var = delay;
+}
+
+double PLRControlMessage::getPdr() const
+{
+    return pdr_var;
+}
+
+void PLRControlMessage::setPdr(double pdr)
+{
+    this->pdr_var = pdr;
 }
 
 int PLRControlMessage::getTxAddr() const
@@ -186,7 +201,7 @@ const char *PLRControlMessageDescriptor::getProperty(const char *propertyname) c
 int PLRControlMessageDescriptor::getFieldCount(void *object) const
 {
     cClassDescriptor *basedesc = getBaseClassDescriptor();
-    return basedesc ? 3+basedesc->getFieldCount(object) : 3;
+    return basedesc ? 4+basedesc->getFieldCount(object) : 4;
 }
 
 unsigned int PLRControlMessageDescriptor::getFieldTypeFlags(void *object, int field) const
@@ -201,8 +216,9 @@ unsigned int PLRControlMessageDescriptor::getFieldTypeFlags(void *object, int fi
         FD_ISEDITABLE,
         FD_ISEDITABLE,
         FD_ISEDITABLE,
+        FD_ISEDITABLE,
     };
-    return (field>=0 && field<3) ? fieldTypeFlags[field] : 0;
+    return (field>=0 && field<4) ? fieldTypeFlags[field] : 0;
 }
 
 const char *PLRControlMessageDescriptor::getFieldName(void *object, int field) const
@@ -216,9 +232,10 @@ const char *PLRControlMessageDescriptor::getFieldName(void *object, int field) c
     static const char *fieldNames[] = {
         "PLRControlMessageKind",
         "delay",
+        "pdr",
         "txAddr",
     };
-    return (field>=0 && field<3) ? fieldNames[field] : NULL;
+    return (field>=0 && field<4) ? fieldNames[field] : NULL;
 }
 
 int PLRControlMessageDescriptor::findField(void *object, const char *fieldName) const
@@ -227,7 +244,8 @@ int PLRControlMessageDescriptor::findField(void *object, const char *fieldName) 
     int base = basedesc ? basedesc->getFieldCount(object) : 0;
     if (fieldName[0]=='P' && strcmp(fieldName, "PLRControlMessageKind")==0) return base+0;
     if (fieldName[0]=='d' && strcmp(fieldName, "delay")==0) return base+1;
-    if (fieldName[0]=='t' && strcmp(fieldName, "txAddr")==0) return base+2;
+    if (fieldName[0]=='p' && strcmp(fieldName, "pdr")==0) return base+2;
+    if (fieldName[0]=='t' && strcmp(fieldName, "txAddr")==0) return base+3;
     return basedesc ? basedesc->findField(object, fieldName) : -1;
 }
 
@@ -242,9 +260,10 @@ const char *PLRControlMessageDescriptor::getFieldTypeString(void *object, int fi
     static const char *fieldTypeStrings[] = {
         "int",
         "double",
+        "double",
         "int",
     };
-    return (field>=0 && field<3) ? fieldTypeStrings[field] : NULL;
+    return (field>=0 && field<4) ? fieldTypeStrings[field] : NULL;
 }
 
 const char *PLRControlMessageDescriptor::getFieldProperty(void *object, int field, const char *propertyname) const
@@ -289,7 +308,8 @@ std::string PLRControlMessageDescriptor::getFieldAsString(void *object, int fiel
     switch (field) {
         case 0: return long2string(pp->getPLRControlMessageKind());
         case 1: return double2string(pp->getDelay());
-        case 2: return long2string(pp->getTxAddr());
+        case 2: return double2string(pp->getPdr());
+        case 3: return long2string(pp->getTxAddr());
         default: return "";
     }
 }
@@ -306,7 +326,8 @@ bool PLRControlMessageDescriptor::setFieldAsString(void *object, int field, int 
     switch (field) {
         case 0: pp->setPLRControlMessageKind(string2long(value)); return true;
         case 1: pp->setDelay(string2double(value)); return true;
-        case 2: pp->setTxAddr(string2long(value)); return true;
+        case 2: pp->setPdr(string2double(value)); return true;
+        case 3: pp->setTxAddr(string2long(value)); return true;
         default: return false;
     }
 }

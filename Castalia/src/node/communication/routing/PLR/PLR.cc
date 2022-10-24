@@ -27,6 +27,8 @@ void PLR::startup()
 {
 	// check that the Application module used has the boolean parameter "isSink"
 	cModule *appModule = getParentModule()->getParentModule()->getSubmodule("Application");
+	
+
 	if (appModule->hasPar("isSink"))
 		isSink = appModule->par("isSink");
 	else
@@ -54,6 +56,12 @@ void PLR::startup()
 	
 	collectReducedTraceInfo = par("collectReducedTraceInfo");
 	riceK = par("riceK");
+
+	cModule *macModule = getParentModule()->getParentModule()->getSubmodule("Communication")->getSubmodule("MAC");
+	if (macModule->hasPar("maxTxRetries"))
+		txRetries = macModule->par("maxTxRetries"); 
+	//else
+	//	txRetries = -1;
 
 	useAverageDelay = par("useAverageDelay");
 	useAvgSecond = par("useAvgSecond");
@@ -152,10 +160,7 @@ void PLR::startup()
 	{
 		setTimer(0, 0); // start of new Round
 	}
-	else
-	{
-		setTimer(2, probeInterval); // probing
-	}    	
+	setTimer(2, probeInterval); // probing ; alle nodes, damit sink bei der PDR-ermittlung helfen kann
 }
 
 void PLR::timerFiredCallback(int index)
@@ -232,11 +237,15 @@ void PLR::handleNetworkControlCommand(cMessage * pkt)
 		return;
 	}
 
+	if (plrc->getPLRControlMessageKind() == PDR)
+	{
+		// monitoring_pdr[plrc -> getTxAddr()] = plrc -> getPdr();
+		// hier: trace für vergleich
+		// trace() << "pdr durch mac acks >" << plrc -> getPdr();
+	}
 	if (plrc->getPLRControlMessageKind() == FAIL)
 	{
 		monitoring_fails[plrc -> getTxAddr()]++;
-		// updateAverageLinkDelay(maxDelay, plrc -> getTxAddr());
-		insertDelay(maxDelay, plrc -> getTxAddr());
 	}
 	if (plrc->getPLRControlMessageKind() == DELAY)
 	{
@@ -244,7 +253,6 @@ void PLR::handleNetworkControlCommand(cMessage * pkt)
 		updateAverageLinkDelay(plrc -> getDelay(), plrc -> getTxAddr());
 		insertDelay(toNanoseconds(plrc -> getDelay()), plrc -> getTxAddr());
 	}
-	monitoring_pdr[plrc -> getTxAddr()] = monitoring_successes[plrc -> getTxAddr()] / (monitoring_successes[plrc -> getTxAddr()] + monitoring_fails[plrc -> getTxAddr()]);
 }
 
 long long PLR::toNanoseconds(double delay)
@@ -279,7 +287,14 @@ void PLR::insertDelay(long long delay_, int address)
 		slot = slot;
 	}
 	
+	// trace() << "inserted into slot: " << slot << " which corresponds to time interval [" << slot * delayStep << ", " << (slot+1) * delayStep << "]";
+	
 	(neighbor_histograms[address])[slot] = (neighbor_histograms[address])[slot]+1;
+
+	//for (int i = 0; i <= pDFSlots; i++)
+	//{
+	//	trace() << "Histogram at position " << i << ":" << (neighbor_histograms[address])[i];
+	//}
 }
 
 
@@ -412,10 +427,9 @@ void PLR::createPDF(int address)
 	{
 		return;
 	}
-	
 	for (int i = 0; i <= pDFSlots; i++)
 	{
-		pdf[i] = (double) histogram[i] / (double) sum;
+		pdf[i] = (double) histogram[i] / (double) sum * monitoring_pdr[address];
 	}
 }
 
@@ -495,6 +509,7 @@ void PLR::sendProbe(int address)
 	netPacket->setPLRPacketKind(PLR_PROBE_PACKET);
 	netPacket->setSource(SELF_NETWORK_ADDRESS);
 	netPacket->setDestination("none");
+	netPacket->setReceivedPackets(receiveCount[address]);
 	netPacket->setSequenceNumber(currentSequenceNumber);
 	netPacket->setByteLength(packetSize + 22);
 	currentSequenceNumber++;
@@ -502,6 +517,11 @@ void PLR::sendProbe(int address)
 	monitoring_probeTo[address][(int) (getClock().dbl()/simTime * monitoring_slots)]++;
 	monitoring_sentProbes[(int) (getClock().dbl()/simTime * monitoring_slots)]++;
 	toMacLayer(netPacket, address);
+	if (sendCount.find(address) == sendCount.end()) 
+	{
+		sendCount.insert({address, 0.0});
+	}
+	sendCount[address]++;
 }	
 	
 void PLR::fromApplicationLayer(cPacket * pkt, const char *destination)
@@ -539,8 +559,11 @@ void PLR::fromApplicationLayer(cPacket * pkt, const char *destination)
 		{
 			toMacLayer(netPacket, nh);
 			monitoring_sentData[(int) (getClock().dbl()/simTime * monitoring_slots)]++;
-			
-			
+			if (sendCount.find(nh) == sendCount.end()) 
+			{
+				sendCount.insert({nh, 0.0});
+			}
+			sendCount[nh]++;
 		}
 		else
 		{
@@ -579,7 +602,13 @@ void PLR::fromMacLayer(cPacket * pkt, int macAddress, double rssi, double lqi)
 		neighbor_pdfs.insert({macAddress, new double[pDFSlots+1]{0}});
 		neighbor_hop_cdfs.insert({macAddress, new double[pDFSlots+2]{0}});
 		neighbor_histograms.insert({macAddress, new int[pDFSlots+1]{0}});
+
+		monitoring_pdr.insert({macAddress, 0.0});
+
+		receiveCount.insert({macAddress, 0.0});
 	}
+
+	
 
 	PLRPacket *netPacket = dynamic_cast <PLRPacket*>(pkt);
 	if (!netPacket)
@@ -593,14 +622,24 @@ void PLR::fromMacLayer(cPacket * pkt, int macAddress, double rssi, double lqi)
 		{
 			monitoring_probeFrom[macAddress][(int) (getClock().dbl()/simTime * monitoring_slots)]++;
 			monitoring_receivedProbes[(int) (getClock().dbl()/simTime * monitoring_slots)]++;
+			receiveCount[macAddress]++;
+			if (sendCount[macAddress] > 0)
+			{
+				monitoring_pdr[macAddress] = netPacket->getReceivedPackets() / sendCount[macAddress];
+			}
+			else
+			{
+				monitoring_pdr[macAddress] = 0.0;
+			}
 			break;
 		}
 		case PLR_DATA_PACKET:
 		{
 			int sourceInt = std::stoi(netPacket->getSource());
 			long long ttl = netPacket->getDeadline() - toNanoseconds(getClock().dbl());
-
 			
+			receiveCount[macAddress]++;
+
 			if ( seenPackets.find(sourceInt) == seenPackets.end() ) {
 				std::set<int> a;
 				seenPackets[sourceInt] = a;
@@ -643,6 +682,12 @@ void PLR::fromMacLayer(cPacket * pkt, int macAddress, double rssi, double lqi)
 							currentSequenceNumber++;
 							
 							toMacLayer(dupPacket, nh);
+							if (sendCount.find(nh) == sendCount.end()) 
+							{
+								sendCount.insert({nh, 0.0});
+							}
+							sendCount[nh]++;
+
 							monitoring_sentData[(int) (getClock().dbl()/simTime * monitoring_slots)]++;
 						}
 						else
@@ -766,7 +811,23 @@ void PLR::nextRound()
 
 
 
-
+int PLR::test()
+{
+	int sum = 0;
+	for ( const auto &keyVal : monitoring_receivedFrom) 
+	{
+		if (keyVal.first == -1 && !isSink) // -1 means, a packet comes from app
+		{
+			int* vals = keyVal.second;
+			
+			for (int i = (monitoring_slots_1 * 3) / 4; i < (monitoring_slots_1-1); i++)
+			{
+				sum += vals[i];
+			}	
+		}
+	}
+	return sum;
+}
 
 
 
@@ -776,21 +837,18 @@ void PLR::finish()
 	// output, general information
 	if (isSink)
 	{
-		
 		if (useAverageDelay)
 		{
-			trace() << "Algorithm: Avg";
 			// 0 = none, 1 = above average; 2 = above median; 3 = above threshold
 			if (neighborSelectionStrategy == 0)
-				trace() << "neighborSelectionStrategy:\tnone";
+				trace() << "Algorithm: Avg;none";
 			if (neighborSelectionStrategy == 1)
-				trace() << "neighborSelectionStrategy:\taverage";
+				trace() << "Algorithm: Avg;average";
 			if (neighborSelectionStrategy == 2)
-				trace() << "neighborSelectionStrategy:\tmedian";
+				trace() << "Algorithm: Avg;median";
 			if (neighborSelectionStrategy == 3)
 			{
-				trace() << "neighborSelectionStrategy:\tthreshold";
-				trace() << "neighborSelectionStrategy_value:\t" << neighborSelectionStrategy_value;
+				trace() << "Algorithm: Avg;thrh"<< neighborSelectionStrategy_value;
 			}
 		}
 		else
@@ -808,12 +866,45 @@ void PLR::finish()
 		trace() << "appSendInterval(ms):\t" << appSendInterval;
 		trace() << "appMaxTTD(ms):\t" << appMaxTTD;
 		trace() << "riceK:\t" << riceK;
-		
+		trace() << "txRetries:\t" << txRetries;
+
+
+
+		bool flag = true;
+		int id = 1;
+		double sentPackets = 0;
+		while (flag)
+		{
+			cModule *node_ = getParentModule()->getParentModule()->getParentModule()->getSubmodule("node",id);
+			if (node_)
+			{
+				PLR *plrInstance = dynamic_cast<PLR*> (getParentModule()->getParentModule()->getParentModule()->getSubmodule("node",id)->getSubmodule("Communication")->getSubmodule("Routing"));
+				sentPackets += plrInstance->test();
+				id ++;
+			}	
+			else
+				flag = false;
+		}
+
+		double receivedInTime = 0;
+		for ( const auto &keyVal : monitoring_SourceOfsuccessfullyDeliveredPackets) 
+		{
+			int * vals = keyVal.second;
+			for (int i = (monitoring_slots_1 * 3) / 4; i < (monitoring_slots_1-1); i++)
+			{
+				receivedInTime += vals[i];
+			}
+		}
+
+		double dar = receivedInTime / sentPackets;
+		trace() << "created packets in network (during last 25\% of time):\t" << sentPackets;
+		trace() << "received in time at sink (during last 25\% of time):\t" << receivedInTime;
+		trace() << "DAR (during last 25\% of time):\t" << dar;
+
 		if (! collectReducedTraceInfo)
 		{
 			trace() << "result time per slot:    " << (simTime/monitoring_slots) << "s";
 		}
-		// trace() << "receivedPacketsInTime:	" << monitoring_receivedPacketsInTime;
 	}
 
 	
@@ -979,12 +1070,45 @@ void PLR::finish()
 	trace() << s1;
 	
 	
+
 	string s = "";
 	for (int i = 0; i <= pDFSlots; i++)
 	{
 		s = s + std::to_string(cdf_forTrace[i]) + "\t";
 	}
 	trace() << "nodeCDF: \t" << s ;
+
+	
+	
+	for ( const auto &keyVal : monitoring_pdr) 
+	{
+		trace() << "pdr: " << keyVal.first << ";" << monitoring_pdr[keyVal.first];
+	}
+
+	for ( const auto &keyVal : neighbor_avgLinkDelays) 
+	{
+		trace() << "avg delay: " << keyVal.first << ";" << neighbor_avgLinkDelays[keyVal.first];
+	}
+
+	
+
+	/*
+	for ( const auto &keyVal : neighbor_pdfs) 
+	{
+		double* pdf = neighbor_pdfs[keyVal.first];
+		s = "";
+		double sum = 0;
+		for (int i = 0; i <= pDFSlots; i++)
+		{
+			sum += pdf[i];
+			s = s + std::to_string(sum) + "\t";
+		}
+		trace() << "cdf for link to " << keyVal.first <<":\n"<< s ;	
+		trace() << "pdr: " << monitoring_pdr[keyVal.first];
+	}
+	*/
+
+
 	
 	if (!isSink){
 		/*
@@ -1036,10 +1160,10 @@ void PLR::finish()
 		int nh = 0;
 
 		nh = routingTable[pDFSlots-1];
-		trace() << "PLR nextHop: " << nh  << "; pdr for that link: "<< std::to_string((monitoring_successes[nh] / (monitoring_successes[nh] + monitoring_fails[nh]) ))<< "; hop avgdelay: " << neighbor_avgHopDelays[nh] << "; succ:" << std::to_string(monitoring_successes[nh])<< "; fails:" << std::to_string(monitoring_fails[nh]);	
+		trace() << "PLR nextHop: " << nh  << "; pdr for that link: "<< std::to_string((monitoring_successes[nh] / (monitoring_successes[nh] + monitoring_fails[nh]) ))<< "; hop avgdelay: " << neighbor_avgLinkDelays[nh] << "; succ:" << std::to_string(monitoring_successes[nh])<< "; fails:" << std::to_string(monitoring_fails[nh]);	
 		
 		nh = nextHop;
-		trace() << "Avg nextHop: " << nh  << "; pdr for that link: "<< std::to_string((monitoring_successes[nh] / (monitoring_successes[nh] + monitoring_fails[nh]) ))<< "; hop avgdelay: " << neighbor_avgHopDelays[nh] << "; succ:" << std::to_string(monitoring_successes[nh])<< "; fails:" << std::to_string(monitoring_fails[nh]);	
+		trace() << "Avg nextHop: " << nh  << "; pdr for that link: "<< std::to_string((monitoring_successes[nh] / (monitoring_successes[nh] + monitoring_fails[nh]) ))<< "; hop avgdelay: " << neighbor_avgLinkDelays[nh] << "; succ:" << std::to_string(monitoring_successes[nh])<< "; fails:" << std::to_string(monitoring_fails[nh]);	
 
 
 

@@ -23,21 +23,24 @@
  * 
  *     DELAY = 1;
  *     FAIL = 2;
+ *     PDR = 3;
  * }
  * </pre>
  */
 enum PLRControlDef {
     DELAY = 1,
-    FAIL = 2
+    FAIL = 2,
+    PDR = 3
 };
 
 /**
- * Class generated from <tt>src/node/communication/routing/PLR/PLRControl.msg:18</tt> by nedtool.
+ * Class generated from <tt>src/node/communication/routing/PLR/PLRControl.msg:19</tt> by nedtool.
  * <pre>
  * message PLRControlMessage
  * {
  *     int PLRControlMessageKind @enum(PLRControlDef);
  *     double delay;
+ *     double pdr;
  *     int txAddr;
  * }
  * </pre>
@@ -47,6 +50,7 @@ class PLRControlMessage : public ::cMessage
   protected:
     int PLRControlMessageKind_var;
     double delay_var;
+    double pdr_var;
     int txAddr_var;
 
   private:
@@ -70,6 +74,8 @@ class PLRControlMessage : public ::cMessage
     virtual void setPLRControlMessageKind(int PLRControlMessageKind);
     virtual double getDelay() const;
     virtual void setDelay(double delay);
+    virtual double getPdr() const;
+    virtual void setPdr(double pdr);
     virtual int getTxAddr() const;
     virtual void setTxAddr(int txAddr);
 };
