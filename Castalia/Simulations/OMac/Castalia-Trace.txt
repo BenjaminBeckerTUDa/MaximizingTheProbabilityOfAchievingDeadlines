@@ -1,0 +1,1301 @@
+
+1000.00342481423  SN.node[0].Communication.MAC             ----------------------MAC monitoring infos----------------------
+1000.00342481423  SN.node[0].Communication.MAC             channel clear count 0
+1000.00342481423  SN.node[0].Communication.MAC             channel busy count 0
+1000.00342481423  SN.node[0].Communication.MAC             data transmission count 0
+1000.00342481423  SN.node[0].Communication.MAC             hop count transmission count 99
+1000.00342481423  SN.node[0].Communication.MAC             reached MAX retries count 0
+1000.00342481423  SN.node[0].Communication.Routing         ----------------------Network monitoring infos----------------------
+1000.00342481423  SN.node[0].Communication.Routing         hop count 0
+1000.00342481423  SN.node[0].Communication.Routing         neighbors:  30 41
+1000.00342481423  SN.node[0].Communication.Routing         receivers: 
+1000.00342481423  SN.node[0].Communication.Routing         hopcount cout: 99
+1000.00342481423  SN.node[0].Communication.Routing         sent packets: 0
+1000.00342481423  SN.node[0].Communication.Routing         sent packets to App layer: 467
+1000.00342481423  SN.node[1].Communication.MAC             ----------------------MAC monitoring infos----------------------
+1000.00342481423  SN.node[1].Communication.MAC             channel clear count 37
+1000.00342481423  SN.node[1].Communication.MAC             channel busy count 13
+1000.00342481423  SN.node[1].Communication.MAC             data transmission count 37
+1000.00342481423  SN.node[1].Communication.MAC             hop count transmission count 99
+1000.00342481423  SN.node[1].Communication.MAC             reached MAX retries count 1
+1000.00342481423  SN.node[1].Communication.Routing         ----------------------Network monitoring infos----------------------
+1000.00342481423  SN.node[1].Communication.Routing         hop count 6
+1000.00342481423  SN.node[1].Communication.Routing         neighbors:  4 6 16 23 25 26 33 34 35 36 38 42 43 47
+1000.00342481423  SN.node[1].Communication.Routing         receivers:  6 25 33 36 42 43
+1000.00342481423  SN.node[1].Communication.Routing         hopcount cout: 99
+1000.00342481423  SN.node[1].Communication.Routing         sent packets: 9
+1000.00342481423  SN.node[1].Communication.Routing         sent packets to App layer: 0
+1000.00342481423  SN.node[2].Communication.MAC             ----------------------MAC monitoring infos----------------------
+1000.00342481423  SN.node[2].Communication.MAC             channel clear count 9
+1000.00342481423  SN.node[2].Communication.MAC             channel busy count 0
+1000.00342481423  SN.node[2].Communication.MAC             data transmission count 9
+1000.00342481423  SN.node[2].Communication.MAC             hop count transmission count 99
+1000.00342481423  SN.node[2].Communication.MAC             reached MAX retries count 0
+1000.00342481423  SN.node[2].Communication.Routing         ----------------------Network monitoring infos----------------------
+1000.00342481423  SN.node[2].Communication.Routing         hop count 7
+1000.00342481423  SN.node[2].Communication.Routing         neighbors:  4 22 23 26 35 39 47
+1000.00342481423  SN.node[2].Communication.Routing         receivers:  4 22 23 26 47
+1000.00342481423  SN.node[2].Communication.Routing         hopcount cout: 99
+1000.00342481423  SN.node[2].Communication.Routing         sent packets: 9
+1000.00342481423  SN.node[2].Communication.Routing         sent packets to App layer: 0
+1000.00342481423  SN.node[3].Communication.MAC             ----------------------MAC monitoring infos----------------------
+1000.00342481423  SN.node[3].Communication.MAC             channel clear count 10
+1000.00342481423  SN.node[3].Communication.MAC             channel busy count 0
+1000.00342481423  SN.node[3].Communication.MAC             data transmission count 10
+1000.00342481423  SN.node[3].Communication.MAC             hop count transmission count 99
+1000.00342481423  SN.node[3].Communication.MAC             reached MAX retries count 0
+1000.00342481423  SN.node[3].Communication.Routing         ----------------------Network monitoring infos----------------------
+1000.00342481423  SN.node[3].Communication.Routing         hop count 8
+1000.00342481423  SN.node[3].Communication.Routing         neighbors:  39 40
+1000.00342481423  SN.node[3].Communication.Routing         receivers:  39 40
+1000.00342481423  SN.node[3].Communication.Routing         hopcount cout: 99
+1000.00342481423  SN.node[3].Communication.Routing         sent packets: 10
+1000.00342481423  SN.node[3].Communication.Routing         sent packets to App layer: 0
+1000.00342481423  SN.node[4].Communication.MAC             ----------------------MAC monitoring infos----------------------
+1000.00342481423  SN.node[4].Communication.MAC             channel clear count 22
+1000.00342481423  SN.node[4].Communication.MAC             channel busy count 0
+1000.00342481423  SN.node[4].Communication.MAC             data transmission count 22
+1000.00342481423  SN.node[4].Communication.MAC             hop count transmission count 99
+1000.00342481423  SN.node[4].Communication.MAC             reached MAX retries count 0
+1000.00342481423  SN.node[4].Communication.Routing         ----------------------Network monitoring infos----------------------
+1000.00342481423  SN.node[4].Communication.Routing         hop count 6
+1000.00342481423  SN.node[4].Communication.Routing         neighbors:  1 2 9 11 18 22 23 26 35 47
+1000.00342481423  SN.node[4].Communication.Routing         receivers:  9 11 18
+1000.00342481423  SN.node[4].Communication.Routing         hopcount cout: 99
+1000.00342481423  SN.node[4].Communication.Routing         sent packets: 13
+1000.00342481423  SN.node[4].Communication.Routing         sent packets to App layer: 0
+1000.00342481423  SN.node[5].Communication.MAC             ----------------------MAC monitoring infos----------------------
+1000.00342481423  SN.node[5].Communication.MAC             channel clear count 221
+1000.00342481423  SN.node[5].Communication.MAC             channel busy count 130
+1000.00342481423  SN.node[5].Communication.MAC             data transmission count 221
+1000.00342481423  SN.node[5].Communication.MAC             hop count transmission count 99
+1000.00342481423  SN.node[5].Communication.MAC             reached MAX retries count 33
+1000.00342481423  SN.node[5].Communication.Routing         ----------------------Network monitoring infos----------------------
+1000.00342481423  SN.node[5].Communication.Routing         hop count 4
+1000.00342481423  SN.node[5].Communication.Routing         neighbors:  9 11 18 28 33 37 46 49
+1000.00342481423  SN.node[5].Communication.Routing         receivers:  49
+1000.00342481423  SN.node[5].Communication.Routing         hopcount cout: 99
+1000.00342481423  SN.node[5].Communication.Routing         sent packets: 12
+1000.00342481423  SN.node[5].Communication.Routing         sent packets to App layer: 0
+1000.00342481423  SN.node[6].Communication.MAC             ----------------------MAC monitoring infos----------------------
+1000.00342481423  SN.node[6].Communication.MAC             channel clear count 99
+1000.00342481423  SN.node[6].Communication.MAC             channel busy count 164
+1000.00342481423  SN.node[6].Communication.MAC             data transmission count 99
+1000.00342481423  SN.node[6].Communication.MAC             hop count transmission count 100
+1000.00342481423  SN.node[6].Communication.MAC             reached MAX retries count 9
+1000.00342481423  SN.node[6].Communication.Routing         ----------------------Network monitoring infos----------------------
+1000.00342481423  SN.node[6].Communication.Routing         hop count 5
+1000.00342481423  SN.node[6].Communication.Routing         neighbors:  1 7 13 14 16 19 21 25 31 32 36 42 43
+1000.00342481423  SN.node[6].Communication.Routing         receivers:  7 13 14 19 21 31 32
+1000.00342481423  SN.node[6].Communication.Routing         hopcount cout: 100
+1000.00342481423  SN.node[6].Communication.Routing         sent packets: 11
+1000.00342481423  SN.node[6].Communication.Routing         sent packets to App layer: 0
+1000.00342481423  SN.node[7].Communication.MAC             ----------------------MAC monitoring infos----------------------
+1000.00342481423  SN.node[7].Communication.MAC             channel clear count 207
+1000.00342481423  SN.node[7].Communication.MAC             channel busy count 1201
+1000.00342481423  SN.node[7].Communication.MAC             data transmission count 207
+1000.00342481423  SN.node[7].Communication.MAC             hop count transmission count 100
+1000.00342481423  SN.node[7].Communication.MAC             reached MAX retries count 18
+1000.00342481423  SN.node[7].Communication.Routing         ----------------------Network monitoring infos----------------------
+1000.00342481423  SN.node[7].Communication.Routing         hop count 4
+1000.00342481423  SN.node[7].Communication.Routing         neighbors:  6 13 14 19 21 27 31 32 36 42 43
+1000.00342481423  SN.node[7].Communication.Routing         receivers:  27
+1000.00342481423  SN.node[7].Communication.Routing         hopcount cout: 100
+1000.00342481423  SN.node[7].Communication.Routing         sent packets: 12
+1000.00342481423  SN.node[7].Communication.Routing         sent packets to App layer: 0
+1000.00342481423  SN.node[8].Communication.MAC             ----------------------MAC monitoring infos----------------------
+1000.00342481423  SN.node[8].Communication.MAC             channel clear count 10
+1000.00342481423  SN.node[8].Communication.MAC             channel busy count 0
+1000.00342481423  SN.node[8].Communication.MAC             data transmission count 10
+1000.00342481423  SN.node[8].Communication.MAC             hop count transmission count 99
+1000.00342481423  SN.node[8].Communication.MAC             reached MAX retries count 0
+1000.00342481423  SN.node[8].Communication.Routing         ----------------------Network monitoring infos----------------------
+1000.00342481423  SN.node[8].Communication.Routing         hop count 7
+1000.00342481423  SN.node[8].Communication.Routing         neighbors:  16 34 35 38 39 40
+1000.00342481423  SN.node[8].Communication.Routing         receivers:  16 38
+1000.00342481423  SN.node[8].Communication.Routing         hopcount cout: 99
+1000.00342481423  SN.node[8].Communication.Routing         sent packets: 10
+1000.00342481423  SN.node[8].Communication.Routing         sent packets to App layer: 0
+1000.00342481423  SN.node[9].Communication.MAC             ----------------------MAC monitoring infos----------------------
+1000.00342481423  SN.node[9].Communication.MAC             channel clear count 50
+1000.00342481423  SN.node[9].Communication.MAC             channel busy count 32
+1000.00342481423  SN.node[9].Communication.MAC             data transmission count 50
+1000.00342481423  SN.node[9].Communication.MAC             hop count transmission count 99
+1000.00342481423  SN.node[9].Communication.MAC             reached MAX retries count 5
+1000.00342481423  SN.node[9].Communication.Routing         ----------------------Network monitoring infos----------------------
+1000.00342481423  SN.node[9].Communication.Routing         hop count 5
+1000.00342481423  SN.node[9].Communication.Routing         neighbors:  4 5 11 12 18 22 26 46 47
+1000.00342481423  SN.node[9].Communication.Routing         receivers:  5
+1000.00342481423  SN.node[9].Communication.Routing         hopcount cout: 99
+1000.00342481423  SN.node[9].Communication.Routing         sent packets: 11
+1000.00342481423  SN.node[9].Communication.Routing         sent packets to App layer: 0
+1000.00342481423  SN.node[10].Communication.MAC            ----------------------MAC monitoring infos----------------------
+1000.00342481423  SN.node[10].Communication.MAC            channel clear count 418
+1000.00342481423  SN.node[10].Communication.MAC            channel busy count 323
+1000.00342481423  SN.node[10].Communication.MAC            data transmission count 418
+1000.00342481423  SN.node[10].Communication.MAC            hop count transmission count 99
+1000.00342481423  SN.node[10].Communication.MAC            reached MAX retries count 60
+1000.00342481423  SN.node[10].Communication.Routing        ----------------------Network monitoring infos----------------------
+1000.00342481423  SN.node[10].Communication.Routing        hop count 2
+1000.00342481423  SN.node[10].Communication.Routing        neighbors:  27 29 41 44 48
+1000.00342481423  SN.node[10].Communication.Routing        receivers:  41
+1000.00342481423  SN.node[10].Communication.Routing        hopcount cout: 99
+1000.00342481423  SN.node[10].Communication.Routing        sent packets: 10
+1000.00342481423  SN.node[10].Communication.Routing        sent packets to App layer: 0
+1000.00342481423  SN.node[11].Communication.MAC            ----------------------MAC monitoring infos----------------------
+1000.00342481423  SN.node[11].Communication.MAC            channel clear count 88
+1000.00342481423  SN.node[11].Communication.MAC            channel busy count 85
+1000.00342481423  SN.node[11].Communication.MAC            data transmission count 88
+1000.00342481423  SN.node[11].Communication.MAC            hop count transmission count 100
+1000.00342481423  SN.node[11].Communication.MAC            reached MAX retries count 11
+1000.00342481423  SN.node[11].Communication.Routing        ----------------------Network monitoring infos----------------------
+1000.00342481423  SN.node[11].Communication.Routing        hop count 5
+1000.00342481423  SN.node[11].Communication.Routing        neighbors:  4 5 9 12 18 22 26 46 47
+1000.00342481423  SN.node[11].Communication.Routing        receivers:  5
+1000.00342481423  SN.node[11].Communication.Routing        hopcount cout: 100
+1000.00342481423  SN.node[11].Communication.Routing        sent packets: 10
+1000.00342481423  SN.node[11].Communication.Routing        sent packets to App layer: 0
+1000.00342481423  SN.node[12].Communication.MAC            ----------------------MAC monitoring infos----------------------
+1000.00342481423  SN.node[12].Communication.MAC            channel clear count 10
+1000.00342481423  SN.node[12].Communication.MAC            channel busy count 0
+1000.00342481423  SN.node[12].Communication.MAC            data transmission count 10
+1000.00342481423  SN.node[12].Communication.MAC            hop count transmission count 99
+1000.00342481423  SN.node[12].Communication.MAC            reached MAX retries count 0
+1000.00342481423  SN.node[12].Communication.Routing        ----------------------Network monitoring infos----------------------
+1000.00342481423  SN.node[12].Communication.Routing        hop count 6
+1000.00342481423  SN.node[12].Communication.Routing        neighbors:  9 11 20 37 46
+1000.00342481423  SN.node[12].Communication.Routing        receivers:  9 11 37 46
+1000.00342481423  SN.node[12].Communication.Routing        hopcount cout: 99
+1000.00342481423  SN.node[12].Communication.Routing        sent packets: 10
+1000.00342481423  SN.node[12].Communication.Routing        sent packets to App layer: 0
+1000.00342481423  SN.node[13].Communication.MAC            ----------------------MAC monitoring infos----------------------
+1000.00342481423  SN.node[13].Communication.MAC            channel clear count 173
+1000.00342481423  SN.node[13].Communication.MAC            channel busy count 1901
+1000.00342481423  SN.node[13].Communication.MAC            data transmission count 173
+1000.00342481423  SN.node[13].Communication.MAC            hop count transmission count 99
+1000.00342481423  SN.node[13].Communication.MAC            reached MAX retries count 54
+1000.00342481423  SN.node[13].Communication.Routing        ----------------------Network monitoring infos----------------------
+1000.00342481423  SN.node[13].Communication.Routing        hop count 4
+1000.00342481423  SN.node[13].Communication.Routing        neighbors:  6 7 14 19 21 24 27 31 32 36 43
+1000.00342481423  SN.node[13].Communication.Routing        receivers:  27
+1000.00342481423  SN.node[13].Communication.Routing        hopcount cout: 99
+1000.00342481423  SN.node[13].Communication.Routing        sent packets: 12
+1000.00342481423  SN.node[13].Communication.Routing        sent packets to App layer: 0
+1000.00342481423  SN.node[14].Communication.MAC            ----------------------MAC monitoring infos----------------------
+1000.00342481423  SN.node[14].Communication.MAC            channel clear count 159
+1000.00342481423  SN.node[14].Communication.MAC            channel busy count 1878
+1000.00342481423  SN.node[14].Communication.MAC            data transmission count 159
+1000.00342481423  SN.node[14].Communication.MAC            hop count transmission count 99
+1000.00342481423  SN.node[14].Communication.MAC            reached MAX retries count 66
+1000.00342481423  SN.node[14].Communication.Routing        ----------------------Network monitoring infos----------------------
+1000.00342481423  SN.node[14].Communication.Routing        hop count 4
+1000.00342481423  SN.node[14].Communication.Routing        neighbors:  6 7 13 19 21 24 27 31 32 36 43
+1000.00342481423  SN.node[14].Communication.Routing        receivers:  27
+1000.00342481423  SN.node[14].Communication.Routing        hopcount cout: 100
+1000.00342481423  SN.node[14].Communication.Routing        sent packets: 13
+1000.00342481423  SN.node[14].Communication.Routing        sent packets to App layer: 0
+1000.00342481423  SN.node[15].Communication.MAC            ----------------------MAC monitoring infos----------------------
+1000.00342481423  SN.node[15].Communication.MAC            channel clear count 33
+1000.00342481423  SN.node[15].Communication.MAC            channel busy count 5
+1000.00342481423  SN.node[15].Communication.MAC            data transmission count 33
+1000.00342481423  SN.node[15].Communication.MAC            hop count transmission count 99
+1000.00342481423  SN.node[15].Communication.MAC            reached MAX retries count 3
+1000.00342481423  SN.node[15].Communication.Routing        ----------------------Network monitoring infos----------------------
+1000.00342481423  SN.node[15].Communication.Routing        hop count 5
+1000.00342481423  SN.node[15].Communication.Routing        neighbors:  17 24 31 32 36 45
+1000.00342481423  SN.node[15].Communication.Routing        receivers:  31 32
+1000.00342481423  SN.node[15].Communication.Routing        hopcount cout: 99
+1000.00342481423  SN.node[15].Communication.Routing        sent packets: 11
+1000.00342481423  SN.node[15].Communication.Routing        sent packets to App layer: 0
+1000.00342481423  SN.node[16].Communication.MAC            ----------------------MAC monitoring infos----------------------
+1000.00342481423  SN.node[16].Communication.MAC            channel clear count 25
+1000.00342481423  SN.node[16].Communication.MAC            channel busy count 3
+1000.00342481423  SN.node[16].Communication.MAC            data transmission count 25
+1000.00342481423  SN.node[16].Communication.MAC            hop count transmission count 100
+1000.00342481423  SN.node[16].Communication.MAC            reached MAX retries count 2
+1000.00342481423  SN.node[16].Communication.Routing        ----------------------Network monitoring infos----------------------
+1000.00342481423  SN.node[16].Communication.Routing        hop count 6
+1000.00342481423  SN.node[16].Communication.Routing        neighbors:  1 6 8 34 35 36 38
+1000.00342481423  SN.node[16].Communication.Routing        receivers:  6 36
+1000.00342481423  SN.node[16].Communication.Routing        hopcount cout: 100
+1000.00342481423  SN.node[16].Communication.Routing        sent packets: 12
+1000.00342481423  SN.node[16].Communication.Routing        sent packets to App layer: 0
+1000.00342481423  SN.node[17].Communication.MAC            ----------------------MAC monitoring infos----------------------
+1000.00342481423  SN.node[17].Communication.MAC            channel clear count 12
+1000.00342481423  SN.node[17].Communication.MAC            channel busy count 0
+1000.00342481423  SN.node[17].Communication.MAC            data transmission count 12
+1000.00342481423  SN.node[17].Communication.MAC            hop count transmission count 100
+1000.00342481423  SN.node[17].Communication.MAC            reached MAX retries count 2
+1000.00342481423  SN.node[17].Communication.Routing        ----------------------Network monitoring infos----------------------
+1000.00342481423  SN.node[17].Communication.Routing        hop count 6
+1000.00342481423  SN.node[17].Communication.Routing        neighbors:  15 45
+1000.00342481423  SN.node[17].Communication.Routing        receivers:  15
+1000.00342481423  SN.node[17].Communication.Routing        hopcount cout: 100
+1000.00342481423  SN.node[17].Communication.Routing        sent packets: 10
+1000.00342481423  SN.node[17].Communication.Routing        sent packets to App layer: 0
+1000.00342481423  SN.node[18].Communication.MAC            ----------------------MAC monitoring infos----------------------
+1000.00342481423  SN.node[18].Communication.MAC            channel clear count 67
+1000.00342481423  SN.node[18].Communication.MAC            channel busy count 191
+1000.00342481423  SN.node[18].Communication.MAC            data transmission count 67
+1000.00342481423  SN.node[18].Communication.MAC            hop count transmission count 99
+1000.00342481423  SN.node[18].Communication.MAC            reached MAX retries count 23
+1000.00342481423  SN.node[18].Communication.Routing        ----------------------Network monitoring infos----------------------
+1000.00342481423  SN.node[18].Communication.Routing        hop count 5
+1000.00342481423  SN.node[18].Communication.Routing        neighbors:  4 5 9 11 22 23 25 26 33 46 47
+1000.00342481423  SN.node[18].Communication.Routing        receivers:  5
+1000.00342481423  SN.node[18].Communication.Routing        hopcount cout: 99
+1000.00342481423  SN.node[18].Communication.Routing        sent packets: 12
+1000.00342481423  SN.node[18].Communication.Routing        sent packets to App layer: 0
+1000.00342481423  SN.node[19].Communication.MAC            ----------------------MAC monitoring infos----------------------
+1000.00342481423  SN.node[19].Communication.MAC            channel clear count 148
+1000.00342481423  SN.node[19].Communication.MAC            channel busy count 1717
+1000.00342481423  SN.node[19].Communication.MAC            data transmission count 148
+1000.00342481423  SN.node[19].Communication.MAC            hop count transmission count 100
+1000.00342481423  SN.node[19].Communication.MAC            reached MAX retries count 60
+1000.00342481423  SN.node[19].Communication.Routing        ----------------------Network monitoring infos----------------------
+1000.00342481423  SN.node[19].Communication.Routing        hop count 4
+1000.00342481423  SN.node[19].Communication.Routing        neighbors:  6 7 13 14 21 27 31 32 36 43
+1000.00342481423  SN.node[19].Communication.Routing        receivers:  27
+1000.00342481423  SN.node[19].Communication.Routing        hopcount cout: 100
+1000.00342481423  SN.node[19].Communication.Routing        sent packets: 12
+1000.00342481423  SN.node[19].Communication.Routing        sent packets to App layer: 0
+1000.00342481423  SN.node[20].Communication.MAC            ----------------------MAC monitoring infos----------------------
+1000.00342481423  SN.node[20].Communication.MAC            channel clear count 10
+1000.00342481423  SN.node[20].Communication.MAC            channel busy count 0
+1000.00342481423  SN.node[20].Communication.MAC            data transmission count 10
+1000.00342481423  SN.node[20].Communication.MAC            hop count transmission count 100
+1000.00342481423  SN.node[20].Communication.MAC            reached MAX retries count 0
+1000.00342481423  SN.node[20].Communication.Routing        ----------------------Network monitoring infos----------------------
+1000.00342481423  SN.node[20].Communication.Routing        hop count 6
+1000.00342481423  SN.node[20].Communication.Routing        neighbors:  12 37 46
+1000.00342481423  SN.node[20].Communication.Routing        receivers:  37 46
+1000.00342481423  SN.node[20].Communication.Routing        hopcount cout: 100
+1000.00342481423  SN.node[20].Communication.Routing        sent packets: 10
+1000.00342481423  SN.node[20].Communication.Routing        sent packets to App layer: 0
+1000.00342481423  SN.node[21].Communication.MAC            ----------------------MAC monitoring infos----------------------
+1000.00342481423  SN.node[21].Communication.MAC            channel clear count 241
+1000.00342481423  SN.node[21].Communication.MAC            channel busy count 2196
+1000.00342481423  SN.node[21].Communication.MAC            data transmission count 241
+1000.00342481423  SN.node[21].Communication.MAC            hop count transmission count 99
+1000.00342481423  SN.node[21].Communication.MAC            reached MAX retries count 92
+1000.00342481423  SN.node[21].Communication.Routing        ----------------------Network monitoring infos----------------------
+1000.00342481423  SN.node[21].Communication.Routing        hop count 4
+1000.00342481423  SN.node[21].Communication.Routing        neighbors:  6 7 13 14 19 25 27 31 33 36 42 43
+1000.00342481423  SN.node[21].Communication.Routing        receivers:  27
+1000.00342481423  SN.node[21].Communication.Routing        hopcount cout: 99
+1000.00342481423  SN.node[21].Communication.Routing        sent packets: 11
+1000.00342481423  SN.node[21].Communication.Routing        sent packets to App layer: 0
+1000.00342481423  SN.node[22].Communication.MAC            ----------------------MAC monitoring infos----------------------
+1000.00342481423  SN.node[22].Communication.MAC            channel clear count 28
+1000.00342481423  SN.node[22].Communication.MAC            channel busy count 21
+1000.00342481423  SN.node[22].Communication.MAC            data transmission count 28
+1000.00342481423  SN.node[22].Communication.MAC            hop count transmission count 100
+1000.00342481423  SN.node[22].Communication.MAC            reached MAX retries count 0
+1000.00342481423  SN.node[22].Communication.Routing        ----------------------Network monitoring infos----------------------
+1000.00342481423  SN.node[22].Communication.Routing        hop count 6
+1000.00342481423  SN.node[22].Communication.Routing        neighbors:  2 4 9 11 18 23 26 35 47
+1000.00342481423  SN.node[22].Communication.Routing        receivers:  9 11 18
+1000.00342481423  SN.node[22].Communication.Routing        hopcount cout: 100
+1000.00342481423  SN.node[22].Communication.Routing        sent packets: 11
+1000.00342481423  SN.node[22].Communication.Routing        sent packets to App layer: 0
+1000.00342481423  SN.node[23].Communication.MAC            ----------------------MAC monitoring infos----------------------
+1000.00342481423  SN.node[23].Communication.MAC            channel clear count 11
+1000.00342481423  SN.node[23].Communication.MAC            channel busy count 0
+1000.00342481423  SN.node[23].Communication.MAC            data transmission count 11
+1000.00342481423  SN.node[23].Communication.MAC            hop count transmission count 100
+1000.00342481423  SN.node[23].Communication.MAC            reached MAX retries count 0
+1000.00342481423  SN.node[23].Communication.Routing        ----------------------Network monitoring infos----------------------
+1000.00342481423  SN.node[23].Communication.Routing        hop count 6
+1000.00342481423  SN.node[23].Communication.Routing        neighbors:  1 2 4 18 22 26 34 35 47
+1000.00342481423  SN.node[23].Communication.Routing        receivers:  18
+1000.00342481423  SN.node[23].Communication.Routing        hopcount cout: 100
+1000.00342481423  SN.node[23].Communication.Routing        sent packets: 11
+1000.00342481423  SN.node[23].Communication.Routing        sent packets to App layer: 0
+1000.00342481423  SN.node[24].Communication.MAC            ----------------------MAC monitoring infos----------------------
+1000.00342481423  SN.node[24].Communication.MAC            channel clear count 12
+1000.00342481423  SN.node[24].Communication.MAC            channel busy count 3
+1000.00342481423  SN.node[24].Communication.MAC            data transmission count 12
+1000.00342481423  SN.node[24].Communication.MAC            hop count transmission count 100
+1000.00342481423  SN.node[24].Communication.MAC            reached MAX retries count 1
+1000.00342481423  SN.node[24].Communication.Routing        ----------------------Network monitoring infos----------------------
+1000.00342481423  SN.node[24].Communication.Routing        hop count 5
+1000.00342481423  SN.node[24].Communication.Routing        neighbors:  13 14 15 31 32
+1000.00342481423  SN.node[24].Communication.Routing        receivers:  13 14 31 32
+1000.00342481423  SN.node[24].Communication.Routing        hopcount cout: 100
+1000.00342481423  SN.node[24].Communication.Routing        sent packets: 11
+1000.00342481423  SN.node[24].Communication.Routing        sent packets to App layer: 0
+1000.00342481423  SN.node[25].Communication.MAC            ----------------------MAC monitoring infos----------------------
+1000.00342481423  SN.node[25].Communication.MAC            channel clear count 30
+1000.00342481423  SN.node[25].Communication.MAC            channel busy count 161
+1000.00342481423  SN.node[25].Communication.MAC            data transmission count 30
+1000.00342481423  SN.node[25].Communication.MAC            hop count transmission count 100
+1000.00342481423  SN.node[25].Communication.MAC            reached MAX retries count 8
+1000.00342481423  SN.node[25].Communication.Routing        ----------------------Network monitoring infos----------------------
+1000.00342481423  SN.node[25].Communication.Routing        hop count 5
+1000.00342481423  SN.node[25].Communication.Routing        neighbors:  1 6 18 21 28 33 42 43
+1000.00342481423  SN.node[25].Communication.Routing        receivers:  21 28
+1000.00342481423  SN.node[25].Communication.Routing        hopcount cout: 100
+1000.00342481423  SN.node[25].Communication.Routing        sent packets: 10
+1000.00342481423  SN.node[25].Communication.Routing        sent packets to App layer: 0
+1000.00342481423  SN.node[26].Communication.MAC            ----------------------MAC monitoring infos----------------------
+1000.00342481423  SN.node[26].Communication.MAC            channel clear count 10
+1000.00342481423  SN.node[26].Communication.MAC            channel busy count 0
+1000.00342481423  SN.node[26].Communication.MAC            data transmission count 10
+1000.00342481423  SN.node[26].Communication.MAC            hop count transmission count 99
+1000.00342481423  SN.node[26].Communication.MAC            reached MAX retries count 0
+1000.00342481423  SN.node[26].Communication.Routing        ----------------------Network monitoring infos----------------------
+1000.00342481423  SN.node[26].Communication.Routing        hop count 6
+1000.00342481423  SN.node[26].Communication.Routing        neighbors:  1 2 4 9 11 18 22 23 35 47
+1000.00342481423  SN.node[26].Communication.Routing        receivers:  9 11 18
+1000.00342481423  SN.node[26].Communication.Routing        hopcount cout: 99
+1000.00342481423  SN.node[26].Communication.Routing        sent packets: 10
+1000.00342481423  SN.node[26].Communication.Routing        sent packets to App layer: 0
+1000.00342481423  SN.node[27].Communication.MAC            ----------------------MAC monitoring infos----------------------
+1000.00342481423  SN.node[27].Communication.MAC            channel clear count 441
+1000.00342481423  SN.node[27].Communication.MAC            channel busy count 1735
+1000.00342481423  SN.node[27].Communication.MAC            data transmission count 441
+1000.00342481423  SN.node[27].Communication.MAC            hop count transmission count 99
+1000.00342481423  SN.node[27].Communication.MAC            reached MAX retries count 78
+1000.00342481423  SN.node[27].Communication.Routing        ----------------------Network monitoring infos----------------------
+1000.00342481423  SN.node[27].Communication.Routing        hop count 3
+1000.00342481423  SN.node[27].Communication.Routing        neighbors:  7 10 13 14 19 21 31 32
+1000.00342481423  SN.node[27].Communication.Routing        receivers:  10
+1000.00342481423  SN.node[27].Communication.Routing        hopcount cout: 99
+1000.00342481423  SN.node[27].Communication.Routing        sent packets: 11
+1000.00342481423  SN.node[27].Communication.Routing        sent packets to App layer: 0
+1000.00342481423  SN.node[28].Communication.MAC            ----------------------MAC monitoring infos----------------------
+1000.00342481423  SN.node[28].Communication.MAC            channel clear count 70
+1000.00342481423  SN.node[28].Communication.MAC            channel busy count 174
+1000.00342481423  SN.node[28].Communication.MAC            data transmission count 70
+1000.00342481423  SN.node[28].Communication.MAC            hop count transmission count 99
+1000.00342481423  SN.node[28].Communication.MAC            reached MAX retries count 8
+1000.00342481423  SN.node[28].Communication.Routing        ----------------------Network monitoring infos----------------------
+1000.00342481423  SN.node[28].Communication.Routing        hop count 4
+1000.00342481423  SN.node[28].Communication.Routing        neighbors:  5 25 33 42 44 46 49
+1000.00342481423  SN.node[28].Communication.Routing        receivers:  44 49
+1000.00342481423  SN.node[28].Communication.Routing        hopcount cout: 99
+1000.00342481423  SN.node[28].Communication.Routing        sent packets: 11
+1000.00342481423  SN.node[28].Communication.Routing        sent packets to App layer: 0
+1000.00342481423  SN.node[29].Communication.MAC            ----------------------MAC monitoring infos----------------------
+1000.00342481423  SN.node[29].Communication.MAC            channel clear count 69
+1000.00342481423  SN.node[29].Communication.MAC            channel busy count 205
+1000.00342481423  SN.node[29].Communication.MAC            data transmission count 69
+1000.00342481423  SN.node[29].Communication.MAC            hop count transmission count 99
+1000.00342481423  SN.node[29].Communication.MAC            reached MAX retries count 18
+1000.00342481423  SN.node[29].Communication.Routing        ----------------------Network monitoring infos----------------------
+1000.00342481423  SN.node[29].Communication.Routing        hop count 2
+1000.00342481423  SN.node[29].Communication.Routing        neighbors:  10 41 44 48
+1000.00342481423  SN.node[29].Communication.Routing        receivers:  41
+1000.00342481423  SN.node[29].Communication.Routing        hopcount cout: 99
+1000.00342481423  SN.node[29].Communication.Routing        sent packets: 10
+1000.00342481423  SN.node[29].Communication.Routing        sent packets to App layer: 0
+1000.00342481423  SN.node[30].Communication.MAC            ----------------------MAC monitoring infos----------------------
+1000.00342481423  SN.node[30].Communication.MAC            channel clear count 10
+1000.00342481423  SN.node[30].Communication.MAC            channel busy count 0
+1000.00342481423  SN.node[30].Communication.MAC            data transmission count 10
+1000.00342481423  SN.node[30].Communication.MAC            hop count transmission count 100
+1000.00342481423  SN.node[30].Communication.MAC            reached MAX retries count 0
+1000.00342481423  SN.node[30].Communication.Routing        ----------------------Network monitoring infos----------------------
+1000.00342481423  SN.node[30].Communication.Routing        hop count 1
+1000.00342481423  SN.node[30].Communication.Routing        neighbors:  0 41
+1000.00342481423  SN.node[30].Communication.Routing        receivers:  0
+1000.00342481423  SN.node[30].Communication.Routing        hopcount cout: 100
+1000.00342481423  SN.node[30].Communication.Routing        sent packets: 10
+1000.00342481423  SN.node[30].Communication.Routing        sent packets to App layer: 0
+1000.00342481423  SN.node[31].Communication.MAC            ----------------------MAC monitoring infos----------------------
+1000.00342481423  SN.node[31].Communication.MAC            channel clear count 240
+1000.00342481423  SN.node[31].Communication.MAC            channel busy count 2252
+1000.00342481423  SN.node[31].Communication.MAC            data transmission count 240
+1000.00342481423  SN.node[31].Communication.MAC            hop count transmission count 100
+1000.00342481423  SN.node[31].Communication.MAC            reached MAX retries count 95
+1000.00342481423  SN.node[31].Communication.Routing        ----------------------Network monitoring infos----------------------
+1000.00342481423  SN.node[31].Communication.Routing        hop count 4
+1000.00342481423  SN.node[31].Communication.Routing        neighbors:  6 7 13 14 15 19 21 24 27 32 36 43
+1000.00342481423  SN.node[31].Communication.Routing        receivers:  27
+1000.00342481423  SN.node[31].Communication.Routing        hopcount cout: 100
+1000.00342481423  SN.node[31].Communication.Routing        sent packets: 12
+1000.00342481423  SN.node[31].Communication.Routing        sent packets to App layer: 0
+1000.00342481423  SN.node[32].Communication.MAC            ----------------------MAC monitoring infos----------------------
+1000.00342481423  SN.node[32].Communication.MAC            channel clear count 221
+1000.00342481423  SN.node[32].Communication.MAC            channel busy count 2081
+1000.00342481423  SN.node[32].Communication.MAC            data transmission count 221
+1000.00342481423  SN.node[32].Communication.MAC            hop count transmission count 99
+1000.00342481423  SN.node[32].Communication.MAC            reached MAX retries count 100
+1000.00342481423  SN.node[32].Communication.Routing        ----------------------Network monitoring infos----------------------
+1000.00342481423  SN.node[32].Communication.Routing        hop count 4
+1000.00342481423  SN.node[32].Communication.Routing        neighbors:  6 7 13 14 15 19 24 27 31 36
+1000.00342481423  SN.node[32].Communication.Routing        receivers:  27
+1000.00342481423  SN.node[32].Communication.Routing        hopcount cout: 99
+1000.00342481423  SN.node[32].Communication.Routing        sent packets: 10
+1000.00342481423  SN.node[32].Communication.Routing        sent packets to App layer: 0
+1000.00342481423  SN.node[33].Communication.MAC            ----------------------MAC monitoring infos----------------------
+1000.00342481423  SN.node[33].Communication.MAC            channel clear count 36
+1000.00342481423  SN.node[33].Communication.MAC            channel busy count 109
+1000.00342481423  SN.node[33].Communication.MAC            data transmission count 36
+1000.00342481423  SN.node[33].Communication.MAC            hop count transmission count 99
+1000.00342481423  SN.node[33].Communication.MAC            reached MAX retries count 4
+1000.00342481423  SN.node[33].Communication.Routing        ----------------------Network monitoring infos----------------------
+1000.00342481423  SN.node[33].Communication.Routing        hop count 5
+1000.00342481423  SN.node[33].Communication.Routing        neighbors:  1 5 18 21 25 28 42 43
+1000.00342481423  SN.node[33].Communication.Routing        receivers:  5 21 28
+1000.00342481423  SN.node[33].Communication.Routing        hopcount cout: 99
+1000.00342481423  SN.node[33].Communication.Routing        sent packets: 11
+1000.00342481423  SN.node[33].Communication.Routing        sent packets to App layer: 0
+1000.00342481423  SN.node[34].Communication.MAC            ----------------------MAC monitoring infos----------------------
+1000.00342481423  SN.node[34].Communication.MAC            channel clear count 11
+1000.00342481423  SN.node[34].Communication.MAC            channel busy count 0
+1000.00342481423  SN.node[34].Communication.MAC            data transmission count 11
+1000.00342481423  SN.node[34].Communication.MAC            hop count transmission count 99
+1000.00342481423  SN.node[34].Communication.MAC            reached MAX retries count 0
+1000.00342481423  SN.node[34].Communication.Routing        ----------------------Network monitoring infos----------------------
+1000.00342481423  SN.node[34].Communication.Routing        hop count 7
+1000.00342481423  SN.node[34].Communication.Routing        neighbors:  1 8 16 23 35 38 39 40
+1000.00342481423  SN.node[34].Communication.Routing        receivers:  1 16 23 38
+1000.00342481423  SN.node[34].Communication.Routing        hopcount cout: 99
+1000.00342481423  SN.node[34].Communication.Routing        sent packets: 11
+1000.00342481423  SN.node[34].Communication.Routing        sent packets to App layer: 0
+1000.00342481423  SN.node[35].Communication.MAC            ----------------------MAC monitoring infos----------------------
+1000.00342481423  SN.node[35].Communication.MAC            channel clear count 11
+1000.00342481423  SN.node[35].Communication.MAC            channel busy count 0
+1000.00342481423  SN.node[35].Communication.MAC            data transmission count 11
+1000.00342481423  SN.node[35].Communication.MAC            hop count transmission count 99
+1000.00342481423  SN.node[35].Communication.MAC            reached MAX retries count 0
+1000.00342481423  SN.node[35].Communication.Routing        ----------------------Network monitoring infos----------------------
+1000.00342481423  SN.node[35].Communication.Routing        hop count 7
+1000.00342481423  SN.node[35].Communication.Routing        neighbors:  1 2 4 8 16 22 23 26 34 38 39 40 47
+1000.00342481423  SN.node[35].Communication.Routing        receivers:  1 4 16 22 23 26 38 47
+1000.00342481423  SN.node[35].Communication.Routing        hopcount cout: 99
+1000.00342481423  SN.node[35].Communication.Routing        sent packets: 11
+1000.00342481423  SN.node[35].Communication.Routing        sent packets to App layer: 0
+1000.00342481423  SN.node[36].Communication.MAC            ----------------------MAC monitoring infos----------------------
+1000.00342481423  SN.node[36].Communication.MAC            channel clear count 121
+1000.00342481423  SN.node[36].Communication.MAC            channel busy count 266
+1000.00342481423  SN.node[36].Communication.MAC            data transmission count 121
+1000.00342481423  SN.node[36].Communication.MAC            hop count transmission count 99
+1000.00342481423  SN.node[36].Communication.MAC            reached MAX retries count 32
+1000.00342481423  SN.node[36].Communication.Routing        ----------------------Network monitoring infos----------------------
+1000.00342481423  SN.node[36].Communication.Routing        hop count 5
+1000.00342481423  SN.node[36].Communication.Routing        neighbors:  1 6 7 13 14 15 16 19 21 31 32 38 43
+1000.00342481423  SN.node[36].Communication.Routing        receivers:  7 13 14 19 21 31 32
+1000.00342481423  SN.node[36].Communication.Routing        hopcount cout: 99
+1000.00342481423  SN.node[36].Communication.Routing        sent packets: 10
+1000.00342481423  SN.node[36].Communication.Routing        sent packets to App layer: 0
+1000.00342481423  SN.node[37].Communication.MAC            ----------------------MAC monitoring infos----------------------
+1000.00342481423  SN.node[37].Communication.MAC            channel clear count 40
+1000.00342481423  SN.node[37].Communication.MAC            channel busy count 0
+1000.00342481423  SN.node[37].Communication.MAC            data transmission count 40
+1000.00342481423  SN.node[37].Communication.MAC            hop count transmission count 99
+1000.00342481423  SN.node[37].Communication.MAC            reached MAX retries count 10
+1000.00342481423  SN.node[37].Communication.Routing        ----------------------Network monitoring infos----------------------
+1000.00342481423  SN.node[37].Communication.Routing        hop count 5
+1000.00342481423  SN.node[37].Communication.Routing        neighbors:  5 12 20 46
+1000.00342481423  SN.node[37].Communication.Routing        receivers:  5
+1000.00342481423  SN.node[37].Communication.Routing        hopcount cout: 99
+1000.00342481423  SN.node[37].Communication.Routing        sent packets: 10
+1000.00342481423  SN.node[37].Communication.Routing        sent packets to App layer: 0
+1000.00342481423  SN.node[38].Communication.MAC            ----------------------MAC monitoring infos----------------------
+1000.00342481423  SN.node[38].Communication.MAC            channel clear count 43
+1000.00342481423  SN.node[38].Communication.MAC            channel busy count 0
+1000.00342481423  SN.node[38].Communication.MAC            data transmission count 43
+1000.00342481423  SN.node[38].Communication.MAC            hop count transmission count 99
+1000.00342481423  SN.node[38].Communication.MAC            reached MAX retries count 1
+1000.00342481423  SN.node[38].Communication.Routing        ----------------------Network monitoring infos----------------------
+1000.00342481423  SN.node[38].Communication.Routing        hop count 6
+1000.00342481423  SN.node[38].Communication.Routing        neighbors:  1 8 16 34 35 36 39 40
+1000.00342481423  SN.node[38].Communication.Routing        receivers:  36
+1000.00342481423  SN.node[38].Communication.Routing        hopcount cout: 99
+1000.00342481423  SN.node[38].Communication.Routing        sent packets: 11
+1000.00342481423  SN.node[38].Communication.Routing        sent packets to App layer: 0
+1000.00342481423  SN.node[39].Communication.MAC            ----------------------MAC monitoring infos----------------------
+1000.00342481423  SN.node[39].Communication.MAC            channel clear count 21
+1000.00342481423  SN.node[39].Communication.MAC            channel busy count 0
+1000.00342481423  SN.node[39].Communication.MAC            data transmission count 21
+1000.00342481423  SN.node[39].Communication.MAC            hop count transmission count 99
+1000.00342481423  SN.node[39].Communication.MAC            reached MAX retries count 0
+1000.00342481423  SN.node[39].Communication.Routing        ----------------------Network monitoring infos----------------------
+1000.00342481423  SN.node[39].Communication.Routing        hop count 7
+1000.00342481423  SN.node[39].Communication.Routing        neighbors:  2 3 8 34 35 38 40
+1000.00342481423  SN.node[39].Communication.Routing        receivers:  38
+1000.00342481423  SN.node[39].Communication.Routing        hopcount cout: 99
+1000.00342481423  SN.node[39].Communication.Routing        sent packets: 11
+1000.00342481423  SN.node[39].Communication.Routing        sent packets to App layer: 0
+1000.00342481423  SN.node[40].Communication.MAC            ----------------------MAC monitoring infos----------------------
+1000.00342481423  SN.node[40].Communication.MAC            channel clear count 9
+1000.00342481423  SN.node[40].Communication.MAC            channel busy count 0
+1000.00342481423  SN.node[40].Communication.MAC            data transmission count 9
+1000.00342481423  SN.node[40].Communication.MAC            hop count transmission count 100
+1000.00342481423  SN.node[40].Communication.MAC            reached MAX retries count 0
+1000.00342481423  SN.node[40].Communication.Routing        ----------------------Network monitoring infos----------------------
+1000.00342481423  SN.node[40].Communication.Routing        hop count 7
+1000.00342481423  SN.node[40].Communication.Routing        neighbors:  3 8 34 35 38 39
+1000.00342481423  SN.node[40].Communication.Routing        receivers:  38
+1000.00342481423  SN.node[40].Communication.Routing        hopcount cout: 100
+1000.00342481423  SN.node[40].Communication.Routing        sent packets: 9
+1000.00342481423  SN.node[40].Communication.Routing        sent packets to App layer: 0
+1000.00342481423  SN.node[41].Communication.MAC            ----------------------MAC monitoring infos----------------------
+1000.00342481423  SN.node[41].Communication.MAC            channel clear count 509
+1000.00342481423  SN.node[41].Communication.MAC            channel busy count 207
+1000.00342481423  SN.node[41].Communication.MAC            data transmission count 509
+1000.00342481423  SN.node[41].Communication.MAC            hop count transmission count 100
+1000.00342481423  SN.node[41].Communication.MAC            reached MAX retries count 31
+1000.00342481423  SN.node[41].Communication.Routing        ----------------------Network monitoring infos----------------------
+1000.00342481423  SN.node[41].Communication.Routing        hop count 1
+1000.00342481423  SN.node[41].Communication.Routing        neighbors:  0 10 29 30 48
+1000.00342481423  SN.node[41].Communication.Routing        receivers:  0
+1000.00342481423  SN.node[41].Communication.Routing        hopcount cout: 100
+1000.00342481423  SN.node[41].Communication.Routing        sent packets: 12
+1000.00342481423  SN.node[41].Communication.Routing        sent packets to App layer: 0
+1000.00342481423  SN.node[42].Communication.MAC            ----------------------MAC monitoring infos----------------------
+1000.00342481423  SN.node[42].Communication.MAC            channel clear count 33
+1000.00342481423  SN.node[42].Communication.MAC            channel busy count 195
+1000.00342481423  SN.node[42].Communication.MAC            data transmission count 33
+1000.00342481423  SN.node[42].Communication.MAC            hop count transmission count 99
+1000.00342481423  SN.node[42].Communication.MAC            reached MAX retries count 11
+1000.00342481423  SN.node[42].Communication.Routing        ----------------------Network monitoring infos----------------------
+1000.00342481423  SN.node[42].Communication.Routing        hop count 5
+1000.00342481423  SN.node[42].Communication.Routing        neighbors:  1 6 7 21 25 28 33 43
+1000.00342481423  SN.node[42].Communication.Routing        receivers:  7 21 28
+1000.00342481423  SN.node[42].Communication.Routing        hopcount cout: 99
+1000.00342481423  SN.node[42].Communication.Routing        sent packets: 12
+1000.00342481423  SN.node[42].Communication.Routing        sent packets to App layer: 0
+1000.00342481423  SN.node[43].Communication.MAC            ----------------------MAC monitoring infos----------------------
+1000.00342481423  SN.node[43].Communication.MAC            channel clear count 56
+1000.00342481423  SN.node[43].Communication.MAC            channel busy count 454
+1000.00342481423  SN.node[43].Communication.MAC            data transmission count 56
+1000.00342481423  SN.node[43].Communication.MAC            hop count transmission count 100
+1000.00342481423  SN.node[43].Communication.MAC            reached MAX retries count 8
+1000.00342481423  SN.node[43].Communication.Routing        ----------------------Network monitoring infos----------------------
+1000.00342481423  SN.node[43].Communication.Routing        hop count 5
+1000.00342481423  SN.node[43].Communication.Routing        neighbors:  1 6 7 13 14 19 21 25 31 33 36 42
+1000.00342481423  SN.node[43].Communication.Routing        receivers:  7 13 14 19 21 31
+1000.00342481423  SN.node[43].Communication.Routing        hopcount cout: 100
+1000.00342481423  SN.node[43].Communication.Routing        sent packets: 10
+1000.00342481423  SN.node[43].Communication.Routing        sent packets to App layer: 0
+1000.00342481423  SN.node[44].Communication.MAC            ----------------------MAC monitoring infos----------------------
+1000.00342481423  SN.node[44].Communication.MAC            channel clear count 118
+1000.00342481423  SN.node[44].Communication.MAC            channel busy count 135
+1000.00342481423  SN.node[44].Communication.MAC            data transmission count 118
+1000.00342481423  SN.node[44].Communication.MAC            hop count transmission count 99
+1000.00342481423  SN.node[44].Communication.MAC            reached MAX retries count 30
+1000.00342481423  SN.node[44].Communication.Routing        ----------------------Network monitoring infos----------------------
+1000.00342481423  SN.node[44].Communication.Routing        hop count 3
+1000.00342481423  SN.node[44].Communication.Routing        neighbors:  10 28 29 48 49
+1000.00342481423  SN.node[44].Communication.Routing        receivers:  10 29 48
+1000.00342481423  SN.node[44].Communication.Routing        hopcount cout: 99
+1000.00342481423  SN.node[44].Communication.Routing        sent packets: 11
+1000.00342481423  SN.node[44].Communication.Routing        sent packets to App layer: 0
+1000.00342481423  SN.node[45].Communication.MAC            ----------------------MAC monitoring infos----------------------
+1000.00342481423  SN.node[45].Communication.MAC            channel clear count 10
+1000.00342481423  SN.node[45].Communication.MAC            channel busy count 0
+1000.00342481423  SN.node[45].Communication.MAC            data transmission count 10
+1000.00342481423  SN.node[45].Communication.MAC            hop count transmission count 99
+1000.00342481423  SN.node[45].Communication.MAC            reached MAX retries count 0
+1000.00342481423  SN.node[45].Communication.Routing        ----------------------Network monitoring infos----------------------
+1000.00342481423  SN.node[45].Communication.Routing        hop count 6
+1000.00342481423  SN.node[45].Communication.Routing        neighbors:  15 17
+1000.00342481423  SN.node[45].Communication.Routing        receivers:  15
+1000.00342481423  SN.node[45].Communication.Routing        hopcount cout: 99
+1000.00342481423  SN.node[45].Communication.Routing        sent packets: 10
+1000.00342481423  SN.node[45].Communication.Routing        sent packets to App layer: 0
+1000.00342481423  SN.node[46].Communication.MAC            ----------------------MAC monitoring infos----------------------
+1000.00342481423  SN.node[46].Communication.MAC            channel clear count 11
+1000.00342481423  SN.node[46].Communication.MAC            channel busy count 0
+1000.00342481423  SN.node[46].Communication.MAC            data transmission count 11
+1000.00342481423  SN.node[46].Communication.MAC            hop count transmission count 99
+1000.00342481423  SN.node[46].Communication.MAC            reached MAX retries count 0
+1000.00342481423  SN.node[46].Communication.Routing        ----------------------Network monitoring infos----------------------
+1000.00342481423  SN.node[46].Communication.Routing        hop count 5
+1000.00342481423  SN.node[46].Communication.Routing        neighbors:  5 9 11 12 18 20 28 37
+1000.00342481423  SN.node[46].Communication.Routing        receivers:  5 28
+1000.00342481423  SN.node[46].Communication.Routing        hopcount cout: 99
+1000.00342481423  SN.node[46].Communication.Routing        sent packets: 11
+1000.00342481423  SN.node[46].Communication.Routing        sent packets to App layer: 0
+1000.00342481423  SN.node[47].Communication.MAC            ----------------------MAC monitoring infos----------------------
+1000.00342481423  SN.node[47].Communication.MAC            channel clear count 9
+1000.00342481423  SN.node[47].Communication.MAC            channel busy count 0
+1000.00342481423  SN.node[47].Communication.MAC            data transmission count 9
+1000.00342481423  SN.node[47].Communication.MAC            hop count transmission count 99
+1000.00342481423  SN.node[47].Communication.MAC            reached MAX retries count 0
+1000.00342481423  SN.node[47].Communication.Routing        ----------------------Network monitoring infos----------------------
+1000.00342481423  SN.node[47].Communication.Routing        hop count 6
+1000.00342481423  SN.node[47].Communication.Routing        neighbors:  1 2 4 9 11 18 22 23 26 35
+1000.00342481423  SN.node[47].Communication.Routing        receivers:  9 11 18
+1000.00342481423  SN.node[47].Communication.Routing        hopcount cout: 99
+1000.00342481423  SN.node[47].Communication.Routing        sent packets: 9
+1000.00342481423  SN.node[47].Communication.Routing        sent packets to App layer: 0
+1000.00342481423  SN.node[48].Communication.MAC            ----------------------MAC monitoring infos----------------------
+1000.00342481423  SN.node[48].Communication.MAC            channel clear count 218
+1000.00342481423  SN.node[48].Communication.MAC            channel busy count 311
+1000.00342481423  SN.node[48].Communication.MAC            data transmission count 218
+1000.00342481423  SN.node[48].Communication.MAC            hop count transmission count 99
+1000.00342481423  SN.node[48].Communication.MAC            reached MAX retries count 28
+1000.00342481423  SN.node[48].Communication.Routing        ----------------------Network monitoring infos----------------------
+1000.00342481423  SN.node[48].Communication.Routing        hop count 2
+1000.00342481423  SN.node[48].Communication.Routing        neighbors:  10 29 41 44 49
+1000.00342481423  SN.node[48].Communication.Routing        receivers:  41
+1000.00342481423  SN.node[48].Communication.Routing        hopcount cout: 99
+1000.00342481423  SN.node[48].Communication.Routing        sent packets: 12
+1000.00342481423  SN.node[48].Communication.Routing        sent packets to App layer: 0
+1000.00342481423  SN.node[49].Communication.MAC            ----------------------MAC monitoring infos----------------------
+1000.00342481423  SN.node[49].Communication.MAC            channel clear count 254
+1000.00342481423  SN.node[49].Communication.MAC            channel busy count 195
+1000.00342481423  SN.node[49].Communication.MAC            data transmission count 254
+1000.00342481423  SN.node[49].Communication.MAC            hop count transmission count 99
+1000.00342481423  SN.node[49].Communication.MAC            reached MAX retries count 47
+1000.00342481423  SN.node[49].Communication.Routing        ----------------------Network monitoring infos----------------------
+1000.00342481423  SN.node[49].Communication.Routing        hop count 3
+1000.00342481423  SN.node[49].Communication.Routing        neighbors:  5 28 44 48
+1000.00342481423  SN.node[49].Communication.Routing        receivers:  48
+1000.00342481423  SN.node[49].Communication.Routing        hopcount cout: 99
+1000.00342481423  SN.node[49].Communication.Routing        sent packets: 12
+1000.00342481423  SN.node[49].Communication.Routing        sent packets to App layer: 0
+1000.00342481423  SN.node[0].Communication.MAC             ----------------------MAC monitoring infos----------------------
+1000.00342481423  SN.node[0].Communication.MAC             channel clear count 0
+1000.00342481423  SN.node[0].Communication.MAC             channel busy count 0
+1000.00342481423  SN.node[0].Communication.MAC             data transmission count 0
+1000.00342481423  SN.node[0].Communication.MAC             hop count transmission count 99
+1000.00342481423  SN.node[0].Communication.MAC             reached MAX retries count 0
+1000.00342481423  SN.node[0].Communication.Routing         ----------------------ODAR Network monitoring infos----------------------
+1000.00342481423  SN.node[0].Communication.Routing         hop count 0
+1000.00342481423  SN.node[0].Communication.Routing         neighbors:  30 41
+1000.00342481423  SN.node[0].Communication.Routing         receivers: 
+1000.00342481423  SN.node[0].Communication.Routing         hopcount cout: 99
+1000.00342481423  SN.node[0].Communication.Routing         sent packets: 0
+1000.00342481423  SN.node[0].Communication.Routing         sent packets to App layer: 467
+1000.00342481423  SN.node[1].Communication.MAC             ----------------------MAC monitoring infos----------------------
+1000.00342481423  SN.node[1].Communication.MAC             channel clear count 37
+1000.00342481423  SN.node[1].Communication.MAC             channel busy count 13
+1000.00342481423  SN.node[1].Communication.MAC             data transmission count 37
+1000.00342481423  SN.node[1].Communication.MAC             hop count transmission count 99
+1000.00342481423  SN.node[1].Communication.MAC             reached MAX retries count 1
+1000.00342481423  SN.node[1].Communication.Routing         ----------------------ODAR Network monitoring infos----------------------
+1000.00342481423  SN.node[1].Communication.Routing         hop count 6
+1000.00342481423  SN.node[1].Communication.Routing         neighbors:  4 6 16 23 25 26 33 34 35 36 38 42 43 47
+1000.00342481423  SN.node[1].Communication.Routing         receivers:  6 25 33 36 42 43
+1000.00342481423  SN.node[1].Communication.Routing         hopcount cout: 99
+1000.00342481423  SN.node[1].Communication.Routing         sent packets: 9
+1000.00342481423  SN.node[1].Communication.Routing         sent packets to App layer: 0
+1000.00342481423  SN.node[2].Communication.MAC             ----------------------MAC monitoring infos----------------------
+1000.00342481423  SN.node[2].Communication.MAC             channel clear count 9
+1000.00342481423  SN.node[2].Communication.MAC             channel busy count 0
+1000.00342481423  SN.node[2].Communication.MAC             data transmission count 9
+1000.00342481423  SN.node[2].Communication.MAC             hop count transmission count 99
+1000.00342481423  SN.node[2].Communication.MAC             reached MAX retries count 0
+1000.00342481423  SN.node[2].Communication.Routing         ----------------------ODAR Network monitoring infos----------------------
+1000.00342481423  SN.node[2].Communication.Routing         hop count 7
+1000.00342481423  SN.node[2].Communication.Routing         neighbors:  4 22 23 26 35 39 47
+1000.00342481423  SN.node[2].Communication.Routing         receivers:  4 22 23 26 47
+1000.00342481423  SN.node[2].Communication.Routing         hopcount cout: 99
+1000.00342481423  SN.node[2].Communication.Routing         sent packets: 9
+1000.00342481423  SN.node[2].Communication.Routing         sent packets to App layer: 0
+1000.00342481423  SN.node[3].Communication.MAC             ----------------------MAC monitoring infos----------------------
+1000.00342481423  SN.node[3].Communication.MAC             channel clear count 10
+1000.00342481423  SN.node[3].Communication.MAC             channel busy count 0
+1000.00342481423  SN.node[3].Communication.MAC             data transmission count 10
+1000.00342481423  SN.node[3].Communication.MAC             hop count transmission count 99
+1000.00342481423  SN.node[3].Communication.MAC             reached MAX retries count 0
+1000.00342481423  SN.node[3].Communication.Routing         ----------------------ODAR Network monitoring infos----------------------
+1000.00342481423  SN.node[3].Communication.Routing         hop count 8
+1000.00342481423  SN.node[3].Communication.Routing         neighbors:  39 40
+1000.00342481423  SN.node[3].Communication.Routing         receivers:  39 40
+1000.00342481423  SN.node[3].Communication.Routing         hopcount cout: 99
+1000.00342481423  SN.node[3].Communication.Routing         sent packets: 10
+1000.00342481423  SN.node[3].Communication.Routing         sent packets to App layer: 0
+1000.00342481423  SN.node[4].Communication.MAC             ----------------------MAC monitoring infos----------------------
+1000.00342481423  SN.node[4].Communication.MAC             channel clear count 22
+1000.00342481423  SN.node[4].Communication.MAC             channel busy count 0
+1000.00342481423  SN.node[4].Communication.MAC             data transmission count 22
+1000.00342481423  SN.node[4].Communication.MAC             hop count transmission count 99
+1000.00342481423  SN.node[4].Communication.MAC             reached MAX retries count 0
+1000.00342481423  SN.node[4].Communication.Routing         ----------------------ODAR Network monitoring infos----------------------
+1000.00342481423  SN.node[4].Communication.Routing         hop count 6
+1000.00342481423  SN.node[4].Communication.Routing         neighbors:  1 2 9 11 18 22 23 26 35 47
+1000.00342481423  SN.node[4].Communication.Routing         receivers:  9 11 18
+1000.00342481423  SN.node[4].Communication.Routing         hopcount cout: 99
+1000.00342481423  SN.node[4].Communication.Routing         sent packets: 13
+1000.00342481423  SN.node[4].Communication.Routing         sent packets to App layer: 0
+1000.00342481423  SN.node[5].Communication.MAC             ----------------------MAC monitoring infos----------------------
+1000.00342481423  SN.node[5].Communication.MAC             channel clear count 221
+1000.00342481423  SN.node[5].Communication.MAC             channel busy count 130
+1000.00342481423  SN.node[5].Communication.MAC             data transmission count 221
+1000.00342481423  SN.node[5].Communication.MAC             hop count transmission count 99
+1000.00342481423  SN.node[5].Communication.MAC             reached MAX retries count 33
+1000.00342481423  SN.node[5].Communication.Routing         ----------------------ODAR Network monitoring infos----------------------
+1000.00342481423  SN.node[5].Communication.Routing         hop count 4
+1000.00342481423  SN.node[5].Communication.Routing         neighbors:  9 11 18 28 33 37 46 49
+1000.00342481423  SN.node[5].Communication.Routing         receivers:  49
+1000.00342481423  SN.node[5].Communication.Routing         hopcount cout: 99
+1000.00342481423  SN.node[5].Communication.Routing         sent packets: 12
+1000.00342481423  SN.node[5].Communication.Routing         sent packets to App layer: 0
+1000.00342481423  SN.node[6].Communication.MAC             ----------------------MAC monitoring infos----------------------
+1000.00342481423  SN.node[6].Communication.MAC             channel clear count 99
+1000.00342481423  SN.node[6].Communication.MAC             channel busy count 164
+1000.00342481423  SN.node[6].Communication.MAC             data transmission count 99
+1000.00342481423  SN.node[6].Communication.MAC             hop count transmission count 100
+1000.00342481423  SN.node[6].Communication.MAC             reached MAX retries count 9
+1000.00342481423  SN.node[6].Communication.Routing         ----------------------ODAR Network monitoring infos----------------------
+1000.00342481423  SN.node[6].Communication.Routing         hop count 5
+1000.00342481423  SN.node[6].Communication.Routing         neighbors:  1 7 13 14 16 19 21 25 31 32 36 42 43
+1000.00342481423  SN.node[6].Communication.Routing         receivers:  7 13 14 19 21 31 32
+1000.00342481423  SN.node[6].Communication.Routing         hopcount cout: 100
+1000.00342481423  SN.node[6].Communication.Routing         sent packets: 11
+1000.00342481423  SN.node[6].Communication.Routing         sent packets to App layer: 0
+1000.00342481423  SN.node[7].Communication.MAC             ----------------------MAC monitoring infos----------------------
+1000.00342481423  SN.node[7].Communication.MAC             channel clear count 207
+1000.00342481423  SN.node[7].Communication.MAC             channel busy count 1201
+1000.00342481423  SN.node[7].Communication.MAC             data transmission count 207
+1000.00342481423  SN.node[7].Communication.MAC             hop count transmission count 100
+1000.00342481423  SN.node[7].Communication.MAC             reached MAX retries count 18
+1000.00342481423  SN.node[7].Communication.Routing         ----------------------ODAR Network monitoring infos----------------------
+1000.00342481423  SN.node[7].Communication.Routing         hop count 4
+1000.00342481423  SN.node[7].Communication.Routing         neighbors:  6 13 14 19 21 27 31 32 36 42 43
+1000.00342481423  SN.node[7].Communication.Routing         receivers:  27
+1000.00342481423  SN.node[7].Communication.Routing         hopcount cout: 100
+1000.00342481423  SN.node[7].Communication.Routing         sent packets: 12
+1000.00342481423  SN.node[7].Communication.Routing         sent packets to App layer: 0
+1000.00342481423  SN.node[8].Communication.MAC             ----------------------MAC monitoring infos----------------------
+1000.00342481423  SN.node[8].Communication.MAC             channel clear count 10
+1000.00342481423  SN.node[8].Communication.MAC             channel busy count 0
+1000.00342481423  SN.node[8].Communication.MAC             data transmission count 10
+1000.00342481423  SN.node[8].Communication.MAC             hop count transmission count 99
+1000.00342481423  SN.node[8].Communication.MAC             reached MAX retries count 0
+1000.00342481423  SN.node[8].Communication.Routing         ----------------------ODAR Network monitoring infos----------------------
+1000.00342481423  SN.node[8].Communication.Routing         hop count 7
+1000.00342481423  SN.node[8].Communication.Routing         neighbors:  16 34 35 38 39 40
+1000.00342481423  SN.node[8].Communication.Routing         receivers:  16 38
+1000.00342481423  SN.node[8].Communication.Routing         hopcount cout: 99
+1000.00342481423  SN.node[8].Communication.Routing         sent packets: 10
+1000.00342481423  SN.node[8].Communication.Routing         sent packets to App layer: 0
+1000.00342481423  SN.node[9].Communication.MAC             ----------------------MAC monitoring infos----------------------
+1000.00342481423  SN.node[9].Communication.MAC             channel clear count 50
+1000.00342481423  SN.node[9].Communication.MAC             channel busy count 32
+1000.00342481423  SN.node[9].Communication.MAC             data transmission count 50
+1000.00342481423  SN.node[9].Communication.MAC             hop count transmission count 99
+1000.00342481423  SN.node[9].Communication.MAC             reached MAX retries count 5
+1000.00342481423  SN.node[9].Communication.Routing         ----------------------ODAR Network monitoring infos----------------------
+1000.00342481423  SN.node[9].Communication.Routing         hop count 5
+1000.00342481423  SN.node[9].Communication.Routing         neighbors:  4 5 11 12 18 22 26 46 47
+1000.00342481423  SN.node[9].Communication.Routing         receivers:  5
+1000.00342481423  SN.node[9].Communication.Routing         hopcount cout: 99
+1000.00342481423  SN.node[9].Communication.Routing         sent packets: 11
+1000.00342481423  SN.node[9].Communication.Routing         sent packets to App layer: 0
+1000.00342481423  SN.node[10].Communication.MAC            ----------------------MAC monitoring infos----------------------
+1000.00342481423  SN.node[10].Communication.MAC            channel clear count 418
+1000.00342481423  SN.node[10].Communication.MAC            channel busy count 323
+1000.00342481423  SN.node[10].Communication.MAC            data transmission count 418
+1000.00342481423  SN.node[10].Communication.MAC            hop count transmission count 99
+1000.00342481423  SN.node[10].Communication.MAC            reached MAX retries count 60
+1000.00342481423  SN.node[10].Communication.Routing        ----------------------ODAR Network monitoring infos----------------------
+1000.00342481423  SN.node[10].Communication.Routing        hop count 2
+1000.00342481423  SN.node[10].Communication.Routing        neighbors:  27 29 41 44 48
+1000.00342481423  SN.node[10].Communication.Routing        receivers:  41
+1000.00342481423  SN.node[10].Communication.Routing        hopcount cout: 99
+1000.00342481423  SN.node[10].Communication.Routing        sent packets: 10
+1000.00342481423  SN.node[10].Communication.Routing        sent packets to App layer: 0
+1000.00342481423  SN.node[11].Communication.MAC            ----------------------MAC monitoring infos----------------------
+1000.00342481423  SN.node[11].Communication.MAC            channel clear count 88
+1000.00342481423  SN.node[11].Communication.MAC            channel busy count 85
+1000.00342481423  SN.node[11].Communication.MAC            data transmission count 88
+1000.00342481423  SN.node[11].Communication.MAC            hop count transmission count 100
+1000.00342481423  SN.node[11].Communication.MAC            reached MAX retries count 11
+1000.00342481423  SN.node[11].Communication.Routing        ----------------------ODAR Network monitoring infos----------------------
+1000.00342481423  SN.node[11].Communication.Routing        hop count 5
+1000.00342481423  SN.node[11].Communication.Routing        neighbors:  4 5 9 12 18 22 26 46 47
+1000.00342481423  SN.node[11].Communication.Routing        receivers:  5
+1000.00342481423  SN.node[11].Communication.Routing        hopcount cout: 100
+1000.00342481423  SN.node[11].Communication.Routing        sent packets: 10
+1000.00342481423  SN.node[11].Communication.Routing        sent packets to App layer: 0
+1000.00342481423  SN.node[12].Communication.MAC            ----------------------MAC monitoring infos----------------------
+1000.00342481423  SN.node[12].Communication.MAC            channel clear count 10
+1000.00342481423  SN.node[12].Communication.MAC            channel busy count 0
+1000.00342481423  SN.node[12].Communication.MAC            data transmission count 10
+1000.00342481423  SN.node[12].Communication.MAC            hop count transmission count 99
+1000.00342481423  SN.node[12].Communication.MAC            reached MAX retries count 0
+1000.00342481423  SN.node[12].Communication.Routing        ----------------------ODAR Network monitoring infos----------------------
+1000.00342481423  SN.node[12].Communication.Routing        hop count 6
+1000.00342481423  SN.node[12].Communication.Routing        neighbors:  9 11 20 37 46
+1000.00342481423  SN.node[12].Communication.Routing        receivers:  9 11 37 46
+1000.00342481423  SN.node[12].Communication.Routing        hopcount cout: 99
+1000.00342481423  SN.node[12].Communication.Routing        sent packets: 10
+1000.00342481423  SN.node[12].Communication.Routing        sent packets to App layer: 0
+1000.00342481423  SN.node[13].Communication.MAC            ----------------------MAC monitoring infos----------------------
+1000.00342481423  SN.node[13].Communication.MAC            channel clear count 173
+1000.00342481423  SN.node[13].Communication.MAC            channel busy count 1901
+1000.00342481423  SN.node[13].Communication.MAC            data transmission count 173
+1000.00342481423  SN.node[13].Communication.MAC            hop count transmission count 99
+1000.00342481423  SN.node[13].Communication.MAC            reached MAX retries count 54
+1000.00342481423  SN.node[13].Communication.Routing        ----------------------ODAR Network monitoring infos----------------------
+1000.00342481423  SN.node[13].Communication.Routing        hop count 4
+1000.00342481423  SN.node[13].Communication.Routing        neighbors:  6 7 14 19 21 24 27 31 32 36 43
+1000.00342481423  SN.node[13].Communication.Routing        receivers:  27
+1000.00342481423  SN.node[13].Communication.Routing        hopcount cout: 99
+1000.00342481423  SN.node[13].Communication.Routing        sent packets: 12
+1000.00342481423  SN.node[13].Communication.Routing        sent packets to App layer: 0
+1000.00342481423  SN.node[14].Communication.MAC            ----------------------MAC monitoring infos----------------------
+1000.00342481423  SN.node[14].Communication.MAC            channel clear count 159
+1000.00342481423  SN.node[14].Communication.MAC            channel busy count 1878
+1000.00342481423  SN.node[14].Communication.MAC            data transmission count 159
+1000.00342481423  SN.node[14].Communication.MAC            hop count transmission count 99
+1000.00342481423  SN.node[14].Communication.MAC            reached MAX retries count 66
+1000.00342481423  SN.node[14].Communication.Routing        ----------------------ODAR Network monitoring infos----------------------
+1000.00342481423  SN.node[14].Communication.Routing        hop count 4
+1000.00342481423  SN.node[14].Communication.Routing        neighbors:  6 7 13 19 21 24 27 31 32 36 43
+1000.00342481423  SN.node[14].Communication.Routing        receivers:  27
+1000.00342481423  SN.node[14].Communication.Routing        hopcount cout: 100
+1000.00342481423  SN.node[14].Communication.Routing        sent packets: 13
+1000.00342481423  SN.node[14].Communication.Routing        sent packets to App layer: 0
+1000.00342481423  SN.node[15].Communication.MAC            ----------------------MAC monitoring infos----------------------
+1000.00342481423  SN.node[15].Communication.MAC            channel clear count 33
+1000.00342481423  SN.node[15].Communication.MAC            channel busy count 5
+1000.00342481423  SN.node[15].Communication.MAC            data transmission count 33
+1000.00342481423  SN.node[15].Communication.MAC            hop count transmission count 99
+1000.00342481423  SN.node[15].Communication.MAC            reached MAX retries count 3
+1000.00342481423  SN.node[15].Communication.Routing        ----------------------ODAR Network monitoring infos----------------------
+1000.00342481423  SN.node[15].Communication.Routing        hop count 5
+1000.00342481423  SN.node[15].Communication.Routing        neighbors:  17 24 31 32 36 45
+1000.00342481423  SN.node[15].Communication.Routing        receivers:  31 32
+1000.00342481423  SN.node[15].Communication.Routing        hopcount cout: 99
+1000.00342481423  SN.node[15].Communication.Routing        sent packets: 11
+1000.00342481423  SN.node[15].Communication.Routing        sent packets to App layer: 0
+1000.00342481423  SN.node[16].Communication.MAC            ----------------------MAC monitoring infos----------------------
+1000.00342481423  SN.node[16].Communication.MAC            channel clear count 25
+1000.00342481423  SN.node[16].Communication.MAC            channel busy count 3
+1000.00342481423  SN.node[16].Communication.MAC            data transmission count 25
+1000.00342481423  SN.node[16].Communication.MAC            hop count transmission count 100
+1000.00342481423  SN.node[16].Communication.MAC            reached MAX retries count 2
+1000.00342481423  SN.node[16].Communication.Routing        ----------------------ODAR Network monitoring infos----------------------
+1000.00342481423  SN.node[16].Communication.Routing        hop count 6
+1000.00342481423  SN.node[16].Communication.Routing        neighbors:  1 6 8 34 35 36 38
+1000.00342481423  SN.node[16].Communication.Routing        receivers:  6 36
+1000.00342481423  SN.node[16].Communication.Routing        hopcount cout: 100
+1000.00342481423  SN.node[16].Communication.Routing        sent packets: 12
+1000.00342481423  SN.node[16].Communication.Routing        sent packets to App layer: 0
+1000.00342481423  SN.node[17].Communication.MAC            ----------------------MAC monitoring infos----------------------
+1000.00342481423  SN.node[17].Communication.MAC            channel clear count 12
+1000.00342481423  SN.node[17].Communication.MAC            channel busy count 0
+1000.00342481423  SN.node[17].Communication.MAC            data transmission count 12
+1000.00342481423  SN.node[17].Communication.MAC            hop count transmission count 100
+1000.00342481423  SN.node[17].Communication.MAC            reached MAX retries count 2
+1000.00342481423  SN.node[17].Communication.Routing        ----------------------ODAR Network monitoring infos----------------------
+1000.00342481423  SN.node[17].Communication.Routing        hop count 6
+1000.00342481423  SN.node[17].Communication.Routing        neighbors:  15 45
+1000.00342481423  SN.node[17].Communication.Routing        receivers:  15
+1000.00342481423  SN.node[17].Communication.Routing        hopcount cout: 100
+1000.00342481423  SN.node[17].Communication.Routing        sent packets: 10
+1000.00342481423  SN.node[17].Communication.Routing        sent packets to App layer: 0
+1000.00342481423  SN.node[18].Communication.MAC            ----------------------MAC monitoring infos----------------------
+1000.00342481423  SN.node[18].Communication.MAC            channel clear count 67
+1000.00342481423  SN.node[18].Communication.MAC            channel busy count 191
+1000.00342481423  SN.node[18].Communication.MAC            data transmission count 67
+1000.00342481423  SN.node[18].Communication.MAC            hop count transmission count 99
+1000.00342481423  SN.node[18].Communication.MAC            reached MAX retries count 23
+1000.00342481423  SN.node[18].Communication.Routing        ----------------------ODAR Network monitoring infos----------------------
+1000.00342481423  SN.node[18].Communication.Routing        hop count 5
+1000.00342481423  SN.node[18].Communication.Routing        neighbors:  4 5 9 11 22 23 25 26 33 46 47
+1000.00342481423  SN.node[18].Communication.Routing        receivers:  5
+1000.00342481423  SN.node[18].Communication.Routing        hopcount cout: 99
+1000.00342481423  SN.node[18].Communication.Routing        sent packets: 12
+1000.00342481423  SN.node[18].Communication.Routing        sent packets to App layer: 0
+1000.00342481423  SN.node[19].Communication.MAC            ----------------------MAC monitoring infos----------------------
+1000.00342481423  SN.node[19].Communication.MAC            channel clear count 148
+1000.00342481423  SN.node[19].Communication.MAC            channel busy count 1717
+1000.00342481423  SN.node[19].Communication.MAC            data transmission count 148
+1000.00342481423  SN.node[19].Communication.MAC            hop count transmission count 100
+1000.00342481423  SN.node[19].Communication.MAC            reached MAX retries count 60
+1000.00342481423  SN.node[19].Communication.Routing        ----------------------ODAR Network monitoring infos----------------------
+1000.00342481423  SN.node[19].Communication.Routing        hop count 4
+1000.00342481423  SN.node[19].Communication.Routing        neighbors:  6 7 13 14 21 27 31 32 36 43
+1000.00342481423  SN.node[19].Communication.Routing        receivers:  27
+1000.00342481423  SN.node[19].Communication.Routing        hopcount cout: 100
+1000.00342481423  SN.node[19].Communication.Routing        sent packets: 12
+1000.00342481423  SN.node[19].Communication.Routing        sent packets to App layer: 0
+1000.00342481423  SN.node[20].Communication.MAC            ----------------------MAC monitoring infos----------------------
+1000.00342481423  SN.node[20].Communication.MAC            channel clear count 10
+1000.00342481423  SN.node[20].Communication.MAC            channel busy count 0
+1000.00342481423  SN.node[20].Communication.MAC            data transmission count 10
+1000.00342481423  SN.node[20].Communication.MAC            hop count transmission count 100
+1000.00342481423  SN.node[20].Communication.MAC            reached MAX retries count 0
+1000.00342481423  SN.node[20].Communication.Routing        ----------------------ODAR Network monitoring infos----------------------
+1000.00342481423  SN.node[20].Communication.Routing        hop count 6
+1000.00342481423  SN.node[20].Communication.Routing        neighbors:  12 37 46
+1000.00342481423  SN.node[20].Communication.Routing        receivers:  37 46
+1000.00342481423  SN.node[20].Communication.Routing        hopcount cout: 100
+1000.00342481423  SN.node[20].Communication.Routing        sent packets: 10
+1000.00342481423  SN.node[20].Communication.Routing        sent packets to App layer: 0
+1000.00342481423  SN.node[21].Communication.MAC            ----------------------MAC monitoring infos----------------------
+1000.00342481423  SN.node[21].Communication.MAC            channel clear count 241
+1000.00342481423  SN.node[21].Communication.MAC            channel busy count 2196
+1000.00342481423  SN.node[21].Communication.MAC            data transmission count 241
+1000.00342481423  SN.node[21].Communication.MAC            hop count transmission count 99
+1000.00342481423  SN.node[21].Communication.MAC            reached MAX retries count 92
+1000.00342481423  SN.node[21].Communication.Routing        ----------------------ODAR Network monitoring infos----------------------
+1000.00342481423  SN.node[21].Communication.Routing        hop count 4
+1000.00342481423  SN.node[21].Communication.Routing        neighbors:  6 7 13 14 19 25 27 31 33 36 42 43
+1000.00342481423  SN.node[21].Communication.Routing        receivers:  27
+1000.00342481423  SN.node[21].Communication.Routing        hopcount cout: 99
+1000.00342481423  SN.node[21].Communication.Routing        sent packets: 11
+1000.00342481423  SN.node[21].Communication.Routing        sent packets to App layer: 0
+1000.00342481423  SN.node[22].Communication.MAC            ----------------------MAC monitoring infos----------------------
+1000.00342481423  SN.node[22].Communication.MAC            channel clear count 28
+1000.00342481423  SN.node[22].Communication.MAC            channel busy count 21
+1000.00342481423  SN.node[22].Communication.MAC            data transmission count 28
+1000.00342481423  SN.node[22].Communication.MAC            hop count transmission count 100
+1000.00342481423  SN.node[22].Communication.MAC            reached MAX retries count 0
+1000.00342481423  SN.node[22].Communication.Routing        ----------------------ODAR Network monitoring infos----------------------
+1000.00342481423  SN.node[22].Communication.Routing        hop count 6
+1000.00342481423  SN.node[22].Communication.Routing        neighbors:  2 4 9 11 18 23 26 35 47
+1000.00342481423  SN.node[22].Communication.Routing        receivers:  9 11 18
+1000.00342481423  SN.node[22].Communication.Routing        hopcount cout: 100
+1000.00342481423  SN.node[22].Communication.Routing        sent packets: 11
+1000.00342481423  SN.node[22].Communication.Routing        sent packets to App layer: 0
+1000.00342481423  SN.node[23].Communication.MAC            ----------------------MAC monitoring infos----------------------
+1000.00342481423  SN.node[23].Communication.MAC            channel clear count 11
+1000.00342481423  SN.node[23].Communication.MAC            channel busy count 0
+1000.00342481423  SN.node[23].Communication.MAC            data transmission count 11
+1000.00342481423  SN.node[23].Communication.MAC            hop count transmission count 100
+1000.00342481423  SN.node[23].Communication.MAC            reached MAX retries count 0
+1000.00342481423  SN.node[23].Communication.Routing        ----------------------ODAR Network monitoring infos----------------------
+1000.00342481423  SN.node[23].Communication.Routing        hop count 6
+1000.00342481423  SN.node[23].Communication.Routing        neighbors:  1 2 4 18 22 26 34 35 47
+1000.00342481423  SN.node[23].Communication.Routing        receivers:  18
+1000.00342481423  SN.node[23].Communication.Routing        hopcount cout: 100
+1000.00342481423  SN.node[23].Communication.Routing        sent packets: 11
+1000.00342481423  SN.node[23].Communication.Routing        sent packets to App layer: 0
+1000.00342481423  SN.node[24].Communication.MAC            ----------------------MAC monitoring infos----------------------
+1000.00342481423  SN.node[24].Communication.MAC            channel clear count 12
+1000.00342481423  SN.node[24].Communication.MAC            channel busy count 3
+1000.00342481423  SN.node[24].Communication.MAC            data transmission count 12
+1000.00342481423  SN.node[24].Communication.MAC            hop count transmission count 100
+1000.00342481423  SN.node[24].Communication.MAC            reached MAX retries count 1
+1000.00342481423  SN.node[24].Communication.Routing        ----------------------ODAR Network monitoring infos----------------------
+1000.00342481423  SN.node[24].Communication.Routing        hop count 5
+1000.00342481423  SN.node[24].Communication.Routing        neighbors:  13 14 15 31 32
+1000.00342481423  SN.node[24].Communication.Routing        receivers:  13 14 31 32
+1000.00342481423  SN.node[24].Communication.Routing        hopcount cout: 100
+1000.00342481423  SN.node[24].Communication.Routing        sent packets: 11
+1000.00342481423  SN.node[24].Communication.Routing        sent packets to App layer: 0
+1000.00342481423  SN.node[25].Communication.MAC            ----------------------MAC monitoring infos----------------------
+1000.00342481423  SN.node[25].Communication.MAC            channel clear count 30
+1000.00342481423  SN.node[25].Communication.MAC            channel busy count 161
+1000.00342481423  SN.node[25].Communication.MAC            data transmission count 30
+1000.00342481423  SN.node[25].Communication.MAC            hop count transmission count 100
+1000.00342481423  SN.node[25].Communication.MAC            reached MAX retries count 8
+1000.00342481423  SN.node[25].Communication.Routing        ----------------------ODAR Network monitoring infos----------------------
+1000.00342481423  SN.node[25].Communication.Routing        hop count 5
+1000.00342481423  SN.node[25].Communication.Routing        neighbors:  1 6 18 21 28 33 42 43
+1000.00342481423  SN.node[25].Communication.Routing        receivers:  21 28
+1000.00342481423  SN.node[25].Communication.Routing        hopcount cout: 100
+1000.00342481423  SN.node[25].Communication.Routing        sent packets: 10
+1000.00342481423  SN.node[25].Communication.Routing        sent packets to App layer: 0
+1000.00342481423  SN.node[26].Communication.MAC            ----------------------MAC monitoring infos----------------------
+1000.00342481423  SN.node[26].Communication.MAC            channel clear count 10
+1000.00342481423  SN.node[26].Communication.MAC            channel busy count 0
+1000.00342481423  SN.node[26].Communication.MAC            data transmission count 10
+1000.00342481423  SN.node[26].Communication.MAC            hop count transmission count 99
+1000.00342481423  SN.node[26].Communication.MAC            reached MAX retries count 0
+1000.00342481423  SN.node[26].Communication.Routing        ----------------------ODAR Network monitoring infos----------------------
+1000.00342481423  SN.node[26].Communication.Routing        hop count 6
+1000.00342481423  SN.node[26].Communication.Routing        neighbors:  1 2 4 9 11 18 22 23 35 47
+1000.00342481423  SN.node[26].Communication.Routing        receivers:  9 11 18
+1000.00342481423  SN.node[26].Communication.Routing        hopcount cout: 99
+1000.00342481423  SN.node[26].Communication.Routing        sent packets: 10
+1000.00342481423  SN.node[26].Communication.Routing        sent packets to App layer: 0
+1000.00342481423  SN.node[27].Communication.MAC            ----------------------MAC monitoring infos----------------------
+1000.00342481423  SN.node[27].Communication.MAC            channel clear count 441
+1000.00342481423  SN.node[27].Communication.MAC            channel busy count 1735
+1000.00342481423  SN.node[27].Communication.MAC            data transmission count 441
+1000.00342481423  SN.node[27].Communication.MAC            hop count transmission count 99
+1000.00342481423  SN.node[27].Communication.MAC            reached MAX retries count 78
+1000.00342481423  SN.node[27].Communication.Routing        ----------------------ODAR Network monitoring infos----------------------
+1000.00342481423  SN.node[27].Communication.Routing        hop count 3
+1000.00342481423  SN.node[27].Communication.Routing        neighbors:  7 10 13 14 19 21 31 32
+1000.00342481423  SN.node[27].Communication.Routing        receivers:  10
+1000.00342481423  SN.node[27].Communication.Routing        hopcount cout: 99
+1000.00342481423  SN.node[27].Communication.Routing        sent packets: 11
+1000.00342481423  SN.node[27].Communication.Routing        sent packets to App layer: 0
+1000.00342481423  SN.node[28].Communication.MAC            ----------------------MAC monitoring infos----------------------
+1000.00342481423  SN.node[28].Communication.MAC            channel clear count 70
+1000.00342481423  SN.node[28].Communication.MAC            channel busy count 174
+1000.00342481423  SN.node[28].Communication.MAC            data transmission count 70
+1000.00342481423  SN.node[28].Communication.MAC            hop count transmission count 99
+1000.00342481423  SN.node[28].Communication.MAC            reached MAX retries count 8
+1000.00342481423  SN.node[28].Communication.Routing        ----------------------ODAR Network monitoring infos----------------------
+1000.00342481423  SN.node[28].Communication.Routing        hop count 4
+1000.00342481423  SN.node[28].Communication.Routing        neighbors:  5 25 33 42 44 46 49
+1000.00342481423  SN.node[28].Communication.Routing        receivers:  44 49
+1000.00342481423  SN.node[28].Communication.Routing        hopcount cout: 99
+1000.00342481423  SN.node[28].Communication.Routing        sent packets: 11
+1000.00342481423  SN.node[28].Communication.Routing        sent packets to App layer: 0
+1000.00342481423  SN.node[29].Communication.MAC            ----------------------MAC monitoring infos----------------------
+1000.00342481423  SN.node[29].Communication.MAC            channel clear count 69
+1000.00342481423  SN.node[29].Communication.MAC            channel busy count 205
+1000.00342481423  SN.node[29].Communication.MAC            data transmission count 69
+1000.00342481423  SN.node[29].Communication.MAC            hop count transmission count 99
+1000.00342481423  SN.node[29].Communication.MAC            reached MAX retries count 18
+1000.00342481423  SN.node[29].Communication.Routing        ----------------------ODAR Network monitoring infos----------------------
+1000.00342481423  SN.node[29].Communication.Routing        hop count 2
+1000.00342481423  SN.node[29].Communication.Routing        neighbors:  10 41 44 48
+1000.00342481423  SN.node[29].Communication.Routing        receivers:  41
+1000.00342481423  SN.node[29].Communication.Routing        hopcount cout: 99
+1000.00342481423  SN.node[29].Communication.Routing        sent packets: 10
+1000.00342481423  SN.node[29].Communication.Routing        sent packets to App layer: 0
+1000.00342481423  SN.node[30].Communication.MAC            ----------------------MAC monitoring infos----------------------
+1000.00342481423  SN.node[30].Communication.MAC            channel clear count 10
+1000.00342481423  SN.node[30].Communication.MAC            channel busy count 0
+1000.00342481423  SN.node[30].Communication.MAC            data transmission count 10
+1000.00342481423  SN.node[30].Communication.MAC            hop count transmission count 100
+1000.00342481423  SN.node[30].Communication.MAC            reached MAX retries count 0
+1000.00342481423  SN.node[30].Communication.Routing        ----------------------ODAR Network monitoring infos----------------------
+1000.00342481423  SN.node[30].Communication.Routing        hop count 1
+1000.00342481423  SN.node[30].Communication.Routing        neighbors:  0 41
+1000.00342481423  SN.node[30].Communication.Routing        receivers:  0
+1000.00342481423  SN.node[30].Communication.Routing        hopcount cout: 100
+1000.00342481423  SN.node[30].Communication.Routing        sent packets: 10
+1000.00342481423  SN.node[30].Communication.Routing        sent packets to App layer: 0
+1000.00342481423  SN.node[31].Communication.MAC            ----------------------MAC monitoring infos----------------------
+1000.00342481423  SN.node[31].Communication.MAC            channel clear count 240
+1000.00342481423  SN.node[31].Communication.MAC            channel busy count 2252
+1000.00342481423  SN.node[31].Communication.MAC            data transmission count 240
+1000.00342481423  SN.node[31].Communication.MAC            hop count transmission count 100
+1000.00342481423  SN.node[31].Communication.MAC            reached MAX retries count 95
+1000.00342481423  SN.node[31].Communication.Routing        ----------------------ODAR Network monitoring infos----------------------
+1000.00342481423  SN.node[31].Communication.Routing        hop count 4
+1000.00342481423  SN.node[31].Communication.Routing        neighbors:  6 7 13 14 15 19 21 24 27 32 36 43
+1000.00342481423  SN.node[31].Communication.Routing        receivers:  27
+1000.00342481423  SN.node[31].Communication.Routing        hopcount cout: 100
+1000.00342481423  SN.node[31].Communication.Routing        sent packets: 12
+1000.00342481423  SN.node[31].Communication.Routing        sent packets to App layer: 0
+1000.00342481423  SN.node[32].Communication.MAC            ----------------------MAC monitoring infos----------------------
+1000.00342481423  SN.node[32].Communication.MAC            channel clear count 221
+1000.00342481423  SN.node[32].Communication.MAC            channel busy count 2081
+1000.00342481423  SN.node[32].Communication.MAC            data transmission count 221
+1000.00342481423  SN.node[32].Communication.MAC            hop count transmission count 99
+1000.00342481423  SN.node[32].Communication.MAC            reached MAX retries count 100
+1000.00342481423  SN.node[32].Communication.Routing        ----------------------ODAR Network monitoring infos----------------------
+1000.00342481423  SN.node[32].Communication.Routing        hop count 4
+1000.00342481423  SN.node[32].Communication.Routing        neighbors:  6 7 13 14 15 19 24 27 31 36
+1000.00342481423  SN.node[32].Communication.Routing        receivers:  27
+1000.00342481423  SN.node[32].Communication.Routing        hopcount cout: 99
+1000.00342481423  SN.node[32].Communication.Routing        sent packets: 10
+1000.00342481423  SN.node[32].Communication.Routing        sent packets to App layer: 0
+1000.00342481423  SN.node[33].Communication.MAC            ----------------------MAC monitoring infos----------------------
+1000.00342481423  SN.node[33].Communication.MAC            channel clear count 36
+1000.00342481423  SN.node[33].Communication.MAC            channel busy count 109
+1000.00342481423  SN.node[33].Communication.MAC            data transmission count 36
+1000.00342481423  SN.node[33].Communication.MAC            hop count transmission count 99
+1000.00342481423  SN.node[33].Communication.MAC            reached MAX retries count 4
+1000.00342481423  SN.node[33].Communication.Routing        ----------------------ODAR Network monitoring infos----------------------
+1000.00342481423  SN.node[33].Communication.Routing        hop count 5
+1000.00342481423  SN.node[33].Communication.Routing        neighbors:  1 5 18 21 25 28 42 43
+1000.00342481423  SN.node[33].Communication.Routing        receivers:  5 21 28
+1000.00342481423  SN.node[33].Communication.Routing        hopcount cout: 99
+1000.00342481423  SN.node[33].Communication.Routing        sent packets: 11
+1000.00342481423  SN.node[33].Communication.Routing        sent packets to App layer: 0
+1000.00342481423  SN.node[34].Communication.MAC            ----------------------MAC monitoring infos----------------------
+1000.00342481423  SN.node[34].Communication.MAC            channel clear count 11
+1000.00342481423  SN.node[34].Communication.MAC            channel busy count 0
+1000.00342481423  SN.node[34].Communication.MAC            data transmission count 11
+1000.00342481423  SN.node[34].Communication.MAC            hop count transmission count 99
+1000.00342481423  SN.node[34].Communication.MAC            reached MAX retries count 0
+1000.00342481423  SN.node[34].Communication.Routing        ----------------------ODAR Network monitoring infos----------------------
+1000.00342481423  SN.node[34].Communication.Routing        hop count 7
+1000.00342481423  SN.node[34].Communication.Routing        neighbors:  1 8 16 23 35 38 39 40
+1000.00342481423  SN.node[34].Communication.Routing        receivers:  1 16 23 38
+1000.00342481423  SN.node[34].Communication.Routing        hopcount cout: 99
+1000.00342481423  SN.node[34].Communication.Routing        sent packets: 11
+1000.00342481423  SN.node[34].Communication.Routing        sent packets to App layer: 0
+1000.00342481423  SN.node[35].Communication.MAC            ----------------------MAC monitoring infos----------------------
+1000.00342481423  SN.node[35].Communication.MAC            channel clear count 11
+1000.00342481423  SN.node[35].Communication.MAC            channel busy count 0
+1000.00342481423  SN.node[35].Communication.MAC            data transmission count 11
+1000.00342481423  SN.node[35].Communication.MAC            hop count transmission count 99
+1000.00342481423  SN.node[35].Communication.MAC            reached MAX retries count 0
+1000.00342481423  SN.node[35].Communication.Routing        ----------------------ODAR Network monitoring infos----------------------
+1000.00342481423  SN.node[35].Communication.Routing        hop count 7
+1000.00342481423  SN.node[35].Communication.Routing        neighbors:  1 2 4 8 16 22 23 26 34 38 39 40 47
+1000.00342481423  SN.node[35].Communication.Routing        receivers:  1 4 16 22 23 26 38 47
+1000.00342481423  SN.node[35].Communication.Routing        hopcount cout: 99
+1000.00342481423  SN.node[35].Communication.Routing        sent packets: 11
+1000.00342481423  SN.node[35].Communication.Routing        sent packets to App layer: 0
+1000.00342481423  SN.node[36].Communication.MAC            ----------------------MAC monitoring infos----------------------
+1000.00342481423  SN.node[36].Communication.MAC            channel clear count 121
+1000.00342481423  SN.node[36].Communication.MAC            channel busy count 266
+1000.00342481423  SN.node[36].Communication.MAC            data transmission count 121
+1000.00342481423  SN.node[36].Communication.MAC            hop count transmission count 99
+1000.00342481423  SN.node[36].Communication.MAC            reached MAX retries count 32
+1000.00342481423  SN.node[36].Communication.Routing        ----------------------ODAR Network monitoring infos----------------------
+1000.00342481423  SN.node[36].Communication.Routing        hop count 5
+1000.00342481423  SN.node[36].Communication.Routing        neighbors:  1 6 7 13 14 15 16 19 21 31 32 38 43
+1000.00342481423  SN.node[36].Communication.Routing        receivers:  7 13 14 19 21 31 32
+1000.00342481423  SN.node[36].Communication.Routing        hopcount cout: 99
+1000.00342481423  SN.node[36].Communication.Routing        sent packets: 10
+1000.00342481423  SN.node[36].Communication.Routing        sent packets to App layer: 0
+1000.00342481423  SN.node[37].Communication.MAC            ----------------------MAC monitoring infos----------------------
+1000.00342481423  SN.node[37].Communication.MAC            channel clear count 40
+1000.00342481423  SN.node[37].Communication.MAC            channel busy count 0
+1000.00342481423  SN.node[37].Communication.MAC            data transmission count 40
+1000.00342481423  SN.node[37].Communication.MAC            hop count transmission count 99
+1000.00342481423  SN.node[37].Communication.MAC            reached MAX retries count 10
+1000.00342481423  SN.node[37].Communication.Routing        ----------------------ODAR Network monitoring infos----------------------
+1000.00342481423  SN.node[37].Communication.Routing        hop count 5
+1000.00342481423  SN.node[37].Communication.Routing        neighbors:  5 12 20 46
+1000.00342481423  SN.node[37].Communication.Routing        receivers:  5
+1000.00342481423  SN.node[37].Communication.Routing        hopcount cout: 99
+1000.00342481423  SN.node[37].Communication.Routing        sent packets: 10
+1000.00342481423  SN.node[37].Communication.Routing        sent packets to App layer: 0
+1000.00342481423  SN.node[38].Communication.MAC            ----------------------MAC monitoring infos----------------------
+1000.00342481423  SN.node[38].Communication.MAC            channel clear count 43
+1000.00342481423  SN.node[38].Communication.MAC            channel busy count 0
+1000.00342481423  SN.node[38].Communication.MAC            data transmission count 43
+1000.00342481423  SN.node[38].Communication.MAC            hop count transmission count 99
+1000.00342481423  SN.node[38].Communication.MAC            reached MAX retries count 1
+1000.00342481423  SN.node[38].Communication.Routing        ----------------------ODAR Network monitoring infos----------------------
+1000.00342481423  SN.node[38].Communication.Routing        hop count 6
+1000.00342481423  SN.node[38].Communication.Routing        neighbors:  1 8 16 34 35 36 39 40
+1000.00342481423  SN.node[38].Communication.Routing        receivers:  36
+1000.00342481423  SN.node[38].Communication.Routing        hopcount cout: 99
+1000.00342481423  SN.node[38].Communication.Routing        sent packets: 11
+1000.00342481423  SN.node[38].Communication.Routing        sent packets to App layer: 0
+1000.00342481423  SN.node[39].Communication.MAC            ----------------------MAC monitoring infos----------------------
+1000.00342481423  SN.node[39].Communication.MAC            channel clear count 21
+1000.00342481423  SN.node[39].Communication.MAC            channel busy count 0
+1000.00342481423  SN.node[39].Communication.MAC            data transmission count 21
+1000.00342481423  SN.node[39].Communication.MAC            hop count transmission count 99
+1000.00342481423  SN.node[39].Communication.MAC            reached MAX retries count 0
+1000.00342481423  SN.node[39].Communication.Routing        ----------------------ODAR Network monitoring infos----------------------
+1000.00342481423  SN.node[39].Communication.Routing        hop count 7
+1000.00342481423  SN.node[39].Communication.Routing        neighbors:  2 3 8 34 35 38 40
+1000.00342481423  SN.node[39].Communication.Routing        receivers:  38
+1000.00342481423  SN.node[39].Communication.Routing        hopcount cout: 99
+1000.00342481423  SN.node[39].Communication.Routing        sent packets: 11
+1000.00342481423  SN.node[39].Communication.Routing        sent packets to App layer: 0
+1000.00342481423  SN.node[40].Communication.MAC            ----------------------MAC monitoring infos----------------------
+1000.00342481423  SN.node[40].Communication.MAC            channel clear count 9
+1000.00342481423  SN.node[40].Communication.MAC            channel busy count 0
+1000.00342481423  SN.node[40].Communication.MAC            data transmission count 9
+1000.00342481423  SN.node[40].Communication.MAC            hop count transmission count 100
+1000.00342481423  SN.node[40].Communication.MAC            reached MAX retries count 0
+1000.00342481423  SN.node[40].Communication.Routing        ----------------------ODAR Network monitoring infos----------------------
+1000.00342481423  SN.node[40].Communication.Routing        hop count 7
+1000.00342481423  SN.node[40].Communication.Routing        neighbors:  3 8 34 35 38 39
+1000.00342481423  SN.node[40].Communication.Routing        receivers:  38
+1000.00342481423  SN.node[40].Communication.Routing        hopcount cout: 100
+1000.00342481423  SN.node[40].Communication.Routing        sent packets: 9
+1000.00342481423  SN.node[40].Communication.Routing        sent packets to App layer: 0
+1000.00342481423  SN.node[41].Communication.MAC            ----------------------MAC monitoring infos----------------------
+1000.00342481423  SN.node[41].Communication.MAC            channel clear count 509
+1000.00342481423  SN.node[41].Communication.MAC            channel busy count 207
+1000.00342481423  SN.node[41].Communication.MAC            data transmission count 509
+1000.00342481423  SN.node[41].Communication.MAC            hop count transmission count 100
+1000.00342481423  SN.node[41].Communication.MAC            reached MAX retries count 31
+1000.00342481423  SN.node[41].Communication.Routing        ----------------------ODAR Network monitoring infos----------------------
+1000.00342481423  SN.node[41].Communication.Routing        hop count 1
+1000.00342481423  SN.node[41].Communication.Routing        neighbors:  0 10 29 30 48
+1000.00342481423  SN.node[41].Communication.Routing        receivers:  0
+1000.00342481423  SN.node[41].Communication.Routing        hopcount cout: 100
+1000.00342481423  SN.node[41].Communication.Routing        sent packets: 12
+1000.00342481423  SN.node[41].Communication.Routing        sent packets to App layer: 0
+1000.00342481423  SN.node[42].Communication.MAC            ----------------------MAC monitoring infos----------------------
+1000.00342481423  SN.node[42].Communication.MAC            channel clear count 33
+1000.00342481423  SN.node[42].Communication.MAC            channel busy count 195
+1000.00342481423  SN.node[42].Communication.MAC            data transmission count 33
+1000.00342481423  SN.node[42].Communication.MAC            hop count transmission count 99
+1000.00342481423  SN.node[42].Communication.MAC            reached MAX retries count 11
+1000.00342481423  SN.node[42].Communication.Routing        ----------------------ODAR Network monitoring infos----------------------
+1000.00342481423  SN.node[42].Communication.Routing        hop count 5
+1000.00342481423  SN.node[42].Communication.Routing        neighbors:  1 6 7 21 25 28 33 43
+1000.00342481423  SN.node[42].Communication.Routing        receivers:  7 21 28
+1000.00342481423  SN.node[42].Communication.Routing        hopcount cout: 99
+1000.00342481423  SN.node[42].Communication.Routing        sent packets: 12
+1000.00342481423  SN.node[42].Communication.Routing        sent packets to App layer: 0
+1000.00342481423  SN.node[43].Communication.MAC            ----------------------MAC monitoring infos----------------------
+1000.00342481423  SN.node[43].Communication.MAC            channel clear count 56
+1000.00342481423  SN.node[43].Communication.MAC            channel busy count 454
+1000.00342481423  SN.node[43].Communication.MAC            data transmission count 56
+1000.00342481423  SN.node[43].Communication.MAC            hop count transmission count 100
+1000.00342481423  SN.node[43].Communication.MAC            reached MAX retries count 8
+1000.00342481423  SN.node[43].Communication.Routing        ----------------------ODAR Network monitoring infos----------------------
+1000.00342481423  SN.node[43].Communication.Routing        hop count 5
+1000.00342481423  SN.node[43].Communication.Routing        neighbors:  1 6 7 13 14 19 21 25 31 33 36 42
+1000.00342481423  SN.node[43].Communication.Routing        receivers:  7 13 14 19 21 31
+1000.00342481423  SN.node[43].Communication.Routing        hopcount cout: 100
+1000.00342481423  SN.node[43].Communication.Routing        sent packets: 10
+1000.00342481423  SN.node[43].Communication.Routing        sent packets to App layer: 0
+1000.00342481423  SN.node[44].Communication.MAC            ----------------------MAC monitoring infos----------------------
+1000.00342481423  SN.node[44].Communication.MAC            channel clear count 118
+1000.00342481423  SN.node[44].Communication.MAC            channel busy count 135
+1000.00342481423  SN.node[44].Communication.MAC            data transmission count 118
+1000.00342481423  SN.node[44].Communication.MAC            hop count transmission count 99
+1000.00342481423  SN.node[44].Communication.MAC            reached MAX retries count 30
+1000.00342481423  SN.node[44].Communication.Routing        ----------------------ODAR Network monitoring infos----------------------
+1000.00342481423  SN.node[44].Communication.Routing        hop count 3
+1000.00342481423  SN.node[44].Communication.Routing        neighbors:  10 28 29 48 49
+1000.00342481423  SN.node[44].Communication.Routing        receivers:  10 29 48
+1000.00342481423  SN.node[44].Communication.Routing        hopcount cout: 99
+1000.00342481423  SN.node[44].Communication.Routing        sent packets: 11
+1000.00342481423  SN.node[44].Communication.Routing        sent packets to App layer: 0
+1000.00342481423  SN.node[45].Communication.MAC            ----------------------MAC monitoring infos----------------------
+1000.00342481423  SN.node[45].Communication.MAC            channel clear count 10
+1000.00342481423  SN.node[45].Communication.MAC            channel busy count 0
+1000.00342481423  SN.node[45].Communication.MAC            data transmission count 10
+1000.00342481423  SN.node[45].Communication.MAC            hop count transmission count 99
+1000.00342481423  SN.node[45].Communication.MAC            reached MAX retries count 0
+1000.00342481423  SN.node[45].Communication.Routing        ----------------------ODAR Network monitoring infos----------------------
+1000.00342481423  SN.node[45].Communication.Routing        hop count 6
+1000.00342481423  SN.node[45].Communication.Routing        neighbors:  15 17
+1000.00342481423  SN.node[45].Communication.Routing        receivers:  15
+1000.00342481423  SN.node[45].Communication.Routing        hopcount cout: 99
+1000.00342481423  SN.node[45].Communication.Routing        sent packets: 10
+1000.00342481423  SN.node[45].Communication.Routing        sent packets to App layer: 0
+1000.00342481423  SN.node[46].Communication.MAC            ----------------------MAC monitoring infos----------------------
+1000.00342481423  SN.node[46].Communication.MAC            channel clear count 11
+1000.00342481423  SN.node[46].Communication.MAC            channel busy count 0
+1000.00342481423  SN.node[46].Communication.MAC            data transmission count 11
+1000.00342481423  SN.node[46].Communication.MAC            hop count transmission count 99
+1000.00342481423  SN.node[46].Communication.MAC            reached MAX retries count 0
+1000.00342481423  SN.node[46].Communication.Routing        ----------------------ODAR Network monitoring infos----------------------
+1000.00342481423  SN.node[46].Communication.Routing        hop count 5
+1000.00342481423  SN.node[46].Communication.Routing        neighbors:  5 9 11 12 18 20 28 37
+1000.00342481423  SN.node[46].Communication.Routing        receivers:  5 28
+1000.00342481423  SN.node[46].Communication.Routing        hopcount cout: 99
+1000.00342481423  SN.node[46].Communication.Routing        sent packets: 11
+1000.00342481423  SN.node[46].Communication.Routing        sent packets to App layer: 0
+1000.00342481423  SN.node[47].Communication.MAC            ----------------------MAC monitoring infos----------------------
+1000.00342481423  SN.node[47].Communication.MAC            channel clear count 9
+1000.00342481423  SN.node[47].Communication.MAC            channel busy count 0
+1000.00342481423  SN.node[47].Communication.MAC            data transmission count 9
+1000.00342481423  SN.node[47].Communication.MAC            hop count transmission count 99
+1000.00342481423  SN.node[47].Communication.MAC            reached MAX retries count 0
+1000.00342481423  SN.node[47].Communication.Routing        ----------------------ODAR Network monitoring infos----------------------
+1000.00342481423  SN.node[47].Communication.Routing        hop count 6
+1000.00342481423  SN.node[47].Communication.Routing        neighbors:  1 2 4 9 11 18 22 23 26 35
+1000.00342481423  SN.node[47].Communication.Routing        receivers:  9 11 18
+1000.00342481423  SN.node[47].Communication.Routing        hopcount cout: 99
+1000.00342481423  SN.node[47].Communication.Routing        sent packets: 9
+1000.00342481423  SN.node[47].Communication.Routing        sent packets to App layer: 0
+1000.00342481423  SN.node[48].Communication.MAC            ----------------------MAC monitoring infos----------------------
+1000.00342481423  SN.node[48].Communication.MAC            channel clear count 218
+1000.00342481423  SN.node[48].Communication.MAC            channel busy count 311
+1000.00342481423  SN.node[48].Communication.MAC            data transmission count 218
+1000.00342481423  SN.node[48].Communication.MAC            hop count transmission count 99
+1000.00342481423  SN.node[48].Communication.MAC            reached MAX retries count 28
+1000.00342481423  SN.node[48].Communication.Routing        ----------------------ODAR Network monitoring infos----------------------
+1000.00342481423  SN.node[48].Communication.Routing        hop count 2
+1000.00342481423  SN.node[48].Communication.Routing        neighbors:  10 29 41 44 49
+1000.00342481423  SN.node[48].Communication.Routing        receivers:  41
+1000.00342481423  SN.node[48].Communication.Routing        hopcount cout: 99
+1000.00342481423  SN.node[48].Communication.Routing        sent packets: 12
+1000.00342481423  SN.node[48].Communication.Routing        sent packets to App layer: 0
+1000.00342481423  SN.node[49].Communication.MAC            ----------------------MAC monitoring infos----------------------
+1000.00342481423  SN.node[49].Communication.MAC            channel clear count 254
+1000.00342481423  SN.node[49].Communication.MAC            channel busy count 195
+1000.00342481423  SN.node[49].Communication.MAC            data transmission count 254
+1000.00342481423  SN.node[49].Communication.MAC            hop count transmission count 99
+1000.00342481423  SN.node[49].Communication.MAC            reached MAX retries count 47
+1000.00342481423  SN.node[49].Communication.Routing        ----------------------ODAR Network monitoring infos----------------------
+1000.00342481423  SN.node[49].Communication.Routing        hop count 3
+1000.00342481423  SN.node[49].Communication.Routing        neighbors:  5 28 44 48
+1000.00342481423  SN.node[49].Communication.Routing        receivers:  48
+1000.00342481423  SN.node[49].Communication.Routing        hopcount cout: 99
+1000.00342481423  SN.node[49].Communication.Routing        sent packets: 12
+1000.00342481423  SN.node[49].Communication.Routing        sent packets to App layer: 0
