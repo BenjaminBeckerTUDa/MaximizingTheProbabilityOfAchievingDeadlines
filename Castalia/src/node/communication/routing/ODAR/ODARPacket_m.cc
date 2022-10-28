@@ -1,5 +1,5 @@
 //
-// Generated file, do not edit! Created by nedtool 4.6 from src/node/communication/routing/oDAR/ODARPacket.msg.
+// Generated file, do not edit! Created by nedtool 4.6 from src/node/communication/routing/ODAR/ODARPacket.msg.
 //
 
 // Disable warnings about unused variables, empty switch stmts, etc:
@@ -80,18 +80,27 @@ ODARPacket& ODARPacket::operator=(const ODARPacket& other)
 void ODARPacket::copy(const ODARPacket& other)
 {
     this->hopcount_var = other.hopcount_var;
+    this->CDF_var = other.CDF_var;
+    this->neighbors_var = other.neighbors_var;
+    this->overheardPackets_var = other.overheardPackets_var;
 }
 
 void ODARPacket::parsimPack(cCommBuffer *b)
 {
     ::OMacRoutingPacket::parsimPack(b);
     doPacking(b,this->hopcount_var);
+    doPacking(b,this->CDF_var);
+    doPacking(b,this->neighbors_var);
+    doPacking(b,this->overheardPackets_var);
 }
 
 void ODARPacket::parsimUnpack(cCommBuffer *b)
 {
     ::OMacRoutingPacket::parsimUnpack(b);
     doUnpacking(b,this->hopcount_var);
+    doUnpacking(b,this->CDF_var);
+    doUnpacking(b,this->neighbors_var);
+    doUnpacking(b,this->overheardPackets_var);
 }
 
 int ODARPacket::getHopcount() const
@@ -102,6 +111,36 @@ int ODARPacket::getHopcount() const
 void ODARPacket::setHopcount(int hopcount)
 {
     this->hopcount_var = hopcount;
+}
+
+CFP& ODARPacket::getCDF()
+{
+    return CDF_var;
+}
+
+void ODARPacket::setCDF(const CFP& CDF)
+{
+    this->CDF_var = CDF;
+}
+
+CFP& ODARPacket::getNeighbors()
+{
+    return neighbors_var;
+}
+
+void ODARPacket::setNeighbors(const CFP& neighbors)
+{
+    this->neighbors_var = neighbors;
+}
+
+CFP& ODARPacket::getOverheardPackets()
+{
+    return overheardPackets_var;
+}
+
+void ODARPacket::setOverheardPackets(const CFP& overheardPackets)
+{
+    this->overheardPackets_var = overheardPackets;
 }
 
 class ODARPacketDescriptor : public cClassDescriptor
@@ -151,7 +190,7 @@ const char *ODARPacketDescriptor::getProperty(const char *propertyname) const
 int ODARPacketDescriptor::getFieldCount(void *object) const
 {
     cClassDescriptor *basedesc = getBaseClassDescriptor();
-    return basedesc ? 1+basedesc->getFieldCount(object) : 1;
+    return basedesc ? 4+basedesc->getFieldCount(object) : 4;
 }
 
 unsigned int ODARPacketDescriptor::getFieldTypeFlags(void *object, int field) const
@@ -164,8 +203,11 @@ unsigned int ODARPacketDescriptor::getFieldTypeFlags(void *object, int field) co
     }
     static unsigned int fieldTypeFlags[] = {
         FD_ISEDITABLE,
+        FD_ISCOMPOUND,
+        FD_ISCOMPOUND,
+        FD_ISCOMPOUND,
     };
-    return (field>=0 && field<1) ? fieldTypeFlags[field] : 0;
+    return (field>=0 && field<4) ? fieldTypeFlags[field] : 0;
 }
 
 const char *ODARPacketDescriptor::getFieldName(void *object, int field) const
@@ -178,8 +220,11 @@ const char *ODARPacketDescriptor::getFieldName(void *object, int field) const
     }
     static const char *fieldNames[] = {
         "hopcount",
+        "CDF",
+        "neighbors",
+        "overheardPackets",
     };
-    return (field>=0 && field<1) ? fieldNames[field] : NULL;
+    return (field>=0 && field<4) ? fieldNames[field] : NULL;
 }
 
 int ODARPacketDescriptor::findField(void *object, const char *fieldName) const
@@ -187,6 +232,9 @@ int ODARPacketDescriptor::findField(void *object, const char *fieldName) const
     cClassDescriptor *basedesc = getBaseClassDescriptor();
     int base = basedesc ? basedesc->getFieldCount(object) : 0;
     if (fieldName[0]=='h' && strcmp(fieldName, "hopcount")==0) return base+0;
+    if (fieldName[0]=='C' && strcmp(fieldName, "CDF")==0) return base+1;
+    if (fieldName[0]=='n' && strcmp(fieldName, "neighbors")==0) return base+2;
+    if (fieldName[0]=='o' && strcmp(fieldName, "overheardPackets")==0) return base+3;
     return basedesc ? basedesc->findField(object, fieldName) : -1;
 }
 
@@ -200,8 +248,11 @@ const char *ODARPacketDescriptor::getFieldTypeString(void *object, int field) co
     }
     static const char *fieldTypeStrings[] = {
         "int",
+        "CFP",
+        "CFP",
+        "CFP",
     };
-    return (field>=0 && field<1) ? fieldTypeStrings[field] : NULL;
+    return (field>=0 && field<4) ? fieldTypeStrings[field] : NULL;
 }
 
 const char *ODARPacketDescriptor::getFieldProperty(void *object, int field, const char *propertyname) const
@@ -242,6 +293,9 @@ std::string ODARPacketDescriptor::getFieldAsString(void *object, int field, int 
     ODARPacket *pp = (ODARPacket *)object; (void)pp;
     switch (field) {
         case 0: return long2string(pp->getHopcount());
+        case 1: {std::stringstream out; out << pp->getCDF(); return out.str();}
+        case 2: {std::stringstream out; out << pp->getNeighbors(); return out.str();}
+        case 3: {std::stringstream out; out << pp->getOverheardPackets(); return out.str();}
         default: return "";
     }
 }
@@ -270,6 +324,9 @@ const char *ODARPacketDescriptor::getFieldStructName(void *object, int field) co
         field -= basedesc->getFieldCount(object);
     }
     switch (field) {
+        case 1: return opp_typename(typeid(CFP));
+        case 2: return opp_typename(typeid(CFP));
+        case 3: return opp_typename(typeid(CFP));
         default: return NULL;
     };
 }
@@ -284,6 +341,9 @@ void *ODARPacketDescriptor::getFieldStructPointer(void *object, int field, int i
     }
     ODARPacket *pp = (ODARPacket *)object; (void)pp;
     switch (field) {
+        case 1: return (void *)(&pp->getCDF()); break;
+        case 2: return (void *)(&pp->getNeighbors()); break;
+        case 3: return (void *)(&pp->getOverheardPackets()); break;
         default: return NULL;
     }
 }

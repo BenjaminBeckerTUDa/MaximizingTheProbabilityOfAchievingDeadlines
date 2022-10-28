@@ -18,6 +18,7 @@
 #include "VirtualMac.h"
 #include "OMacPacket_m.h"
 #include "OMacRoutingPacket_m.h"
+#include "ODARControl_m.h"
 
 using namespace std;
 
@@ -60,6 +61,7 @@ private:
     int channelClear;
     int dataTransmissions;
     int hopCountTransmission;
+    int controlTransmission;
     int reachedMaxRetriesCount;
     map<int, int> overheardPackets;
 
@@ -89,6 +91,7 @@ protected:
     void fromNetworkLayer(cPacket *, int);
 
     int handleRadioControlMessage(cMessage *);
+    int handleControlCommand(cMessage *);
 
     void sendDataPacket();
     void sendAck();
@@ -110,6 +113,9 @@ protected:
     int getIndexInReceiversList(list<int>);
 
     string displayReceiverList(list<int>);
+
+public:
+    int getMacAdress();
 };
 
 #endif

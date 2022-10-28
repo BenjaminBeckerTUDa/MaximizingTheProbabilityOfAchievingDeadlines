@@ -58,6 +58,7 @@ EXECUTE_ON_STARTUP(
     if (!e) enums.getInstance()->add(e = new cEnum("OMacRoutingPacket_type"));
     e->insert(OMAC_ROUTING_DATA_PACKET, "OMAC_ROUTING_DATA_PACKET");
     e->insert(OMAC_ROUTING_HOPCOUNT_PACKET, "OMAC_ROUTING_HOPCOUNT_PACKET");
+    e->insert(OMAC_ROUTING_CONTROL_PACKET, "OMAC_ROUTING_CONTROL_PACKET");
 );
 
 Register_Class(OMacRoutingPacket);

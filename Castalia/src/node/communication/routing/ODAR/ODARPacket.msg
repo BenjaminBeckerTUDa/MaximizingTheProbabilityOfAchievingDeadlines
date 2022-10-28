@@ -12,10 +12,15 @@
 
 cplusplus {{
 #include "OMacRoutingPacket_m.h"
+#include "CFP.h"
 }}
 
 class OMacRoutingPacket;
+class noncobject CFP;
 
 packet ODARPacket extends OMacRoutingPacket {
 	int hopcount;
+	CFP CDF;
+	CFP neighbors;
+	CFP overheardPackets;
 }

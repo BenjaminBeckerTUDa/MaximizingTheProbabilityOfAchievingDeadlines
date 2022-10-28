@@ -1,7 +1,7 @@
 //****************************************************************************
-//*  Copyright: National ICT Australia,  2007 - 2011                         *
+//*  Copyright: National ICT Australia,  2007 - 2010                         *
 //*  Developed at the ATP lab, Networked Systems research theme              *
-//*  Author(s): Athanassios Boulis, Yuriy Tselishchev                        *
+//*  Author(s): Dimosthenis Pediaditakis, Yuriy Tselishchev                  *
 //*  This file is distributed under the terms in the attached LICENSE file.  *
 //*  If you do not find this file, copies can be found by writing to:        *
 //*                                                                          *
@@ -11,27 +11,21 @@
 //****************************************************************************/
 
 
-
-
-cplusplus {{
-#include "MacPacket_m.h"
-#include "ReceiversContainer.h"
-}}
-
-
-class MacPacket;
-class noncobject ReceiversContainer;
-
-
-enum OMacPacket_type {
-    OMAC_DATA_PACKET = 1;
-    OMAC_ACK_PACKET = 2;
-    OMAC_HOPCOUNT_PACKET = 3;
-    OMAC_CONTROL_PACKET = 4;
+enum ODARControlDef {
+	INC_RCV = 1;
+	INC_TX = 2;
+	REPLY_TIMES = 3;
+	REQUEST_TIMES  = 4;
 }
 
-packet OMacPacket extends MacPacket {
-    int OMacPacketKind enum (OMacPacket_type);
-    ReceiversContainer receiversContainer;
-    unsigned int packetId;
+message ODARControlMessage {
+	int ODARControlMessageKind enum (ODARControlDef);
+	int senderAddress;
+	int databytelength;
+	simtime_t requiredTimeForACK;
+	simtime_t requiredTimeForDATA;
+	simtime_t minTimeForCA;
+	simtime_t maxTimeForCA;
+	int selfMACAdress;
 }
+

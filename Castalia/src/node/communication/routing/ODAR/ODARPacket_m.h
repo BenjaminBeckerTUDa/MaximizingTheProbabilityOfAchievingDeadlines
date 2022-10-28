@@ -1,5 +1,5 @@
 //
-// Generated file, do not edit! Created by nedtool 4.6 from src/node/communication/routing/oDAR/ODARPacket.msg.
+// Generated file, do not edit! Created by nedtool 4.6 from src/node/communication/routing/ODAR/ODARPacket.msg.
 //
 
 #ifndef _ODARPACKET_M_H_
@@ -17,14 +17,18 @@
 
 // cplusplus {{
 #include "OMacRoutingPacket_m.h"
+#include "CFP.h"
 // }}
 
 /**
- * Class generated from <tt>src/node/communication/routing/oDAR/ODARPacket.msg:19</tt> by nedtool.
+ * Class generated from <tt>src/node/communication/routing/ODAR/ODARPacket.msg:21</tt> by nedtool.
  * <pre>
  * packet ODARPacket extends OMacRoutingPacket
  * {
  *     int hopcount;
+ *     CFP CDF;
+ *     CFP neighbors;
+ *     CFP overheardPackets;
  * }
  * </pre>
  */
@@ -32,6 +36,9 @@ class ODARPacket : public ::OMacRoutingPacket
 {
   protected:
     int hopcount_var;
+    CFP CDF_var;
+    CFP neighbors_var;
+    CFP overheardPackets_var;
 
   private:
     void copy(const ODARPacket& other);
@@ -52,6 +59,15 @@ class ODARPacket : public ::OMacRoutingPacket
     // field getter/setter methods
     virtual int getHopcount() const;
     virtual void setHopcount(int hopcount);
+    virtual CFP& getCDF();
+    virtual const CFP& getCDF() const {return const_cast<ODARPacket*>(this)->getCDF();}
+    virtual void setCDF(const CFP& CDF);
+    virtual CFP& getNeighbors();
+    virtual const CFP& getNeighbors() const {return const_cast<ODARPacket*>(this)->getNeighbors();}
+    virtual void setNeighbors(const CFP& neighbors);
+    virtual CFP& getOverheardPackets();
+    virtual const CFP& getOverheardPackets() const {return const_cast<ODARPacket*>(this)->getOverheardPackets();}
+    virtual void setOverheardPackets(const CFP& overheardPackets);
 };
 
 inline void doPacking(cCommBuffer *b, ODARPacket& obj) {obj.parsimPack(b);}

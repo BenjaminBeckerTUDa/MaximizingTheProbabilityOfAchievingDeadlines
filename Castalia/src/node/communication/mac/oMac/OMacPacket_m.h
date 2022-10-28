@@ -29,17 +29,19 @@
  *     OMAC_DATA_PACKET = 1;
  *     OMAC_ACK_PACKET = 2;
  *     OMAC_HOPCOUNT_PACKET = 3;
+ *     OMAC_CONTROL_PACKET = 4;
  * }
  * </pre>
  */
 enum OMacPacket_type {
     OMAC_DATA_PACKET = 1,
     OMAC_ACK_PACKET = 2,
-    OMAC_HOPCOUNT_PACKET = 3
+    OMAC_HOPCOUNT_PACKET = 3,
+    OMAC_CONTROL_PACKET = 4
 };
 
 /**
- * Class generated from <tt>src/node/communication/mac/oMac/OMacPacket.msg:32</tt> by nedtool.
+ * Class generated from <tt>src/node/communication/mac/oMac/OMacPacket.msg:33</tt> by nedtool.
  * <pre>
  * packet OMacPacket extends MacPacket
  * {

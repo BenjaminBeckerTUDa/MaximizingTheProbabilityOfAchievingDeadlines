@@ -21,6 +21,7 @@ class noncobject ReceiversContainer;
 enum OMacRoutingPacket_type {
 	OMAC_ROUTING_DATA_PACKET = 1;
 	OMAC_ROUTING_HOPCOUNT_PACKET = 2;
+	OMAC_ROUTING_CONTROL_PACKET = 3;
 }
 
 packet OMacRoutingPacket extends RoutingPacket {

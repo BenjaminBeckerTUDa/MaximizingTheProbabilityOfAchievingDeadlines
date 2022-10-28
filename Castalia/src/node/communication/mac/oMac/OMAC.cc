@@ -10,7 +10,6 @@ void OMAC::startup()
     maxTxRetries = par("maxTxRetries");
     waitTimeout = ((double)par("waitTimeout")) / 1000.0;
 
-    // used to call TX_TIME(x)
     phyDataRate = par("phyDataRate");
     phyLayerOverhead = par("phyFrameOverhead");
 
@@ -33,6 +32,7 @@ void OMAC::startup()
     channelClear = 0;
     dataTransmissions = 0;
     hopCountTransmission = 0;
+    controlTransmission = 0;
     reachedMaxRetriesCount = 0;
 
     // clear buffers
@@ -48,6 +48,11 @@ void OMAC::startup()
         pktToNetBuffer.pop();
 
     macState = MAC_STATE_ACTIVE;
+}
+
+int OMAC::getMacAdress()
+{
+    return SELF_MAC_ADDRESS;
 }
 
 void OMAC::timerFiredCallback(int timer)
@@ -127,8 +132,6 @@ void OMAC::resetDefaultState(const char *descr)
         if (txRetries <= 0)
         {
             unsigned int packetId = check_and_cast<OMacPacket *>(TXBuffer.front())->getPacketId();
-            /*             trace() << "Packet ID " << packetId << "   DATA   " << SELF_MAC_ADDRESS << "->B"
-                                << "   DROP   " << "reached MAX retries"; */
             popTxBuffer();
             reachedMaxRetriesCount++;
         }
@@ -193,10 +196,19 @@ void OMAC::fromNetworkLayer(cPacket *netPkt, int destination)
 
     case OMAC_ROUTING_HOPCOUNT_PACKET:
     {
-        macFrame->setOMacPacketKind(OMAC_HOPCOUNT_PACKET);
+        macFrame->setOMacPacketKind(OMAC_CONTROL_PACKET);
         toRadioLayer(macFrame);
         toRadioLayer(createRadioCommand(SET_STATE, TX));
         hopCountTransmission++;
+        break;
+    }
+
+    case OMAC_ROUTING_CONTROL_PACKET:
+    {
+        macFrame->setOMacPacketKind(OMAC_CONTROL_PACKET);
+        toRadioLayer(macFrame);
+        toRadioLayer(createRadioCommand(SET_STATE, TX));
+        controlTransmission++;
         break;
     }
 
@@ -218,6 +230,7 @@ void OMAC::fromRadioLayer(cPacket *pkt, double RSSI, double LQI)
     {
     case OMAC_DATA_PACKET:
     {
+        
         updateOverheardPackets(source);
 
         unsigned int packetId = macFrame->getPacketId();
@@ -227,8 +240,6 @@ void OMAC::fromRadioLayer(cPacket *pkt, double RSSI, double LQI)
         // check if this packet has been sent before, YES: drop
         if (sentPackets.count(packetId))
         {
-            /*             trace() << "Packet ID " << packetId << "   DATA   " << source << "->" << SELF_MAC_ADDRESS
-                                << "   DROP   " << "sent before "; */
             return;
         }
 
@@ -241,6 +252,7 @@ void OMAC::fromRadioLayer(cPacket *pkt, double RSSI, double LQI)
             OMacPacket *ackPkt = new OMacPacket("OMAC ACK packet", MAC_LAYER_PACKET);
             ackPkt->setOMacPacketKind(OMAC_ACK_PACKET);
             ackPkt->setSource(SELF_MAC_ADDRESS);
+            ackPkt->setByteLength(ackPacketSize);
             ackPkt->setDestination(source);
             ackPkt->setPacketId(packetId);
 
@@ -255,9 +267,6 @@ void OMAC::fromRadioLayer(cPacket *pkt, double RSSI, double LQI)
         // check if the source is in the receiver list, No: drop
         if (indexInReceiversList == -1)
         {
-
-            /* trace() << "Packet ID " << packetId << "   DATA   " << source << "->" << SELF_MAC_ADDRESS << "   DROP   "
-                    << "not in receiver list"; */
             return;
         }
 
@@ -267,15 +276,6 @@ void OMAC::fromRadioLayer(cPacket *pkt, double RSSI, double LQI)
         {
             if (!overheardAcks.at(packetId).count(source))
             {
-                /*                 // for debug
-                                string str = "";
-                                for (int node : overheardAcks.at(packetId))
-                                {
-                                    str = str + " " + std::to_string(node);
-                                }
-
-                                trace() << "Packet ID " << packetId << "   DATA   " << source << "->" << SELF_MAC_ADDRESS << "   DROP   "
-                                        << "not in the overheard ACK list" << str; */
                 return;
             }
         }
@@ -300,6 +300,7 @@ void OMAC::fromRadioLayer(cPacket *pkt, double RSSI, double LQI)
         ackPkt->setPacketId(packetId);
         ackBuffer.push(ackPkt);
 
+        waitTimeout = TX_TIME(ackPacketSize + 2);
         setTimer(HANDLE_SEND_ACK, indexInReceiversList * waitTimeout);
         break;
     }
@@ -312,8 +313,6 @@ void OMAC::fromRadioLayer(cPacket *pkt, double RSSI, double LQI)
         {
             if (macState == MAC_STATE_WAIT_FOR_ACK && !ackedPackets.count(packetId))
             {
-                // trace() << "Packet ID " << packetId << "   ACK    " << source << "->" << SELF_MAC_ADDRESS << "   ACCEPT   ";
-
                 cancelTimer(TRANSMISSION_TIMEOUT);
                 popTxBuffer();
                 sentPackets.insert(packetId);
@@ -330,13 +329,12 @@ void OMAC::fromRadioLayer(cPacket *pkt, double RSSI, double LQI)
         }
         else
         {
-            // trace() << "Packet ID " << packetId << "   ACK    " << source << "->" << destination << "   OVERHEARD   " << SELF_MAC_ADDRESS;
             updateOverheardAcks(packetId, source);
         }
         break;
     }
 
-    case OMAC_HOPCOUNT_PACKET:
+    case OMAC_CONTROL_PACKET:
     {
         if (isNotDuplicatePacket(macFrame))
             toNetworkLayer(decapsulatePacket(macFrame));
@@ -362,9 +360,6 @@ void OMAC::handleSendAck()
         {
             if (!overheardAcks.at(packetId).count(ackPkt->getDestination()))
             {
-                /* trace() << "Packet ID " << packetId << "   ACK    " << ackPkt->getSource() << "->" << ackPkt->getDestination() << "   DROP   "
-                    << "overheard ACK from other node"; */
-
                 delete ackBuffer.front();
                 ackBuffer.pop();
                 delete pktToNetBuffer.front();
@@ -377,11 +372,10 @@ void OMAC::handleSendAck()
         toRadioLayer(createRadioCommand(SET_STATE, TX));
         ackBuffer.pop();
         setMacState(MAC_STATE_IN_TX, "transmitting ACK packet");
+        // important here: packet gets to NET after ACK has been sent!
 
         toNetworkLayer(decapsulatePacket(pktToNetBuffer.front()));
         pktToNetBuffer.pop();
-
-        // trace() << "Packet ID " << packetId << "   ACK    " << ackPkt->getSource() << "->" << ackPkt->getDestination() << "   SEND   ";
     }
 }
 
@@ -398,6 +392,27 @@ int OMAC::handleRadioControlMessage(cMessage *msg)
     toNetworkLayer(msg);
     return 1;
 }
+
+
+int OMAC::handleControlCommand(cMessage *msg)
+{
+    ODARControlMessage *odarMsg = check_and_cast<ODARControlMessage *>(msg);
+    if (!odarMsg)
+        return 0;
+    if (odarMsg->getODARControlMessageKind() == REQUEST_TIMES)
+    {
+        ODARControlMessage *oc = new ODARControlMessage("REPLY_TIMES", NETWORK_CONTROL_COMMAND);
+	    oc->setODARControlMessageKind(REPLY_TIMES);
+        oc->setRequiredTimeForACK(TX_TIME(ackPacketSize + 2));
+        oc->setRequiredTimeForDATA(TX_TIME(odarMsg->getDatabytelength() + macFrameOverhead));
+        oc->setMaxTimeForCA(contentionPeriod);
+        oc->setMinTimeForCA(0);
+        oc->setSelfMACAdress(SELF_MAC_ADDRESS);
+	    toNetworkLayer(oc);
+    }
+    return 1;
+}
+
 
 void OMAC::performCarrierSense(int newState, simtime_t delay)
 {
@@ -433,7 +448,7 @@ void OMAC::sendDataPacket()
 
     OMacPacket *macFrame = check_and_cast<OMacPacket *>(TXBuffer.front());
 
-    if (macFrame->getOMacPacketKind() == OMAC_HOPCOUNT_PACKET)
+    if (macFrame->getOMacPacketKind() == OMAC_CONTROL_PACKET)
     {
         toRadioLayer(macFrame->dup());
         toRadioLayer(createRadioCommand(SET_STATE, TX));
@@ -444,19 +459,19 @@ void OMAC::sendDataPacket()
     }
 
     toRadioLayer(macFrame->dup());
-
-    /*     trace() << "Packet ID " << macFrame->getPacketId() << "   DATA   " << macFrame->getSource() << "->B"
-                << "   SEND   " << displayReceiverList(macFrame->getReceiversContainer().getReceivers())
-                << "   retries " << txRetries; */
-
     double txTime = TX_TIME(macFrame->getByteLength());
 
     txRetries--;
 
+    waitTimeout = TX_TIME(ackPacketSize + 2);
     int waitTimeoutCount = macFrame->getReceiversContainer().getReceivers().size();
     setMacState(MAC_STATE_WAIT_FOR_ACK, "sent DATA packet");
     setTimer(TRANSMISSION_TIMEOUT, txTime + waitTimeoutCount * waitTimeout);
     dataTransmissions++;
+
+    ODARControlMessage *oc = new ODARControlMessage("INC_TX", NETWORK_CONTROL_COMMAND);
+	oc->setODARControlMessageKind(INC_TX);
+	toNetworkLayer(oc);
 
     toRadioLayer(createRadioCommand(SET_STATE, TX));
 }
@@ -496,6 +511,11 @@ void OMAC::updateOverheardPackets(int node)
         overheardPackets.at(node)++;
     else
         overheardPackets.insert({node, 1});
+
+    ODARControlMessage *oc = new ODARControlMessage("INC_RCV", NETWORK_CONTROL_COMMAND);
+	oc->setODARControlMessageKind(INC_RCV);
+	oc->setSenderAddress(node);
+	toNetworkLayer(oc);
 }
 
 /**
