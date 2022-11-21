@@ -46,6 +46,7 @@ enum OMacRoutingPacket_type {
  *     int OMacRoutingKind @enum(OMacRoutingPacket_type);
  *     unsigned int packetId;
  *     ReceiversContainer receiversContainer;
+ *     double deadline;
  * }
  * </pre>
  */
@@ -55,6 +56,7 @@ class OMacRoutingPacket : public ::RoutingPacket
     int OMacRoutingKind_var;
     unsigned int packetId_var;
     ReceiversContainer receiversContainer_var;
+    double deadline_var;
 
   private:
     void copy(const OMacRoutingPacket& other);
@@ -80,6 +82,8 @@ class OMacRoutingPacket : public ::RoutingPacket
     virtual ReceiversContainer& getReceiversContainer();
     virtual const ReceiversContainer& getReceiversContainer() const {return const_cast<OMacRoutingPacket*>(this)->getReceiversContainer();}
     virtual void setReceiversContainer(const ReceiversContainer& receiversContainer);
+    virtual double getDeadline() const;
+    virtual void setDeadline(double deadline);
 };
 
 inline void doPacking(cCommBuffer *b, OMacRoutingPacket& obj) {obj.parsimPack(b);}

@@ -28,4 +28,5 @@ packet OMacRoutingPacket extends RoutingPacket {
 	int OMacRoutingKind enum (OMacRoutingPacket_type);
 	unsigned int packetId;
     ReceiversContainer receiversContainer;
+	double deadline;
 }

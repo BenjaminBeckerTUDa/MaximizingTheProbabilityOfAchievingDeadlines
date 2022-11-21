@@ -16,7 +16,7 @@ Define_Module(SimpleAggregation);
 
 void SimpleAggregation::startup()
 {
-	maxTTD = ((long long)((long)par("maxTTD"))) * ((long long)1000);
+	maxTTD = par("maxTTD");
 	sendInterval = (double)par("sendInterval") / 1000;
 	packetSize = (int)par("packetSize");
 	aggregatedValue = 0.0;
@@ -44,8 +44,7 @@ void SimpleAggregation::timerFiredCallback(int index)
 		DeadlinePacket *newPacket = new DeadlinePacket("App generic packet", APPLICATION_PACKET);
 		newPacket->setSequenceNumber(totalPackets);
 		newPacket->setByteLength(packetSize);
-		long long fac = 10000;
-		newPacket->setDeadline(maxTTD + (long long)(getClock().dbl() * fac));
+		newPacket->setDeadline(maxTTD + (getClock().dbl()*1000) );
 
 		toNetworkLayer(newPacket, "sink");
 

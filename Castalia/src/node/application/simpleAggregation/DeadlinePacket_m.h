@@ -24,14 +24,14 @@
  * <pre>
  * packet DeadlinePacket extends ApplicationPacket
  * {
- *     int64_t deadline;
+ *     double deadline;
  * }
  * </pre>
  */
 class DeadlinePacket : public ::ApplicationPacket
 {
   protected:
-    int64_t deadline_var;
+    double deadline_var;
 
   private:
     void copy(const DeadlinePacket& other);
@@ -50,8 +50,8 @@ class DeadlinePacket : public ::ApplicationPacket
     virtual void parsimUnpack(cCommBuffer *b);
 
     // field getter/setter methods
-    virtual int64_t getDeadline() const;
-    virtual void setDeadline(int64_t deadline);
+    virtual double getDeadline() const;
+    virtual void setDeadline(double deadline);
 };
 
 inline void doPacking(cCommBuffer *b, DeadlinePacket& obj) {obj.parsimPack(b);}

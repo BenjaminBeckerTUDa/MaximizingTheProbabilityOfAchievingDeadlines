@@ -26,6 +26,6 @@ cplusplus {{
 class ApplicationPacket;
 
 packet DeadlinePacket extends ApplicationPacket{
-	int64_t deadline;
+	double deadline;
 }
 

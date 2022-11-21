@@ -29,7 +29,7 @@ class SimpleAggregation: public VirtualApplication {
 	int routingLevel;
 	double waitingTimeForLowerLevelData;
 	double lastSensedValue;
-	unsigned long long maxTTD;
+	double maxTTD; //ms
 	double sendInterval;
 	int totalPackets;
 	int packetSize;

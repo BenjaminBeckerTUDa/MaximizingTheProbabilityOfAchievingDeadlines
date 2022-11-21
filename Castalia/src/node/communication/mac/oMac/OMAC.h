@@ -116,6 +116,10 @@ protected:
 
 public:
     int getMacAdress();
+    int getChannelClearCount();
+    int getChannelBusyCount();
+    int getMaxRetriesCount();
+
 };
 
 #endif

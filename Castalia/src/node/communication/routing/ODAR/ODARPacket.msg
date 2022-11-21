@@ -23,4 +23,6 @@ packet ODARPacket extends OMacRoutingPacket {
 	CFP CDF;
 	CFP neighbors;
 	CFP overheardPackets;
+	int round;
+	int CDFversion;
 }

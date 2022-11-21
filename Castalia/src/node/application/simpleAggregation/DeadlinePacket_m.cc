@@ -94,12 +94,12 @@ void DeadlinePacket::parsimUnpack(cCommBuffer *b)
     doUnpacking(b,this->deadline_var);
 }
 
-int64_t DeadlinePacket::getDeadline() const
+double DeadlinePacket::getDeadline() const
 {
     return deadline_var;
 }
 
-void DeadlinePacket::setDeadline(int64_t deadline)
+void DeadlinePacket::setDeadline(double deadline)
 {
     this->deadline_var = deadline;
 }
@@ -199,7 +199,7 @@ const char *DeadlinePacketDescriptor::getFieldTypeString(void *object, int field
         field -= basedesc->getFieldCount(object);
     }
     static const char *fieldTypeStrings[] = {
-        "int64_t",
+        "double",
     };
     return (field>=0 && field<1) ? fieldTypeStrings[field] : NULL;
 }
@@ -241,7 +241,7 @@ std::string DeadlinePacketDescriptor::getFieldAsString(void *object, int field, 
     }
     DeadlinePacket *pp = (DeadlinePacket *)object; (void)pp;
     switch (field) {
-        case 0: return int642string(pp->getDeadline());
+        case 0: return double2string(pp->getDeadline());
         default: return "";
     }
 }
@@ -256,7 +256,7 @@ bool DeadlinePacketDescriptor::setFieldAsString(void *object, int field, int i, 
     }
     DeadlinePacket *pp = (DeadlinePacket *)object; (void)pp;
     switch (field) {
-        case 0: pp->setDeadline(string2int64(value)); return true;
+        case 0: pp->setDeadline(string2double(value)); return true;
         default: return false;
     }
 }

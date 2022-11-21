@@ -535,6 +535,21 @@ int OMAC::getIndexInReceiversList(std::list<int> receivers)
     return -1;
 }
 
+int OMAC::getChannelClearCount()
+{
+    return channelClear;
+}
+
+int OMAC::getChannelBusyCount()
+{
+    return channelBusy;
+}
+
+int OMAC::getMaxRetriesCount()
+{
+    return reachedMaxRetriesCount;
+}
+
 void OMAC::finishSpecific()
 {
     trace() << "----------------------MAC monitoring infos----------------------";

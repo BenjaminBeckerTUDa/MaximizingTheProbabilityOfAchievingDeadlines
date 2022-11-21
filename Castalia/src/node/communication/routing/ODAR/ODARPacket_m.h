@@ -29,6 +29,8 @@
  *     CFP CDF;
  *     CFP neighbors;
  *     CFP overheardPackets;
+ *     int round;
+ *     int CDFversion;
  * }
  * </pre>
  */
@@ -39,6 +41,8 @@ class ODARPacket : public ::OMacRoutingPacket
     CFP CDF_var;
     CFP neighbors_var;
     CFP overheardPackets_var;
+    int round_var;
+    int CDFversion_var;
 
   private:
     void copy(const ODARPacket& other);
@@ -68,6 +72,10 @@ class ODARPacket : public ::OMacRoutingPacket
     virtual CFP& getOverheardPackets();
     virtual const CFP& getOverheardPackets() const {return const_cast<ODARPacket*>(this)->getOverheardPackets();}
     virtual void setOverheardPackets(const CFP& overheardPackets);
+    virtual int getRound() const;
+    virtual void setRound(int round);
+    virtual int getCDFversion() const;
+    virtual void setCDFversion(int CDFversion);
 };
 
 inline void doPacking(cCommBuffer *b, ODARPacket& obj) {obj.parsimPack(b);}
