@@ -6,7 +6,7 @@ void ODAR::startup()
 {
     cModule *appModule = getParentModule()->getParentModule()->getSubmodule("Application");
     if (appModule->hasPar("isSink"))
-        isSink = appModule->par("isSink");
+        isSink = appModule->par("isSink"); // one node is used as a sink node
     else
         opp_error("\nODAR has to be used with an application that defines the parameter isSink");
 
@@ -27,56 +27,58 @@ void ODAR::startup()
     /*
     Every node starts with a round with the value 0 and encloses it with every control-message that is transmitted. The sink increments its own round in intervals of hopCountPeriod*3. This increment propagates through the network in a flooding fashion as follows when control-messages are exchanged. Each time a node receives a new control-message from a neighbor, it inspects the enclosed round and acts accordingly as follows: 
 
+    If the received round is smaller than the own round, then the received CDF is considered outdated and ignored.
+
     If the received round is larger than the own round, then:
       - the own round is updated to the received round 
       - a new empty routing table (routingTable_calculation) is allocated (but not yet used). This table will be updated several times (steps explained below) and will become operational (i.e. used for forwarding decisions) the next time a sequence number larger than the own is received (when these steps here are applied the next time and a new routingTable_calculation is allocated).
       - all locally stored CDFs of neighbors and the nodes own CDF are erased.
-      - all link succes-rates are calculated from the current histograms.
+      - what is not implemented yet, but should be done: all link succes-rates are calculated from the current histograms.
 
     In the previous case, as well as in case the received round is equal to the own number, the node-CDF is locally updated
-
-    Finally, when the received round is smaller than the own round, then the received CDF is considered outdated and ignored.
     */
 
-    hopCountPeriod = ((double)par("hopCountPeriod")) / 1000.0;
+    hopCountPeriod = ((double)par("hopCountPeriod")) / 1000.0; // fixed time-intervals, in which control messages are broadcast
 
     minHopOnly = false; // set this parameter to true, to use minHop instead of ODAR
-    // minHop: use all nodes, which have a smaller hop-count towards the sink than the current node as forwarding set
+    /*
+    minHop: use all nodes as forwarding set, which have a smaller hop-count towards the sink than the current node.
+    */
+    
 
     if (isSink)
     {
-        // the sinks CDF is set to 1 for each time-to-deadline
         hopCount = 0; 
         CDF_calculation = new double[cdfSlots]{0};
         for (int i = 0; i < cdfSlots; i++)
         {
-            CDF_calculation[i]=1;
+            CDF_calculation[i]=1; // the sinks CDF is set to 1 for each time-to-deadline
         }
-        setTimer(INC_ROUND, hopCountPeriod*3);
+        setTimer(INC_ROUND, hopCountPeriod*3); // the sink increments its round in fixed time-intervals
     }
     else
     {
         hopCount = INT_MAX;
-        CDF_calculation = new double[cdfSlots]{0};
-        convolutedCDF_withoutACKs = new double[cdfSlots]{0};
-        convolutedCDF_withACKs = new double[cdfSlots]{0};
+        CDF_calculation = new double[cdfSlots]{0}; // the nodes CDF is initialized by 0 for each time-to-deadline
         list<int> x;
         for (int i = 0; i < cdfSlots; i++){
-            routingTable_calculation.insert({i, x});
-            routingTable_inUse.insert({i, x});
+            routingTable_calculation.insert({i, x}); // routing table is empty; see "currRound" for more information
+            routingTable_inUse.insert({i, x}); // routing table is empty; see "currRound" for more information
         }
     }
 
     
-    
-    setTimer(BROADCAST_CONTROL, hopCountPeriod); // start with timer for broadcasting control messages
-    setTimer(REQUEST_TIMES_FROM_MAC, .1); // start a timer to get information from MAC (e.g., time between transmissions, time for each transmission etc.)
-    createMask(0); // the mask is used for convolution in ODAR::convoluteCDFAtSinglePosition
+    setTimer(BROADCAST_CONTROL, hopCountPeriod); // control messages are broadcast in fixed time-intervals
+    setTimer(REQUEST_TIMES_FROM_MAC, .1); // get information from MAC (e.g., time between transmissions, time for each transmission etc.) after 0.1 seconds. so we can be sure, that the MAC is initialized.
+    createMask(0); // the mask is used for convolution in ODAR::convoluteCDFAtSinglePosition; for more information, see comments there.
     
     potentialReceiverSetsStrategy = CLIQUES; // we can restrict the allowed sets of forwarding candidates
-    // two strategies are implemented, to define the possible sets of receivers we consider:
-    // NONE: potential forwarding sets are arbitrary
-    // CLIQUES: nodes in potential forwarding sets must be neighboured to each other
+    /*
+    two strategies are implemented, to define the possible sets of receivers we consider:
+    NONE: potential forwarding sets are arbitrary
+    CLIQUES: nodes in potential forwarding sets must be neighboured to each other
+    */
+    
     neighborSuccRateThreshold = .8; // a neighbor for mode "CLIQUES" is defined as any node, where the packet success rate is above "neighborSuccRateThreshold"
 }
 
