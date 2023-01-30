@@ -48,13 +48,13 @@ class PLR: public VirtualRouting {
 	double probeInterval;
 	double cdfBroadcastInterval;
 	double newRoundInterval;
-	double riceK;
-	bool collectReducedTraceInfo;
-	int neighborSelectionStrategy; // 0 = none, 1 = above average; 2 = above median; 3 = above threshold
-	double neighborSelectionStrategy_value;
-	int appMaxTTD;
-	int appSendInterval;
-	int txRetries;
+	double riceK;		// used for logging only
+	bool collectReducedTraceInfo;		// depricated
+	int neighborSelectionStrategy;		// strategy to filter neighbors, when using average delay 0 = none, 1 = above average; 2 = above median; 3 = above threshold
+	double neighborSelectionStrategy_value;		// used as parameter when neighborSelectionStrategy = 3
+	int appMaxTTD;		// maximum(=initial) time to deadline; used to calculate the time-slots of CDFs and PDFs
+	int appSendInterval;		// used for logging only
+	int txRetries;		// used for logging only
 	
 	
 	// PLR-related member variables
