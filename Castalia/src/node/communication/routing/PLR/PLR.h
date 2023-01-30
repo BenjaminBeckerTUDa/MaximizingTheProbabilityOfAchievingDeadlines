@@ -134,8 +134,8 @@ class PLR: public VirtualRouting {
  	void broadcastCDF();	// creates a packet containing the nodes CDF and the current round number, and broadcast it
  	void sendProbe(int);	// sends a probe to the neighbor with the given id
 
-	void startup();
-	void finish();	
+	void startup();		// initializing nodes, loading data from .ned file
+	void finish();		// used for generating logging-output only
 	void fromApplicationLayer(cPacket *, const char *);
 	void fromMacLayer(cPacket *, int, double, double);
 	void handleNetworkControlCommand(cMessage *);
