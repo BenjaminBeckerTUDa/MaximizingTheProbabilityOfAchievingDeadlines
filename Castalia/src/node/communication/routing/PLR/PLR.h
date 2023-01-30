@@ -122,11 +122,11 @@ class PLR: public VirtualRouting {
 	int test();		// for monitoring
 
  protected:
- 	void insertDelay(long long, int);
- 	void updateAverageLinkDelay(double, int);
- 	void createPDF(int);
- 	void convoluteCDF(int);
- 	void addMaxToCDF();
+ 	void insertDelay(long long, int);		// inserts a delay (which was measured at the MAC) at the correct position in the histogram
+ 	void updateAverageLinkDelay(double, int);		// used for average delay only
+ 	void createPDF(int);		// calculates a PDF from a histogram
+ 	void convoluteCDF(int);		// concolutes a CDF with the corresponding link-pdf and stores the result as hop-cdf
+ 	void addMaxToCDF();		//
  	int getNextHop(long long);
  	long long toNanoseconds(double);
  	
