@@ -126,13 +126,13 @@ class PLR: public VirtualRouting {
  	void updateAverageLinkDelay(double, int);		// used for average delay only
  	void createPDF(int);		// calculates a PDF from a histogram
  	void convoluteCDF(int);		// concolutes a CDF with the corresponding link-pdf and stores the result as hop-cdf
- 	void addMaxToCDF();		//
- 	int getNextHop(long long);
- 	long long toNanoseconds(double);
+ 	void addMaxToCDF();		// [...]
+ 	int getNextHop(long long);		// returns the routing-table entry for a given time-to-deadline
+ 	long long toNanoseconds(double);		// converts a given double (representing seconds) to long long (representing nanoseconds) 
  	
- 	void nextRound();
- 	void broadcastCDF();
- 	void sendProbe(int);
+ 	void nextRound();		// triggered, when the round number increases. [...]
+ 	void broadcastCDF();	// creates a packet containing the nodes CDF and the current round number, and broadcast it
+ 	void sendProbe(int);	// sends a probe to the neighbor with the given id
 
 	void startup();
 	void finish();	
