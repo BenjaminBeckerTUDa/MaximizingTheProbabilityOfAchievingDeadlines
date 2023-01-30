@@ -76,7 +76,10 @@ class PLR: public VirtualRouting {
 	int* routingTable;		// routing table in use
 	int* routingTable_calc;		// routing table during calculations, which will be used in the next round
 	double* cdf;		// cdf of this node
+
+
 	// used for average delay only
+	// the following parameters used for average delay and not related to PLR
 	std::map<int, double> neighbor_avgNodeDelays;		// used for average delay only
 	std::map<int, double> neighbor_avgLinkDelays;		// used for average delay only
 	std::map<int, double> neighbor_avgLinkDelays_fixed;		// used for average delay only
@@ -87,12 +90,15 @@ class PLR: public VirtualRouting {
 	double avgDelay;		// used for average delay only
 	int currentRound;		// the current round of a node; i.e., the highest received round number so far (except for sink, as the sink initiates the rounds)
 
-	//depricated
+
+	// depricated
+	// the following parameters are depricated and not used anymore.
 	std::map<int, std::set<int>> seenPackets;		// depricated
 	bool betterCDF;		// depricated
 	std::map<int, double> currentRound_neighbor_avgLinkDelays;		// depricated
 	std::map<int, double*> currentRound_neighbor_pdfs;		// depricated
 	bool noTiming;		// depricated
+
 
 	// for monitoring
 	// the following parameters are used for monitoring and logging of network statistics only.
