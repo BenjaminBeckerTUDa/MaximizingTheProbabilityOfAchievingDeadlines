@@ -40,14 +40,14 @@ struct cmp_str
 class PLR: public VirtualRouting {
  private:
  	// configurable
-	int pDFSlots;
-	long long maxDelay;
-	int pDFMessageTimes;
-	bool useAverageDelay;
-	bool useAvgSecond;
-	double probeInterval;
-	double cdfBroadcastInterval;
-	double newRoundInterval;
+	int pDFSlots;		// The number of timeslots for PDFs and CDFs	
+	long long maxDelay;		// same as appMaxTTD
+	int pDFMessageTimes;		// depricated
+	bool useAverageDelay;		// true = average delay for routing; false = PLR for routing
+	bool useAvgSecond;		// true = use average delay, when there is no entry in the PLR tables
+	double probeInterval;		// interval between sending probes
+	double cdfBroadcastInterval;		// interval between broadcasting control messages
+	double newRoundInterval;		// interval, after which a new round starts
 	double riceK;		// used for logging only
 	bool collectReducedTraceInfo;		// depricated
 	int neighborSelectionStrategy;		// strategy to filter neighbors, when using average delay 0 = none, 1 = above average; 2 = above median; 3 = above threshold
@@ -58,52 +58,45 @@ class PLR: public VirtualRouting {
 	
 	
 	// PLR-related member variables
-	int packetSize;
-	long long delayStep;
+	int packetSize;		// size of packets from app layer
+	long long delayStep;		// time-span for an individual slot in a CDF, i.e. maxDelay/pDFSlots;
 	bool isSink;		//is a .ned file parameter of the Application module
-	std::set<int> neighbors;
+	std::set<int> neighbors;		// set of nodes, which are in communication range
 	//plr
-	std::map<int, double*> neighbor_cdfs;
-	std::map<int, double*> neighbor_pdfs;
-	std::map<int, double*> neighbor_pdfs_fixed;
-	std::map<int, double*> neighbor_hop_cdfs;
-	std::map<int, int*> neighbor_histograms;
+	std::map<int, double*> neighbor_cdfs;		// collection of most recently received cdfs from neighbors
+	std::map<int, double*> neighbor_pdfs;		// collection of most recently calculated pdfs towards neighbors
+	std::map<int, double*> neighbor_pdfs_fixed;		// collection of pdfs towards neighbors, which were calculated during last round
+	std::map<int, double*> neighbor_hop_cdfs;		// collection of most recently calculated cdfs towards neighbors (e.g. pdf*cdf)
+	std::map<int, int*> neighbor_histograms;		// measured delays towards neighbors
 
 
-	std::map<int,double> sendCount;
-	std::map<int,double> receiveCount;
+	std::map<int,double> sendCount;		// number of data-packets and probes sent to specific neighbors; used for monitoring network statistics
+	std::map<int,double> receiveCount;		// number of packets received from different senders; used for monitoring network statistics
 
-	int* routingTable;
-	int* routingTable_calc;
-	double* cdf;
-	double* cdf_forTrace;
-	//avg
-	std::map<int, double> neighbor_avgNodeDelays;
-	std::map<int, double> neighbor_avgLinkDelays;
-	std::map<int, double> neighbor_avgLinkDelays_fixed;
-	std::map<int, double> neighbor_avgHopDelays;
-	std::map<int, double> neighbor_avgLinkDelaysCounter;
-	int nextHop;
-	int nextHop_calc;
-	double avgDelay;
-	
-	//both
-	std::map<int, std::set<int>> seenPackets;
-	bool betterCDF;
-	
-	//rounds
-	int currentRound;
-	std::map<int, double> currentRound_neighbor_avgLinkDelays;
-	std::map<int, double*> currentRound_neighbor_pdfs;
-	
+	int* routingTable;		// routing table in use
+	int* routingTable_calc;		// routing table during calculations, which will be used in the next round
+	double* cdf;		// cdf of this node
+	// used for average delay only
+	std::map<int, double> neighbor_avgNodeDelays;		// used for average delay only
+	std::map<int, double> neighbor_avgLinkDelays;		// used for average delay only
+	std::map<int, double> neighbor_avgLinkDelays_fixed;		// used for average delay only
+	std::map<int, double> neighbor_avgHopDelays;		// used for average delay only
+	std::map<int, double> neighbor_avgLinkDelaysCounter;		// used for average delay only
+	int nextHop;		// used for average delay only
+	int nextHop_calc;		// used for average delay only
+	double avgDelay;		// used for average delay only
+	int currentRound;		// the current round of a node; i.e., the highest received round number so far (except for sink, as the sink initiates the rounds)
 
-	bool noTiming; 
-	// if true, then ...
-	// ... after 20 minutes: no more probes
-	// ... after 30 minutes: no more new rounds rounds
-	// ... after 40 minutes: no more broadcasts
+	//depricated
+	std::map<int, std::set<int>> seenPackets;		// depricated
+	bool betterCDF;		// depricated
+	std::map<int, double> currentRound_neighbor_avgLinkDelays;		// depricated
+	std::map<int, double*> currentRound_neighbor_pdfs;		// depricated
+	bool noTiming;		// depricated
 
 	// for monitoring
+	// the following parameters are used for monitoring and logging of network statistics only.
+	double* cdf_forTrace;
 	double simTime;
 	int monitoring_receivedPacketsInTime;
 	int monitoring_slots_1;
@@ -123,8 +116,9 @@ class PLR: public VirtualRouting {
 	int* monitoring_receivedData;
 	int* monitoring_sentData;
 	int* monitoring_droppedData;
+
  public:
-	int test();
+	int test();		// for monitoring
 
  protected:
  	void insertDelay(long long, int);
@@ -140,7 +134,7 @@ class PLR: public VirtualRouting {
  	void sendProbe(int);
 
 	void startup();
-	void finish();
+	void finish();	
 	void fromApplicationLayer(cPacket *, const char *);
 	void fromMacLayer(cPacket *, int, double, double);
 	void handleNetworkControlCommand(cMessage *);
