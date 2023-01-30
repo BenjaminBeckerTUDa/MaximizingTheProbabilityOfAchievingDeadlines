@@ -39,47 +39,37 @@ struct cmp_str
 
 class PLR: public VirtualRouting {
  private:
+// PLR-related variables
  	// configurable
 	int pDFSlots;		// The number of timeslots for PDFs and CDFs	
 	long long maxDelay;		// same as appMaxTTD
-	int pDFMessageTimes;		// depricated
-	bool useAverageDelay;		// true = average delay for routing; false = PLR for routing
-	bool useAvgSecond;		// true = use average delay, when there is no entry in the PLR tables
 	double probeInterval;		// interval between sending probes
 	double cdfBroadcastInterval;		// interval between broadcasting control messages
 	double newRoundInterval;		// interval, after which a new round starts
-	double riceK;		// used for logging only
-	bool collectReducedTraceInfo;		// depricated
-	int neighborSelectionStrategy;		// strategy to filter neighbors, when using average delay 0 = none, 1 = above average; 2 = above median; 3 = above threshold
-	double neighborSelectionStrategy_value;		// used as parameter when neighborSelectionStrategy = 3
 	int appMaxTTD;		// maximum(=initial) time to deadline; used to calculate the time-slots of CDFs and PDFs
-	int appSendInterval;		// used for logging only
-	int txRetries;		// used for logging only
-	
-	
 	// PLR-related member variables
 	int packetSize;		// size of packets from app layer
 	long long delayStep;		// time-span for an individual slot in a CDF, i.e. maxDelay/pDFSlots;
 	bool isSink;		//is a .ned file parameter of the Application module
 	std::set<int> neighbors;		// set of nodes, which are in communication range
-	//plr
 	std::map<int, double*> neighbor_cdfs;		// collection of most recently received cdfs from neighbors
 	std::map<int, double*> neighbor_pdfs;		// collection of most recently calculated pdfs towards neighbors
 	std::map<int, double*> neighbor_pdfs_fixed;		// collection of pdfs towards neighbors, which were calculated during last round
 	std::map<int, double*> neighbor_hop_cdfs;		// collection of most recently calculated cdfs towards neighbors (e.g. pdf*cdf)
 	std::map<int, int*> neighbor_histograms;		// measured delays towards neighbors
-
-
 	std::map<int,double> sendCount;		// number of data-packets and probes sent to specific neighbors; used for monitoring network statistics
 	std::map<int,double> receiveCount;		// number of packets received from different senders; used for monitoring network statistics
-
 	int* routingTable;		// routing table in use
 	int* routingTable_calc;		// routing table during calculations, which will be used in the next round
 	double* cdf;		// cdf of this node
 
 
-	// used for average delay only
-	// the following parameters used for average delay and not related to PLR
+// used for average delay only
+// the following parameters used for average delay and not related to PLR
+	bool useAverageDelay;		// true = average delay for routing; false = PLR for routing
+	bool useAvgSecond;		// true = use average delay, when there is no entry in the PLR tables
+	int neighborSelectionStrategy;		// strategy to filter neighbors, when using average delay 0 = none, 1 = above average; 2 = above median; 3 = above threshold
+	double neighborSelectionStrategy_value;		// used as parameter when neighborSelectionStrategy = 3
 	std::map<int, double> neighbor_avgNodeDelays;		// used for average delay only
 	std::map<int, double> neighbor_avgLinkDelays;		// used for average delay only
 	std::map<int, double> neighbor_avgLinkDelays_fixed;		// used for average delay only
@@ -91,17 +81,22 @@ class PLR: public VirtualRouting {
 	int currentRound;		// the current round of a node; i.e., the highest received round number so far (except for sink, as the sink initiates the rounds)
 
 
-	// depricated
-	// the following parameters are depricated and not used anymore.
+// depricated
+// the following parameters are depricated and not used anymore.
 	std::map<int, std::set<int>> seenPackets;		// depricated
 	bool betterCDF;		// depricated
 	std::map<int, double> currentRound_neighbor_avgLinkDelays;		// depricated
 	std::map<int, double*> currentRound_neighbor_pdfs;		// depricated
 	bool noTiming;		// depricated
+	int pDFMessageTimes;		// depricated
+	bool collectReducedTraceInfo;		// depricated
 
 
-	// for monitoring
-	// the following parameters are used for monitoring and logging of network statistics only.
+// for monitoring
+// the following parameters are used for monitoring and logging of network statistics only.
+	double riceK;
+	int appSendInterval;
+	int txRetries;
 	double* cdf_forTrace;
 	double simTime;
 	int monitoring_receivedPacketsInTime;
