@@ -165,6 +165,13 @@ void PLR::startup()
 
 void PLR::timerFiredCallback(int index)
 {
+	/*
+	this function handles all timer-callbacks.
+	(index == 0) corresponds to a timer, which is used by the sink only. it triggers incrementation of the current round. 
+	(index == 1) is used by all nodes, and triggers the broadcast of the nodes CDF (and current round number)
+	(index == 2) is used by all nodes except the sink, and triggers the probing of neighbors
+	(index > 2) is used by all nodes except the sink, and triggers the probing of individual neighbors
+	*/
 	if (index == 0)
 	{
 		// increase round
@@ -198,7 +205,10 @@ void PLR::timerFiredCallback(int index)
 
 void PLR::broadcastCDF()
 {
-
+	/*
+	in this function, a packet is created, which contains the cdf of this node and the current round number.
+	the packet is then broadcasted.
+	*/
 	
 	PLRPacket *netPacket = new PLRPacket("PLR cdf packet", NETWORK_LAYER_PACKET);
 	netPacket->setPLRPacketKind(PLR_CDF_PACKET);
@@ -232,16 +242,15 @@ void PLR::broadcastCDF()
 
 void PLR::handleNetworkControlCommand(cMessage * pkt)
 {
+	/*
+	this function handles control commands from the MAC-layer.
+	there are two different kinds of control commands:
+	FAIL : this command is used for monitoring only, not relevant for PLR.
+	DELAY : this command contains a measured delay for an data-packet or probe (which was transmitted from this node and acknoledged by the receiving node). the delay is inserted to the histogram corresponding to the receiver of the data-packet/probe.
+	*/
 	PLRControlMessage *plrc = dynamic_cast <PLRControlMessage*>(pkt);
 	if (!plrc){
 		return;
-	}
-
-	if (plrc->getPLRControlMessageKind() == PDR)
-	{
-		// monitoring_pdr[plrc -> getTxAddr()] = plrc -> getPdr();
-		// hier: trace für vergleich
-		// trace() << "pdr durch mac acks >" << plrc -> getPdr();
 	}
 	if (plrc->getPLRControlMessageKind() == FAIL)
 	{
@@ -257,12 +266,18 @@ void PLR::handleNetworkControlCommand(cMessage * pkt)
 
 long long PLR::toNanoseconds(double delay)
 {
+	/*
+	this function returns the time in nanoseconds for a given time in seconds (delay)
+	*/
 	long long fac = 1000000;
 	return (long long) (delay * fac);
 }
 
 void PLR::updateAverageLinkDelay(double delay_, int address)
 {
+	/*
+	used for average delay only
+	*/
 	if (neighbor_avgLinkDelaysCounter[address] == 99999)
 	{
 		neighbor_avgLinkDelays[address] = delay_;
@@ -277,6 +292,9 @@ void PLR::updateAverageLinkDelay(double delay_, int address)
 
 void PLR::insertDelay(long long delay_, int address)
 {
+	/*
+	insert a delay to the histogram (i.e., increment the value in the correct slot of the histogram)
+	*/
 	if (delay_ > maxDelay)
 	{
 		delay_ = maxDelay;
@@ -286,24 +304,17 @@ void PLR::insertDelay(long long delay_, int address)
 	{
 		slot = slot;
 	}
-	
-	// trace() << "inserted into slot: " << slot << " which corresponds to time interval [" << slot * delayStep << ", " << (slot+1) * delayStep << "]";
-	
 	(neighbor_histograms[address])[slot] = (neighbor_histograms[address])[slot]+1;
-
-	//for (int i = 0; i <= pDFSlots; i++)
-	//{
-	//	trace() << "Histogram at position " << i << ":" << (neighbor_histograms[address])[i];
-	//}
 }
 
 
 void PLR::addMaxToCDF()
 {
-
-	// neighborSelectionStrategy_value = default(0.0);
-	// neighborSelectionStrategy = default(0); // 0 = none, 1 = above average; 2 = above median; 3 = above threshold
-
+	/* 
+	average delay only:
+	filter out neighbors, which have a low pdr.
+	neighborSelectionStrategy = default(0); // 0 = none, 1 = above average; 2 = above median; 3 = above threshold
+	*/
 	double pdr_min = 0.0;
 	if (neighborSelectionStrategy == 0){
 		pdr_min = 0.0;
@@ -334,8 +345,6 @@ void PLR::addMaxToCDF()
 			pdrs[i] = monitoring_pdr[address];
 			i ++;
 		}
-
-		// TODO: hier noch mal genau prüfen, ob das mit dem median so klappt
 		int n = sizeof(pdrs) / sizeof(pdrs[0]);
 		sort(pdrs, pdrs+n);
 		pdr_min = pdrs[n/2];
@@ -343,12 +352,12 @@ void PLR::addMaxToCDF()
 	if (neighborSelectionStrategy == 3){
 		pdr_min = neighborSelectionStrategy_value;
 	}
-
-
-
-	// iterate over all neighbors to find the one with minimum delay
-	//avgDelay = 99999;
-	for (int address : neighbors)
+	/* 
+	average delay only:
+	iterate over all neighbors to find the one with minimum delay
+	avgDelay = 99999;
+	*/
+	for (int address : neighbors) 
 	{
 		double neighbor_avg = neighbor_avgHopDelays[address];
 		double pdr = monitoring_pdr[address];
@@ -359,7 +368,10 @@ void PLR::addMaxToCDF()
 		}
 	}
 
-	// iterate over all neighbors to find the max values for each cdf slot
+	/* 
+	PLR:
+	iterate over all neighbors to find the max values for each cdf slot
+	*/
 	for (int address : neighbors)
 	{
 		for (int i = 0; i <= pDFSlots; i++)
@@ -371,7 +383,10 @@ void PLR::addMaxToCDF()
 			}
 		}
 	}
-	// making sure no loops
+		/* 
+	PLR:
+	loop-avoidance (which could occour, for instance, if two nodes each have a CDF of 1 for a certain range of ttds. then, a packet might get stuck in a loop between those nodes, until the ttd of that packet sufficiently decreases.)
+	*/
 	for (int i = 0; i <= pDFSlots; i++)
 	{
 		if(cdf[i+1] == cdf[i])
@@ -384,6 +399,10 @@ void PLR::addMaxToCDF()
 
 int PLR::getNextHop(long long ttl)
 {
+	/*
+	this function returns the next hop for a given time-to-deadline (ttl).
+	after some checks (e.g. ttl must be >= 0), a lookup in the routing table is performed.
+	*/
 	if (ttl < 0)
 	{
 		// no next hop for packets with expired deadlines
@@ -416,6 +435,9 @@ int PLR::getNextHop(long long ttl)
 
 void PLR::createPDF(int address)
 {
+	/*
+	this function calculates a PDF from a histogram for the neighbor with the given adress (neighbor_histograms[address]). the packet delivery ratio (monitoring_pdr[address]) is used as an additional factor. the result is stored in neighbor_pdfs[address]. 
+	*/
 	int* histogram = neighbor_histograms[address];
 	double* pdf = neighbor_pdfs[address];
 	int sum = 0;
