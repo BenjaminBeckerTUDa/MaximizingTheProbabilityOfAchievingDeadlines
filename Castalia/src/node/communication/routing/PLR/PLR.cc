@@ -435,6 +435,11 @@ void PLR::createPDF(int address)
 
 void PLR::convoluteCDF(int address)
 {
+	/*
+	this function convolutes the CDF of a neighbor (neighbor_cdfs[address]) with the corresponding link-PDF (neighbor_pdfs[address]). The result is stored in neighbor_hop_cdf (neighbor_hop_cdfs[address]).
+	many parts of this function are optimizations, to save computation time and also to mitigate rounding errors.
+	the convolution itself happens only after the comment "// convolute CDF".
+	*/
 	neighbor_avgHopDelays[address] = neighbor_avgLinkDelays[address] + neighbor_avgNodeDelays[address];
 
 	double* neighbor_pdf = neighbor_pdfs[address];
@@ -504,16 +509,20 @@ void PLR::convoluteCDF(int address)
 
 void PLR::sendProbe(int address)
 {
+	/*
+	this function creates and sends a probing packet.
+	probing packets have the same size as data packets and are transmitted via unicast. 
+	probes further contain the number of packets, which were (created by the receiver of the probe) and (successfully received by this node). 
+	*/
 	PLRPacket *netPacket =
 	    new PLRPacket("PLR probe packet", NETWORK_LAYER_PACKET);
 	netPacket->setPLRPacketKind(PLR_PROBE_PACKET);
 	netPacket->setSource(SELF_NETWORK_ADDRESS);
 	netPacket->setDestination("none");
-	netPacket->setReceivedPackets(receiveCount[address]);
+	netPacket->setReceivedPackets(receiveCount[address]);	// number of packets, which were (created by the receiver of the probe) and (successfully received by this node).
 	netPacket->setSequenceNumber(currentSequenceNumber);
 	netPacket->setByteLength(packetSize + 22);
 	currentSequenceNumber++;
-	// trace() << "toMacLayer(PLR_PROBE_PACKET, " << address << ");"  << " size " << netPacket->getByteLength();
 	monitoring_probeTo[address][(int) (getClock().dbl()/simTime * monitoring_slots)]++;
 	monitoring_sentProbes[(int) (getClock().dbl()/simTime * monitoring_slots)]++;
 	toMacLayer(netPacket, address);
@@ -528,7 +537,7 @@ void PLR::fromApplicationLayer(cPacket * pkt, const char *destination)
 {
 	/*
 	in this function, packets received from the application layer are handled.
-	they are encapsulated and forwarded based on the deadline-aware routing table
+	they are encapsulated and then forwarded based on the deadline-aware routing table
 	*/
 	if (isSink == true)
 	{
@@ -560,9 +569,12 @@ void PLR::fromApplicationLayer(cPacket * pkt, const char *destination)
 	{
 
 		long long ttl = netPacket->getDeadline() - toNanoseconds(getClock().dbl());
-		int nh = getNextHop(ttl);
+		int nh = getNextHop(ttl); // the next hop is determined, using the routing table
 		
 		monitoring_forwardedTo[nh][(int) (getClock().dbl()/simTime * monitoring_slots)]++;
+		/*
+		if the lookup in the routing table was successfull, a new packet is created and forwarded to the next hop
+		*/
 		if (not (nh == -1))
 		{
 			toMacLayer(netPacket, nh);
