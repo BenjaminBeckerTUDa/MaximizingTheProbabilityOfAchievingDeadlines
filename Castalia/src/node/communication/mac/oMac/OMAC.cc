@@ -276,7 +276,7 @@ void OMAC::fromRadioLayer(cPacket *pkt, double RSSI, double LQI)
         {
             if (!overheardAcks.at(packetId).count(source))
             {
-                return;
+                //return; // 
             }
         }
 
@@ -329,7 +329,10 @@ void OMAC::fromRadioLayer(cPacket *pkt, double RSSI, double LQI)
         }
         else
         {
-            updateOverheardAcks(packetId, source);
+            //race() << "x    overheard ACK for packet ID " << packetId << " with source " << source << " and destination " << destination;
+            updateOverheardAcks(packetId, destination); // changed source to destination
+
+            
         }
         break;
     }
@@ -358,7 +361,7 @@ void OMAC::handleSendAck()
 
         if (overheardAcks.count(packetId))
         {
-            if (!overheardAcks.at(packetId).count(ackPkt->getDestination()))
+            if (overheardAcks.at(packetId).count(ackPkt->getDestination())) // removed "!"
             {
                 delete ackBuffer.front();
                 ackBuffer.pop();
