@@ -108,7 +108,7 @@ protected:
     void popTxBuffer();
 
     void updateOverheardAcks(unsigned int, int);
-    void updateOverheardPackets(int);
+    void updateOverheardPackets(int, int);
 
     int getIndexInReceiversList(list<int>);
 

@@ -48,6 +48,7 @@ enum ODARControlDef {
  *     simtime_t minTimeForCA;
  *     simtime_t maxTimeForCA;
  *     int selfMACAdress;
+ *     int packetCounter;
  * }
  * </pre>
  */
@@ -62,6 +63,7 @@ class ODARControlMessage : public ::cMessage
     simtime_t minTimeForCA_var;
     simtime_t maxTimeForCA_var;
     int selfMACAdress_var;
+    int packetCounter_var;
 
   private:
     void copy(const ODARControlMessage& other);
@@ -96,6 +98,8 @@ class ODARControlMessage : public ::cMessage
     virtual void setMaxTimeForCA(simtime_t maxTimeForCA);
     virtual int getSelfMACAdress() const;
     virtual void setSelfMACAdress(int selfMACAdress);
+    virtual int getPacketCounter() const;
+    virtual void setPacketCounter(int packetCounter);
 };
 
 inline void doPacking(cCommBuffer *b, ODARControlMessage& obj) {obj.parsimPack(b);}

@@ -68,6 +68,7 @@ OMacRoutingPacket::OMacRoutingPacket(const char *name, int kind) : ::RoutingPack
     this->OMacRoutingKind_var = 0;
     this->packetId_var = 0;
     this->deadline_var = 0;
+    this->packetCounter_var = 0;
 }
 
 OMacRoutingPacket::OMacRoutingPacket(const OMacRoutingPacket& other) : ::RoutingPacket(other)
@@ -93,6 +94,7 @@ void OMacRoutingPacket::copy(const OMacRoutingPacket& other)
     this->packetId_var = other.packetId_var;
     this->receiversContainer_var = other.receiversContainer_var;
     this->deadline_var = other.deadline_var;
+    this->packetCounter_var = other.packetCounter_var;
 }
 
 void OMacRoutingPacket::parsimPack(cCommBuffer *b)
@@ -102,6 +104,7 @@ void OMacRoutingPacket::parsimPack(cCommBuffer *b)
     doPacking(b,this->packetId_var);
     doPacking(b,this->receiversContainer_var);
     doPacking(b,this->deadline_var);
+    doPacking(b,this->packetCounter_var);
 }
 
 void OMacRoutingPacket::parsimUnpack(cCommBuffer *b)
@@ -111,6 +114,7 @@ void OMacRoutingPacket::parsimUnpack(cCommBuffer *b)
     doUnpacking(b,this->packetId_var);
     doUnpacking(b,this->receiversContainer_var);
     doUnpacking(b,this->deadline_var);
+    doUnpacking(b,this->packetCounter_var);
 }
 
 int OMacRoutingPacket::getOMacRoutingKind() const
@@ -151,6 +155,16 @@ double OMacRoutingPacket::getDeadline() const
 void OMacRoutingPacket::setDeadline(double deadline)
 {
     this->deadline_var = deadline;
+}
+
+int OMacRoutingPacket::getPacketCounter() const
+{
+    return packetCounter_var;
+}
+
+void OMacRoutingPacket::setPacketCounter(int packetCounter)
+{
+    this->packetCounter_var = packetCounter;
 }
 
 class OMacRoutingPacketDescriptor : public cClassDescriptor
@@ -200,7 +214,7 @@ const char *OMacRoutingPacketDescriptor::getProperty(const char *propertyname) c
 int OMacRoutingPacketDescriptor::getFieldCount(void *object) const
 {
     cClassDescriptor *basedesc = getBaseClassDescriptor();
-    return basedesc ? 4+basedesc->getFieldCount(object) : 4;
+    return basedesc ? 5+basedesc->getFieldCount(object) : 5;
 }
 
 unsigned int OMacRoutingPacketDescriptor::getFieldTypeFlags(void *object, int field) const
@@ -216,8 +230,9 @@ unsigned int OMacRoutingPacketDescriptor::getFieldTypeFlags(void *object, int fi
         FD_ISEDITABLE,
         FD_ISCOMPOUND,
         FD_ISEDITABLE,
+        FD_ISEDITABLE,
     };
-    return (field>=0 && field<4) ? fieldTypeFlags[field] : 0;
+    return (field>=0 && field<5) ? fieldTypeFlags[field] : 0;
 }
 
 const char *OMacRoutingPacketDescriptor::getFieldName(void *object, int field) const
@@ -233,8 +248,9 @@ const char *OMacRoutingPacketDescriptor::getFieldName(void *object, int field) c
         "packetId",
         "receiversContainer",
         "deadline",
+        "packetCounter",
     };
-    return (field>=0 && field<4) ? fieldNames[field] : NULL;
+    return (field>=0 && field<5) ? fieldNames[field] : NULL;
 }
 
 int OMacRoutingPacketDescriptor::findField(void *object, const char *fieldName) const
@@ -245,6 +261,7 @@ int OMacRoutingPacketDescriptor::findField(void *object, const char *fieldName) 
     if (fieldName[0]=='p' && strcmp(fieldName, "packetId")==0) return base+1;
     if (fieldName[0]=='r' && strcmp(fieldName, "receiversContainer")==0) return base+2;
     if (fieldName[0]=='d' && strcmp(fieldName, "deadline")==0) return base+3;
+    if (fieldName[0]=='p' && strcmp(fieldName, "packetCounter")==0) return base+4;
     return basedesc ? basedesc->findField(object, fieldName) : -1;
 }
 
@@ -261,8 +278,9 @@ const char *OMacRoutingPacketDescriptor::getFieldTypeString(void *object, int fi
         "unsigned int",
         "ReceiversContainer",
         "double",
+        "int",
     };
-    return (field>=0 && field<4) ? fieldTypeStrings[field] : NULL;
+    return (field>=0 && field<5) ? fieldTypeStrings[field] : NULL;
 }
 
 const char *OMacRoutingPacketDescriptor::getFieldProperty(void *object, int field, const char *propertyname) const
@@ -309,6 +327,7 @@ std::string OMacRoutingPacketDescriptor::getFieldAsString(void *object, int fiel
         case 1: return ulong2string(pp->getPacketId());
         case 2: {std::stringstream out; out << pp->getReceiversContainer(); return out.str();}
         case 3: return double2string(pp->getDeadline());
+        case 4: return long2string(pp->getPacketCounter());
         default: return "";
     }
 }
@@ -326,6 +345,7 @@ bool OMacRoutingPacketDescriptor::setFieldAsString(void *object, int field, int 
         case 0: pp->setOMacRoutingKind(string2long(value)); return true;
         case 1: pp->setPacketId(string2ulong(value)); return true;
         case 3: pp->setDeadline(string2double(value)); return true;
+        case 4: pp->setPacketCounter(string2long(value)); return true;
         default: return false;
     }
 }

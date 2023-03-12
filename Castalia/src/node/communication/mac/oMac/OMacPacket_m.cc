@@ -68,6 +68,7 @@ OMacPacket::OMacPacket(const char *name, int kind) : ::MacPacket(name,kind)
 {
     this->OMacPacketKind_var = 0;
     this->packetId_var = 0;
+    this->packetCounter_var = 0;
 }
 
 OMacPacket::OMacPacket(const OMacPacket& other) : ::MacPacket(other)
@@ -92,6 +93,7 @@ void OMacPacket::copy(const OMacPacket& other)
     this->OMacPacketKind_var = other.OMacPacketKind_var;
     this->receiversContainer_var = other.receiversContainer_var;
     this->packetId_var = other.packetId_var;
+    this->packetCounter_var = other.packetCounter_var;
 }
 
 void OMacPacket::parsimPack(cCommBuffer *b)
@@ -100,6 +102,7 @@ void OMacPacket::parsimPack(cCommBuffer *b)
     doPacking(b,this->OMacPacketKind_var);
     doPacking(b,this->receiversContainer_var);
     doPacking(b,this->packetId_var);
+    doPacking(b,this->packetCounter_var);
 }
 
 void OMacPacket::parsimUnpack(cCommBuffer *b)
@@ -108,6 +111,7 @@ void OMacPacket::parsimUnpack(cCommBuffer *b)
     doUnpacking(b,this->OMacPacketKind_var);
     doUnpacking(b,this->receiversContainer_var);
     doUnpacking(b,this->packetId_var);
+    doUnpacking(b,this->packetCounter_var);
 }
 
 int OMacPacket::getOMacPacketKind() const
@@ -138,6 +142,16 @@ unsigned int OMacPacket::getPacketId() const
 void OMacPacket::setPacketId(unsigned int packetId)
 {
     this->packetId_var = packetId;
+}
+
+int OMacPacket::getPacketCounter() const
+{
+    return packetCounter_var;
+}
+
+void OMacPacket::setPacketCounter(int packetCounter)
+{
+    this->packetCounter_var = packetCounter;
 }
 
 class OMacPacketDescriptor : public cClassDescriptor
@@ -187,7 +201,7 @@ const char *OMacPacketDescriptor::getProperty(const char *propertyname) const
 int OMacPacketDescriptor::getFieldCount(void *object) const
 {
     cClassDescriptor *basedesc = getBaseClassDescriptor();
-    return basedesc ? 3+basedesc->getFieldCount(object) : 3;
+    return basedesc ? 4+basedesc->getFieldCount(object) : 4;
 }
 
 unsigned int OMacPacketDescriptor::getFieldTypeFlags(void *object, int field) const
@@ -202,8 +216,9 @@ unsigned int OMacPacketDescriptor::getFieldTypeFlags(void *object, int field) co
         FD_ISEDITABLE,
         FD_ISCOMPOUND,
         FD_ISEDITABLE,
+        FD_ISEDITABLE,
     };
-    return (field>=0 && field<3) ? fieldTypeFlags[field] : 0;
+    return (field>=0 && field<4) ? fieldTypeFlags[field] : 0;
 }
 
 const char *OMacPacketDescriptor::getFieldName(void *object, int field) const
@@ -218,8 +233,9 @@ const char *OMacPacketDescriptor::getFieldName(void *object, int field) const
         "OMacPacketKind",
         "receiversContainer",
         "packetId",
+        "packetCounter",
     };
-    return (field>=0 && field<3) ? fieldNames[field] : NULL;
+    return (field>=0 && field<4) ? fieldNames[field] : NULL;
 }
 
 int OMacPacketDescriptor::findField(void *object, const char *fieldName) const
@@ -229,6 +245,7 @@ int OMacPacketDescriptor::findField(void *object, const char *fieldName) const
     if (fieldName[0]=='O' && strcmp(fieldName, "OMacPacketKind")==0) return base+0;
     if (fieldName[0]=='r' && strcmp(fieldName, "receiversContainer")==0) return base+1;
     if (fieldName[0]=='p' && strcmp(fieldName, "packetId")==0) return base+2;
+    if (fieldName[0]=='p' && strcmp(fieldName, "packetCounter")==0) return base+3;
     return basedesc ? basedesc->findField(object, fieldName) : -1;
 }
 
@@ -244,8 +261,9 @@ const char *OMacPacketDescriptor::getFieldTypeString(void *object, int field) co
         "int",
         "ReceiversContainer",
         "unsigned int",
+        "int",
     };
-    return (field>=0 && field<3) ? fieldTypeStrings[field] : NULL;
+    return (field>=0 && field<4) ? fieldTypeStrings[field] : NULL;
 }
 
 const char *OMacPacketDescriptor::getFieldProperty(void *object, int field, const char *propertyname) const
@@ -291,6 +309,7 @@ std::string OMacPacketDescriptor::getFieldAsString(void *object, int field, int 
         case 0: return long2string(pp->getOMacPacketKind());
         case 1: {std::stringstream out; out << pp->getReceiversContainer(); return out.str();}
         case 2: return ulong2string(pp->getPacketId());
+        case 3: return long2string(pp->getPacketCounter());
         default: return "";
     }
 }
@@ -307,6 +326,7 @@ bool OMacPacketDescriptor::setFieldAsString(void *object, int field, int i, cons
     switch (field) {
         case 0: pp->setOMacPacketKind(string2long(value)); return true;
         case 2: pp->setPacketId(string2ulong(value)); return true;
+        case 3: pp->setPacketCounter(string2long(value)); return true;
         default: return false;
     }
 }

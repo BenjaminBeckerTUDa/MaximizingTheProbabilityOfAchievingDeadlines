@@ -12,6 +12,7 @@
 #include "CFP.h"
 #include "OMAC.h"
 #include "Mask.h"
+#include <vector>
 
 using namespace std;
 
@@ -98,16 +99,18 @@ private:
     int pktCount = 0;
     int pktCountToApp = 0;
     int deadlineExpiredCount = 0;
-    int txCount = 0;
-    map<int, int> rxCount;
+    int txCount = 0; // replaced by dataTransmissionTimes in resilient version
+    map<int, int> rxCount;  // replaced by dataReceivedTimes in resilient version
+    map<int, std::vector<long>> dataReceivedTimes;
 
-
+    std::vector<long> dataTransmissionTimes;
+    map<long, long> pdrBroadcastTimes;
 
     bool minHopOnly;
 
-
+    bool resilientVersion = true; // toggle resilient modifications to ODAR
     
-
+    
 
 
     /*--- The .ned file's parameters ---*/

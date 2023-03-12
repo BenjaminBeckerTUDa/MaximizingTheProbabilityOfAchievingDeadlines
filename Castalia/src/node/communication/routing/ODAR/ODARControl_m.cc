@@ -74,6 +74,7 @@ ODARControlMessage::ODARControlMessage(const char *name, int kind) : ::cMessage(
     this->minTimeForCA_var = 0;
     this->maxTimeForCA_var = 0;
     this->selfMACAdress_var = 0;
+    this->packetCounter_var = 0;
 }
 
 ODARControlMessage::ODARControlMessage(const ODARControlMessage& other) : ::cMessage(other)
@@ -103,6 +104,7 @@ void ODARControlMessage::copy(const ODARControlMessage& other)
     this->minTimeForCA_var = other.minTimeForCA_var;
     this->maxTimeForCA_var = other.maxTimeForCA_var;
     this->selfMACAdress_var = other.selfMACAdress_var;
+    this->packetCounter_var = other.packetCounter_var;
 }
 
 void ODARControlMessage::parsimPack(cCommBuffer *b)
@@ -116,6 +118,7 @@ void ODARControlMessage::parsimPack(cCommBuffer *b)
     doPacking(b,this->minTimeForCA_var);
     doPacking(b,this->maxTimeForCA_var);
     doPacking(b,this->selfMACAdress_var);
+    doPacking(b,this->packetCounter_var);
 }
 
 void ODARControlMessage::parsimUnpack(cCommBuffer *b)
@@ -129,6 +132,7 @@ void ODARControlMessage::parsimUnpack(cCommBuffer *b)
     doUnpacking(b,this->minTimeForCA_var);
     doUnpacking(b,this->maxTimeForCA_var);
     doUnpacking(b,this->selfMACAdress_var);
+    doUnpacking(b,this->packetCounter_var);
 }
 
 int ODARControlMessage::getODARControlMessageKind() const
@@ -211,6 +215,16 @@ void ODARControlMessage::setSelfMACAdress(int selfMACAdress)
     this->selfMACAdress_var = selfMACAdress;
 }
 
+int ODARControlMessage::getPacketCounter() const
+{
+    return packetCounter_var;
+}
+
+void ODARControlMessage::setPacketCounter(int packetCounter)
+{
+    this->packetCounter_var = packetCounter;
+}
+
 class ODARControlMessageDescriptor : public cClassDescriptor
 {
   public:
@@ -258,7 +272,7 @@ const char *ODARControlMessageDescriptor::getProperty(const char *propertyname) 
 int ODARControlMessageDescriptor::getFieldCount(void *object) const
 {
     cClassDescriptor *basedesc = getBaseClassDescriptor();
-    return basedesc ? 8+basedesc->getFieldCount(object) : 8;
+    return basedesc ? 9+basedesc->getFieldCount(object) : 9;
 }
 
 unsigned int ODARControlMessageDescriptor::getFieldTypeFlags(void *object, int field) const
@@ -278,8 +292,9 @@ unsigned int ODARControlMessageDescriptor::getFieldTypeFlags(void *object, int f
         FD_ISEDITABLE,
         FD_ISEDITABLE,
         FD_ISEDITABLE,
+        FD_ISEDITABLE,
     };
-    return (field>=0 && field<8) ? fieldTypeFlags[field] : 0;
+    return (field>=0 && field<9) ? fieldTypeFlags[field] : 0;
 }
 
 const char *ODARControlMessageDescriptor::getFieldName(void *object, int field) const
@@ -299,8 +314,9 @@ const char *ODARControlMessageDescriptor::getFieldName(void *object, int field) 
         "minTimeForCA",
         "maxTimeForCA",
         "selfMACAdress",
+        "packetCounter",
     };
-    return (field>=0 && field<8) ? fieldNames[field] : NULL;
+    return (field>=0 && field<9) ? fieldNames[field] : NULL;
 }
 
 int ODARControlMessageDescriptor::findField(void *object, const char *fieldName) const
@@ -315,6 +331,7 @@ int ODARControlMessageDescriptor::findField(void *object, const char *fieldName)
     if (fieldName[0]=='m' && strcmp(fieldName, "minTimeForCA")==0) return base+5;
     if (fieldName[0]=='m' && strcmp(fieldName, "maxTimeForCA")==0) return base+6;
     if (fieldName[0]=='s' && strcmp(fieldName, "selfMACAdress")==0) return base+7;
+    if (fieldName[0]=='p' && strcmp(fieldName, "packetCounter")==0) return base+8;
     return basedesc ? basedesc->findField(object, fieldName) : -1;
 }
 
@@ -335,8 +352,9 @@ const char *ODARControlMessageDescriptor::getFieldTypeString(void *object, int f
         "simtime_t",
         "simtime_t",
         "int",
+        "int",
     };
-    return (field>=0 && field<8) ? fieldTypeStrings[field] : NULL;
+    return (field>=0 && field<9) ? fieldTypeStrings[field] : NULL;
 }
 
 const char *ODARControlMessageDescriptor::getFieldProperty(void *object, int field, const char *propertyname) const
@@ -387,6 +405,7 @@ std::string ODARControlMessageDescriptor::getFieldAsString(void *object, int fie
         case 5: return double2string(pp->getMinTimeForCA());
         case 6: return double2string(pp->getMaxTimeForCA());
         case 7: return long2string(pp->getSelfMACAdress());
+        case 8: return long2string(pp->getPacketCounter());
         default: return "";
     }
 }
@@ -409,6 +428,7 @@ bool ODARControlMessageDescriptor::setFieldAsString(void *object, int field, int
         case 5: pp->setMinTimeForCA(string2double(value)); return true;
         case 6: pp->setMaxTimeForCA(string2double(value)); return true;
         case 7: pp->setSelfMACAdress(string2long(value)); return true;
+        case 8: pp->setPacketCounter(string2long(value)); return true;
         default: return false;
     }
 }

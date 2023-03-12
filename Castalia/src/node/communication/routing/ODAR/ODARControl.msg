@@ -27,5 +27,6 @@ message ODARControlMessage {
 	simtime_t minTimeForCA;
 	simtime_t maxTimeForCA;
 	int selfMACAdress;
+	int packetCounter;
 }
 

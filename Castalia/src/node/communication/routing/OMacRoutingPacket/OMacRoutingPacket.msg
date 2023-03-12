@@ -29,4 +29,5 @@ packet OMacRoutingPacket extends RoutingPacket {
 	unsigned int packetId;
     ReceiversContainer receiversContainer;
 	double deadline;
+	int packetCounter;
 }

@@ -162,8 +162,24 @@ void ODAR::fromApplicationLayer(cPacket *pkt, const char *destination)
     netPacket->setDeadline(deadline);
 
     netPacket->setReceiversContainer(receiversContainer);
+
+    if(this->resilientVersion) {
+                
+        // remove all transmission time entries older than 180 seconds
+        dataTransmissionTimes.erase(std::remove_if(dataTransmissionTimes.begin(), dataTransmissionTimes.end(), 
+                       [](long i) { return i < std::time(nullptr) - 180; }), dataTransmissionTimes.end());
+
+        // count transmissions
+        int packetCount = dataTransmissionTimes.size() + 1;
+
+        // put count in packet
+        netPacket->setPacketCounter(packetCount);
+
+        trace() << "node " << SELF_MAC_ADDRESS << " sent packet with packet counter " << packetCount << " and packet ID " << packetId;
+    }
+
     encapsulatePacket(netPacket, pkt);
-    
+
     toMacLayer(netPacket, BROADCAST_MAC_ADDRESS);
 
     pktCount++;
@@ -190,16 +206,52 @@ void ODAR::handleNetworkControlCommand(cMessage *pkt)
         case INC_RCV:
         {
             int srcMacAddress = oc -> getSenderAddress();
-            if (rxCount.find(srcMacAddress) == rxCount.end())
+            
+            if(this->resilientVersion) {
+                // read piggybacked packet counters
+                int packetCounter = oc->getPacketCounter();
+                
+                OMAC *omac = dynamic_cast<OMAC*> (getParentModule()->getParentModule()->getSubmodule("Communication")->getSubmodule("MAC"));
+                int selfMacAdress = omac->getMacAdress();
+                //trace() << "node " << selfMacAdress << " heard data packet from node " << srcMacAddress << " with packet counter " << packetCounter;
+
+
+                // store srcmac + timestamp of received message in dataReceivedTimes
+                std::time_t time = std::time(nullptr);
+                if(dataReceivedTimes.find(srcMacAddress) == dataReceivedTimes.end()) {
+                    dataReceivedTimes.insert(pair<int,vector<long> >(srcMacAddress, vector<long>()));
+                }
+                dataReceivedTimes[srcMacAddress].push_back(time);
+
+                // remove all received packet timestamps older than 180s
+                dataReceivedTimes[srcMacAddress].erase(std::remove_if(dataReceivedTimes[srcMacAddress].begin(), dataReceivedTimes[srcMacAddress].end(), 
+                       [](long i) { return i < std::time(nullptr) - 180; }), dataReceivedTimes[srcMacAddress].end());
+                int receivedPackets = dataReceivedTimes[srcMacAddress].size();
+
+                // calculate PDR
+                double pdr = (double)receivedPackets / (double)packetCounter;
+                //trace() << "Calculating pdr: " << receivedPackets << " / " << packetCounter;
+
+                // logging only
+                trace() << "node " << selfMacAdress << " overheard packet from node " << srcMacAddress << " and calculated PDR of " << pdr << " (" << receivedPackets << " / " << packetCounter << ")";
+                
+            }
+
+            if (rxCount.find(srcMacAddress) == rxCount.end()) // this block for original protocol
             {
                 rxCount.insert({srcMacAddress, 0});
             }
-            rxCount[srcMacAddress]++;
+                rxCount[srcMacAddress]++;
             break;
         }
         case INC_TX:
         {
-            txCount ++;
+            txCount ++; // not needed for resilient protocol version
+
+            // store unix timestamp of sent packets
+            std::time_t time = std::time(nullptr);
+            dataTransmissionTimes.push_back(time);
+
             break;
         }
 
@@ -299,6 +351,22 @@ void ODAR::fromMacLayer(cPacket *pkt, int srcMacAddress, double rssi, double lqi
                 dupPacket->setSource(SELF_NETWORK_ADDRESS);
                 dupPacket->setSequenceNumber(currentSequenceNumber++);
                 dupPacket->setReceiversContainer(receiversContainer);
+
+                if(this->resilientVersion) {
+                
+                    // remove all transmission time entries older than 180 seconds
+                    dataTransmissionTimes.erase(std::remove_if(dataTransmissionTimes.begin(), dataTransmissionTimes.end(), 
+                       [](long i) { return i < std::time(nullptr) - 180; }), dataTransmissionTimes.end());
+
+                    // count transmissions
+                    int packetCount = dataTransmissionTimes.size() + 1;
+
+                    // put count in packet
+                    dupPacket->setPacketCounter(packetCount);
+
+                    trace() << "node " << SELF_MAC_ADDRESS << " forwarded packet to maclayer with packet counter " << packetCount << " and packet ID " << dupPacket->getPacketId();
+                }
+
                 toMacLayer(dupPacket, BROADCAST_MAC_ADDRESS);
             }
             break;
