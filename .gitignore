@@ -1,1 +1,4 @@
 **/PLR[0-9]*
+Castalia/Simulations/*
+Castalia/out/*
+Castalia/bin/*
