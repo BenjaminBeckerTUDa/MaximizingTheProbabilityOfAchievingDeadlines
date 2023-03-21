@@ -29,17 +29,21 @@
  *     OMAC_ROUTING_DATA_PACKET = 1;
  *     OMAC_ROUTING_HOPCOUNT_PACKET = 2;
  *     OMAC_ROUTING_CONTROL_PACKET = 3;
+ *     OMAC_ROUTING_PDR_PACKET = 4;
+ *     OMAC_ROUTING_CDF_PACKET = 5;
  * }
  * </pre>
  */
 enum OMacRoutingPacket_type {
     OMAC_ROUTING_DATA_PACKET = 1,
     OMAC_ROUTING_HOPCOUNT_PACKET = 2,
-    OMAC_ROUTING_CONTROL_PACKET = 3
+    OMAC_ROUTING_CONTROL_PACKET = 3,
+    OMAC_ROUTING_PDR_PACKET = 4,
+    OMAC_ROUTING_CDF_PACKET = 5
 };
 
 /**
- * Class generated from <tt>src/node/communication/routing/OMacRoutingPacket/OMacRoutingPacket.msg:27</tt> by nedtool.
+ * Class generated from <tt>src/node/communication/routing/OMacRoutingPacket/OMacRoutingPacket.msg:29</tt> by nedtool.
  * <pre>
  * packet OMacRoutingPacket extends RoutingPacket
  * {

@@ -23,6 +23,10 @@ void ODAR::startup()
 
     cdfSlots = (int) par("cdfSlots"); // number of slots used for the CDF; granularity, which changes the accuracy of deadline-achievement-probability-predictions
 
+    // no previous PDR/CDF broadcast has taken place, since we are starting up
+    lastPdrBroadcast = -1;
+    lastCdfBroadcast = -1;
+
     currRound = 0; // rounds are used to avoid the count to infinity problem:
     /*
     Every node starts with a round with the value 0 and encloses it with every control-message that is transmitted. The sink increments its own round in intervals of hopCountPeriod*3. This increment propagates through the network in a flooding fashion as follows when control-messages are exchanged. Each time a node receives a new control-message from a neighbor, it inspects the enclosed round and acts accordingly as follows: 
@@ -66,10 +70,14 @@ void ODAR::startup()
             routingTable_inUse.insert({i, x}); // routing table is empty; see "currRound" for more information
         }
     }
-
     
     setTimer(BROADCAST_CONTROL, hopCountPeriod); // control messages are broadcast in fixed time-intervals
     setTimer(REQUEST_TIMES_FROM_MAC, .1); // get information from MAC (e.g., time between transmissions, time for each transmission etc.) after 0.1 seconds. so we can be sure, that the MAC is initialized.
+    
+    // offset to prevent collisions due to synchronous clocks
+    double offset = ((double) rand() / (RAND_MAX)) / 10;
+    setTimer(PDR_BROADCAST, 200 + offset);
+    setTimer(CDF_BROADCAST, 200 + offset);
     createMask(0); // the mask is used for convolution in ODAR::convoluteCDFAtSinglePosition; for more information, see comments there.
     
     potentialReceiverSetsStrategy = CLIQUES; // we can restrict the allowed sets of forwarding candidates
@@ -106,6 +114,12 @@ void ODAR::timerFiredCallback(int timer)
         {
             currRound++;
             setTimer(INC_ROUND, hopCountPeriod*10);
+            break;
+        }
+        case PDR_BROADCAST:
+        {
+            checkPdrBroadcast();
+            setTimer(PDR_BROADCAST, 1);
             break;
         }
         
@@ -166,8 +180,15 @@ void ODAR::fromApplicationLayer(cPacket *pkt, const char *destination)
     if(this->resilientVersion) {
                 
         // remove all transmission time entries older than 180 seconds
-        dataTransmissionTimes.erase(std::remove_if(dataTransmissionTimes.begin(), dataTransmissionTimes.end(), 
-                       [](long i) { return i < std::time(nullptr) - 180; }), dataTransmissionTimes.end());
+        std::vector<long>::iterator it = dataTransmissionTimes.begin();
+        int now = int(getClock().dbl());
+        while(it != dataTransmissionTimes.end()){
+            if ((now - 180) > *it){
+                it = dataTransmissionTimes.erase(it);
+            } else {
+                it++;
+            }
+        }
 
         // count transmissions
         int packetCount = dataTransmissionTimes.size() + 1;
@@ -215,22 +236,33 @@ void ODAR::handleNetworkControlCommand(cMessage *pkt)
                 int selfMacAdress = omac->getMacAdress();
                 //trace() << "node " << selfMacAdress << " heard data packet from node " << srcMacAddress << " with packet counter " << packetCounter;
 
-
                 // store srcmac + timestamp of received message in dataReceivedTimes
-                std::time_t time = std::time(nullptr);
+                int time = int(getClock().dbl());
                 if(dataReceivedTimes.find(srcMacAddress) == dataReceivedTimes.end()) {
                     dataReceivedTimes.insert(pair<int,vector<long> >(srcMacAddress, vector<long>()));
                 }
                 dataReceivedTimes[srcMacAddress].push_back(time);
 
                 // remove all received packet timestamps older than 180s
-                dataReceivedTimes[srcMacAddress].erase(std::remove_if(dataReceivedTimes[srcMacAddress].begin(), dataReceivedTimes[srcMacAddress].end(), 
-                       [](long i) { return i < std::time(nullptr) - 180; }), dataReceivedTimes[srcMacAddress].end());
+                for(auto& [key, value]: dataReceivedTimes) {
+                    std::vector<long>::iterator it = value.begin();
+                    int now = int(getClock().dbl());
+                    while(it != value.end()){
+                        if ((now - 180) > *it){
+                            it = value.erase(it);
+                        } else {
+                            it++;
+                        }
+                    }
+                }
+                
                 int receivedPackets = dataReceivedTimes[srcMacAddress].size();
 
                 // calculate PDR
                 double pdr = (double)receivedPackets / (double)packetCounter;
-                //trace() << "Calculating pdr: " << receivedPackets << " / " << packetCounter;
+
+                // calculate new PDR broadcast times
+                calculatePdrBroadcastTimes(pdr, srcMacAddress);
 
                 // logging only
                 trace() << "node " << selfMacAdress << " overheard packet from node " << srcMacAddress << " and calculated PDR of " << pdr << " (" << receivedPackets << " / " << packetCounter << ")";
@@ -249,7 +281,7 @@ void ODAR::handleNetworkControlCommand(cMessage *pkt)
             txCount ++; // not needed for resilient protocol version
 
             // store unix timestamp of sent packets
-            std::time_t time = std::time(nullptr);
+            int time = int(simTime().dbl());
             dataTransmissionTimes.push_back(time);
 
             break;
@@ -257,7 +289,6 @@ void ODAR::handleNetworkControlCommand(cMessage *pkt)
 
     }
 }
-
 
 
 
@@ -355,8 +386,15 @@ void ODAR::fromMacLayer(cPacket *pkt, int srcMacAddress, double rssi, double lqi
                 if(this->resilientVersion) {
                 
                     // remove all transmission time entries older than 180 seconds
-                    dataTransmissionTimes.erase(std::remove_if(dataTransmissionTimes.begin(), dataTransmissionTimes.end(), 
-                       [](long i) { return i < std::time(nullptr) - 180; }), dataTransmissionTimes.end());
+                    std::vector<long>::iterator it = dataTransmissionTimes.begin();
+                    int now = int(getClock().dbl());
+                    while(it != dataTransmissionTimes.end()){
+                        if ((now - 180) > *it){
+                            it = dataTransmissionTimes.erase(it);
+                        } else {
+                            it++;
+                        }
+                    }
 
                     // count transmissions
                     int packetCount = dataTransmissionTimes.size() + 1;
@@ -371,6 +409,26 @@ void ODAR::fromMacLayer(cPacket *pkt, int srcMacAddress, double rssi, double lqi
             }
             break;
         }
+        case OMAC_ROUTING_PDR_PACKET:
+        {
+            // get own MAC address
+            OMAC *omac = dynamic_cast<OMAC*> (getParentModule()->getParentModule()->getSubmodule("Communication")->getSubmodule("MAC"));
+            int selfMacAdress = omac->getMacAdress();
+
+            // retrieve relevant PDR from packet
+            CFP cfp = netPacket->getPdr();
+            map<int, double> receivedPdrs = cfp.getMapIntDouble();
+
+            //trace() << "XXX     retrieved PDR from node " << srcMacAddress << ": " << receivedPdrs[selfMacAdress];
+
+            if (txSuccessRates.find(srcMacAddress) == txSuccessRates.end()){
+                txSuccessRates.insert({srcMacAddress, 0});
+            }
+            txSuccessRates[srcMacAddress] = receivedPdrs[selfMacAdress];
+
+
+            break;
+        }
 
         case OMAC_ROUTING_CONTROL_PACKET:
         {
@@ -378,6 +436,7 @@ void ODAR::fromMacLayer(cPacket *pkt, int srcMacAddress, double rssi, double lqi
             {
                 break;
             }
+
             /*
             For Min-Hop
             */
@@ -408,6 +467,25 @@ void ODAR::fromMacLayer(cPacket *pkt, int srcMacAddress, double rssi, double lqi
                 findPotentialReceiverSets(); 
                 //findCliques();
             }
+
+            /*
+            For txSuccessRate
+            "Die von jedem einzelnen seiner Nachbarn erfolgreich gehörten Datenpakete."
+            Die Übertragungswahrscheinlichkeit eines Knotens x zu einem Nachbarn y berechnet sich als „von y
+            erfolgreich gehörten Übertragungen von x“ / „Übertragungsversuche von Datenpaketen durch x“.
+            */
+            map<int,int> ohc = netPacket -> getOverheardPackets().getMapIntInt();
+            OMAC *omac = dynamic_cast<OMAC*> (getParentModule()->getParentModule()->getSubmodule("Communication")->getSubmodule("MAC"));
+            int selfMacAdress = omac->getMacAdress();
+            if (ohc.find(selfMacAdress) != ohc.end())
+            {
+                double txSuccessRate = (double)ohc[selfMacAdress] / (double)txCount;
+                if (txSuccessRates.find(srcMacAddress) == txSuccessRates.end()){
+                    txSuccessRates.insert({srcMacAddress, 0});
+                }
+                txSuccessRates[srcMacAddress] = txSuccessRate;
+            }
+            break;
 
             /*
             CDFs und routing table berechnen
@@ -446,26 +524,7 @@ void ODAR::fromMacLayer(cPacket *pkt, int srcMacAddress, double rssi, double lqi
                 neighborCDFs_byMAC[srcMacAddress] = netPacket -> getCDF().getDoubleArray();
                 calculateCDF();
             }     
-            
 
-            /*
-            For txSuccessRate
-            "Die von jedem einzelnen seiner Nachbarn erfolgreich gehörten Datenpakete."
-            Die Übertragungswahrscheinlichkeit eines Knotens x zu einem Nachbarn y berechnet sich als „von y
-            erfolgreich gehörten Übertragungen von x“ / „Übertragungsversuche von Datenpaketen durch x“.
-            */
-            map<int,int> ohc = netPacket -> getOverheardPackets().getMapIntInt();
-            OMAC *omac = dynamic_cast<OMAC*> (getParentModule()->getParentModule()->getSubmodule("Communication")->getSubmodule("MAC"));
-            int selfMacAdress = omac->getMacAdress();
-            if (ohc.find(selfMacAdress) != ohc.end())
-            {
-                double txSuccessRate = (double)ohc[selfMacAdress] / (double)txCount;
-                if (txSuccessRates.find(srcMacAddress) == txSuccessRates.end()){
-                    txSuccessRates.insert({srcMacAddress, 0});
-                }
-                txSuccessRates[srcMacAddress] = txSuccessRate;
-            }
-            break;
         }
 
         default:
@@ -856,6 +915,90 @@ void ODAR::findCliques() {
     }
 }
 
+
+void ODAR::calculatePdrBroadcastTimes(double pdr, long srcMacAddress)
+{
+    // add PDR to currentPdrs
+    currentPdrs[srcMacAddress] = pdr;
+
+    // if there has been no previous broadcast of the source node's PDR, set its transmitted PDR to zero for calculating difference
+    if(transmittedPdrs.count(srcMacAddress) == 0) {
+        transmittedPdrs[srcMacAddress] = 0;
+    }
+
+    // calculate difference to previous PDR
+    double pdr_difference = fabs(transmittedPdrs[srcMacAddress] - pdr);
+
+    // calculate PDR broadcast timer
+    int result;
+    if(pdr_difference == 0) {
+        result = 600;
+    } else {
+        result = std::min((double)600, 6/pdr_difference);
+    }
+    
+    long timer;
+
+    if(lastPdrBroadcast == -1) {
+        int now = int(getClock().dbl());
+        lastPdrBroadcast = now;
+    }
+    
+    trace() << "last broadcast: " << lastPdrBroadcast << ", result: " << result;
+
+    timer = lastPdrBroadcast + result;
+
+    // store broadcast timer
+    pdrBroadcastTimes[srcMacAddress] = timer;
+
+    trace() << "setting timer to: " << timer;
+}
+
+
+void ODAR::checkPdrBroadcast(){
+    int now = int(getClock().dbl());
+    
+    if(pdrBroadcastTimes.size() == 0) {
+        return;
+    }
+
+    for (auto const& x : pdrBroadcastTimes) {
+        if (x.second < now) {
+            //trace() << "timer: " << x.second << ", now: " << now;
+            executePdrBroadcast();
+            return;
+        }
+    }
+}
+
+void ODAR::executePdrBroadcast()
+{
+    // assemble broadcast packet
+    ODARPacket *netPacket = new ODARPacket("ODAR pdr packet", NETWORK_LAYER_PACKET);
+    netPacket->setOMacRoutingKind(OMAC_ROUTING_PDR_PACKET);
+    netPacket->setSource(SELF_NETWORK_ADDRESS);
+    netPacket->setDestination("ALL");
+    //netPacket->setHopcount(hopCount);
+    netPacket->setSequenceNumber(currentSequenceNumber++);
+
+    CFP cfp;
+    cfp.setMapIntDouble(currentPdrs);
+    netPacket->setPdr(cfp);
+    
+    trace() << "node " << SELF_MAC_ADDRESS << " is sending PDR broadcast";
+    toMacLayer(netPacket, BROADCAST_MAC_ADDRESS);
+
+    transmittedPdrs = currentPdrs;
+
+    int now = int(getClock().dbl());
+    lastPdrBroadcast = now;
+
+    // set all broadcast times to 10min in the future
+    for (auto& x : pdrBroadcastTimes) {
+        x.second = now + 600;
+    }
+
+}
 
 
 string ODAR::longToBitString(long nodes)

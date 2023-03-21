@@ -22,6 +22,8 @@ enum ODARTimers
     REQUEST_TIMES_FROM_MAC = 2,
     BROADCAST_CONTROL = 3,
     INC_ROUND = 4,
+    PDR_BROADCAST = 5,
+    CDF_BROADCAST = 6
 };
 
 enum potentialReceiverSets
@@ -99,12 +101,18 @@ private:
     int pktCount = 0;
     int pktCountToApp = 0;
     int deadlineExpiredCount = 0;
-    int txCount = 0; // replaced by dataTransmissionTimes in resilient version
-    map<int, int> rxCount;  // replaced by dataReceivedTimes in resilient version
-    map<int, std::vector<long>> dataReceivedTimes;
 
-    std::vector<long> dataTransmissionTimes;
-    map<long, long> pdrBroadcastTimes;
+    int txCount = 0; // replaced by dataTransmissionTimes in resilient version
+    std::vector<long> dataTransmissionTimes; // timestamps of transmitted packets
+
+    map<int, int> rxCount;  // replaced by dataReceivedTimes in resilient version
+    map<int, std::vector<long>> dataReceivedTimes; // timestamps of received packets for every neighbor node
+
+    long lastPdrBroadcast; // time of last PDR broadcast
+    long lastCdfBroadcast; // time of last CDF broadcast
+    map<int, double> currentPdrs; // current PDRs (transmittedPdrs + recent changes)
+    map<int, double> transmittedPdrs; // PDRs transmitted in last PDR broadcast
+    map<int, long> pdrBroadcastTimes; // time values for next PDR broadcast for every neighbor node
 
     bool minHopOnly;
 
@@ -143,6 +151,10 @@ protected:
 
     long nodesetToLong(set<int>);
     list<int> longToNodelist(long);
+
+    void calculatePdrBroadcastTimes(double, long);
+    void checkPdrBroadcast();
+    void executePdrBroadcast();
 
     void finish();
 

@@ -87,6 +87,7 @@ void ODARPacket::copy(const ODARPacket& other)
     this->overheardPackets_var = other.overheardPackets_var;
     this->round_var = other.round_var;
     this->CDFversion_var = other.CDFversion_var;
+    this->pdr_var = other.pdr_var;
 }
 
 void ODARPacket::parsimPack(cCommBuffer *b)
@@ -98,6 +99,7 @@ void ODARPacket::parsimPack(cCommBuffer *b)
     doPacking(b,this->overheardPackets_var);
     doPacking(b,this->round_var);
     doPacking(b,this->CDFversion_var);
+    doPacking(b,this->pdr_var);
 }
 
 void ODARPacket::parsimUnpack(cCommBuffer *b)
@@ -109,6 +111,7 @@ void ODARPacket::parsimUnpack(cCommBuffer *b)
     doUnpacking(b,this->overheardPackets_var);
     doUnpacking(b,this->round_var);
     doUnpacking(b,this->CDFversion_var);
+    doUnpacking(b,this->pdr_var);
 }
 
 int ODARPacket::getHopcount() const
@@ -171,6 +174,16 @@ void ODARPacket::setCDFversion(int CDFversion)
     this->CDFversion_var = CDFversion;
 }
 
+CFP& ODARPacket::getPdr()
+{
+    return pdr_var;
+}
+
+void ODARPacket::setPdr(const CFP& pdr)
+{
+    this->pdr_var = pdr;
+}
+
 class ODARPacketDescriptor : public cClassDescriptor
 {
   public:
@@ -218,7 +231,7 @@ const char *ODARPacketDescriptor::getProperty(const char *propertyname) const
 int ODARPacketDescriptor::getFieldCount(void *object) const
 {
     cClassDescriptor *basedesc = getBaseClassDescriptor();
-    return basedesc ? 6+basedesc->getFieldCount(object) : 6;
+    return basedesc ? 7+basedesc->getFieldCount(object) : 7;
 }
 
 unsigned int ODARPacketDescriptor::getFieldTypeFlags(void *object, int field) const
@@ -236,8 +249,9 @@ unsigned int ODARPacketDescriptor::getFieldTypeFlags(void *object, int field) co
         FD_ISCOMPOUND,
         FD_ISEDITABLE,
         FD_ISEDITABLE,
+        FD_ISCOMPOUND,
     };
-    return (field>=0 && field<6) ? fieldTypeFlags[field] : 0;
+    return (field>=0 && field<7) ? fieldTypeFlags[field] : 0;
 }
 
 const char *ODARPacketDescriptor::getFieldName(void *object, int field) const
@@ -255,8 +269,9 @@ const char *ODARPacketDescriptor::getFieldName(void *object, int field) const
         "overheardPackets",
         "round",
         "CDFversion",
+        "pdr",
     };
-    return (field>=0 && field<6) ? fieldNames[field] : NULL;
+    return (field>=0 && field<7) ? fieldNames[field] : NULL;
 }
 
 int ODARPacketDescriptor::findField(void *object, const char *fieldName) const
@@ -269,6 +284,7 @@ int ODARPacketDescriptor::findField(void *object, const char *fieldName) const
     if (fieldName[0]=='o' && strcmp(fieldName, "overheardPackets")==0) return base+3;
     if (fieldName[0]=='r' && strcmp(fieldName, "round")==0) return base+4;
     if (fieldName[0]=='C' && strcmp(fieldName, "CDFversion")==0) return base+5;
+    if (fieldName[0]=='p' && strcmp(fieldName, "pdr")==0) return base+6;
     return basedesc ? basedesc->findField(object, fieldName) : -1;
 }
 
@@ -287,8 +303,9 @@ const char *ODARPacketDescriptor::getFieldTypeString(void *object, int field) co
         "CFP",
         "int",
         "int",
+        "CFP",
     };
-    return (field>=0 && field<6) ? fieldTypeStrings[field] : NULL;
+    return (field>=0 && field<7) ? fieldTypeStrings[field] : NULL;
 }
 
 const char *ODARPacketDescriptor::getFieldProperty(void *object, int field, const char *propertyname) const
@@ -334,6 +351,7 @@ std::string ODARPacketDescriptor::getFieldAsString(void *object, int field, int 
         case 3: {std::stringstream out; out << pp->getOverheardPackets(); return out.str();}
         case 4: return long2string(pp->getRound());
         case 5: return long2string(pp->getCDFversion());
+        case 6: {std::stringstream out; out << pp->getPdr(); return out.str();}
         default: return "";
     }
 }
@@ -367,6 +385,7 @@ const char *ODARPacketDescriptor::getFieldStructName(void *object, int field) co
         case 1: return opp_typename(typeid(CFP));
         case 2: return opp_typename(typeid(CFP));
         case 3: return opp_typename(typeid(CFP));
+        case 6: return opp_typename(typeid(CFP));
         default: return NULL;
     };
 }
@@ -384,6 +403,7 @@ void *ODARPacketDescriptor::getFieldStructPointer(void *object, int field, int i
         case 1: return (void *)(&pp->getCDF()); break;
         case 2: return (void *)(&pp->getNeighbors()); break;
         case 3: return (void *)(&pp->getOverheardPackets()); break;
+        case 6: return (void *)(&pp->getPdr()); break;
         default: return NULL;
     }
 }

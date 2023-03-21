@@ -60,6 +60,8 @@ EXECUTE_ON_STARTUP(
     e->insert(OMAC_ACK_PACKET, "OMAC_ACK_PACKET");
     e->insert(OMAC_HOPCOUNT_PACKET, "OMAC_HOPCOUNT_PACKET");
     e->insert(OMAC_CONTROL_PACKET, "OMAC_CONTROL_PACKET");
+    e->insert(OMAC_PDR_PACKET, "OMAC_PDR_PACKET");
+    e->insert(OMAC_CDF_PACKET, "OMAC_CDF_PACKET");
 );
 
 Register_Class(OMacPacket);

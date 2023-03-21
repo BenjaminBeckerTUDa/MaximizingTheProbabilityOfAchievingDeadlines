@@ -179,7 +179,7 @@ void OMAC::fromNetworkLayer(cPacket *netPkt, int destination)
         macFrame->setReceiversContainer(receiversListContainer);
         macFrame->setPacketCounter(OMacNetPkt->getPacketCounter());
 
-        trace() << "MAClayer - node " << SELF_MAC_ADDRESS << " is sending packet counter " << OMacNetPkt->getPacketCounter();
+        //trace() << "MAClayer - node " << SELF_MAC_ADDRESS << " is sending packet counter " << OMacNetPkt->getPacketCounter();
 
         if (bufferPacket(macFrame))
         {
@@ -212,6 +212,24 @@ void OMAC::fromNetworkLayer(cPacket *netPkt, int destination)
         toRadioLayer(macFrame);
         toRadioLayer(createRadioCommand(SET_STATE, TX));
         controlTransmission++;
+        break;
+    }
+
+    case OMAC_ROUTING_PDR_PACKET:
+    {
+        macFrame->setOMacPacketKind(OMAC_PDR_PACKET);
+        toRadioLayer(macFrame);
+        //toRadioLayer(createRadioCommand(SET_STATE, TX));
+        //controlTransmission++;
+        break;
+    }
+
+    case OMAC_ROUTING_CDF_PACKET:
+    {
+        macFrame->setOMacPacketKind(OMAC_CDF_PACKET);
+        toRadioLayer(macFrame);
+        //toRadioLayer(createRadioCommand(SET_STATE, TX));
+        //controlTransmission++;
         break;
     }
 
@@ -346,6 +364,21 @@ void OMAC::fromRadioLayer(cPacket *pkt, double RSSI, double LQI)
     }
 
     case OMAC_CONTROL_PACKET:
+    {
+        if (isNotDuplicatePacket(macFrame))
+            toNetworkLayer(decapsulatePacket(macFrame));
+        break;
+    }
+
+    case OMAC_PDR_PACKET:
+    {
+        if (isNotDuplicatePacket(macFrame))
+            toNetworkLayer(decapsulatePacket(macFrame));
+        //trace() << "received a PDR packet from " << source;
+        break;
+    }
+
+    case OMAC_CDF_PACKET:
     {
         if (isNotDuplicatePacket(macFrame))
             toNetworkLayer(decapsulatePacket(macFrame));

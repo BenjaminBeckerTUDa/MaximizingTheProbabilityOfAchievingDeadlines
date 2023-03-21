@@ -28,6 +28,8 @@ enum OMacPacket_type {
     OMAC_ACK_PACKET = 2;
     OMAC_HOPCOUNT_PACKET = 3;
     OMAC_CONTROL_PACKET = 4;
+    OMAC_PDR_PACKET = 5;
+    OMAC_CDF_PACKET = 6;
 }
 
 packet OMacPacket extends MacPacket {
