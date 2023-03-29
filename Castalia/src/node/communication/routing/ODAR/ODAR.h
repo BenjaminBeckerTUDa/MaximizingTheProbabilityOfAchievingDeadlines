@@ -54,7 +54,7 @@ private:
     map<int, double> txSuccessRates;
     double * convolutedCDF_withoutACKs;
     double * convolutedCDF_withACKs;
-    double * CDF_inUse;
+    double * CDF_transmitted;
     double * CDF_calculation;
 
     map<int, Mask> masks;
@@ -113,6 +113,8 @@ private:
     map<int, double> currentPdrs; // current PDRs (transmittedPdrs + recent changes)
     map<int, double> transmittedPdrs; // PDRs transmitted in last PDR broadcast
     map<int, long> pdrBroadcastTimes; // time values for next PDR broadcast for every neighbor node
+    double sum_cdf_abs_differences; // The sum of absolute differences of current and last transmitted CDF for all received data packets since last CDF broadcast
+    int packets_since_cdf_broadcast; // Number of data packets received since last CDF broadcast  yx
 
     bool minHopOnly;
 
@@ -155,6 +157,8 @@ protected:
     void calculatePdrBroadcastTimes(double, long);
     void checkPdrBroadcast();
     void executePdrBroadcast();
+    void checkCdfBroadcast();
+    void executeCdfBroadcast();
 
     void finish();
 

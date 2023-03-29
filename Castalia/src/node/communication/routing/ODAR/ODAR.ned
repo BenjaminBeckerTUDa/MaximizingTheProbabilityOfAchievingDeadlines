@@ -32,7 +32,7 @@ simple ODAR like node.communication.routing.iRouting
 //====================================================================================
 {
  parameters:
-	bool collectTraceInfo = default (false);
+	bool collectTraceInfo = true;//default (false);
 	int maxNetFrameSize = default (0);	// bytes
 	int netDataFrameOverhead = default (10);	// bytes
 	int netBufferSize = default (32);	// number of messages

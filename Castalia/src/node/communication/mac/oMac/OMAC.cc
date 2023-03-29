@@ -219,8 +219,8 @@ void OMAC::fromNetworkLayer(cPacket *netPkt, int destination)
     {
         macFrame->setOMacPacketKind(OMAC_PDR_PACKET);
         toRadioLayer(macFrame);
-        //toRadioLayer(createRadioCommand(SET_STATE, TX));
-        //controlTransmission++;
+        toRadioLayer(createRadioCommand(SET_STATE, TX));
+        controlTransmission++;
         break;
     }
 
@@ -228,8 +228,8 @@ void OMAC::fromNetworkLayer(cPacket *netPkt, int destination)
     {
         macFrame->setOMacPacketKind(OMAC_CDF_PACKET);
         toRadioLayer(macFrame);
-        //toRadioLayer(createRadioCommand(SET_STATE, TX));
-        //controlTransmission++;
+        toRadioLayer(createRadioCommand(SET_STATE, TX));
+        controlTransmission++;
         break;
     }
 
@@ -348,14 +348,14 @@ void OMAC::fromRadioLayer(cPacket *pkt, double RSSI, double LQI)
             {
                 if (ackedPackets.count(packetId))
                 {
-                    // trace() << "Packet ID " << packetId << "   ACK    " << source << "->" << SELF_MAC_ADDRESS << "   DROP   "
+                    //trace() << "Packet ID " << packetId << "   ACK    " << source << "->" << SELF_MAC_ADDRESS << "   DROP   "
                     //        << "received ACK before";
                 }
             }
         }
         else
         {   
-            //race() << "x    overheard ACK for packet ID " << packetId << " with source " << source << " and destination " << destination;
+            trace() << "x    overheard ACK for packet ID " << packetId << " with source " << source << " and destination " << destination;
             updateOverheardAcks(packetId, destination); // changed source to destination
 
             

@@ -26,6 +26,9 @@ void ODAR::startup()
     // no previous PDR/CDF broadcast has taken place, since we are starting up
     lastPdrBroadcast = -1;
     lastCdfBroadcast = -1;
+    sum_cdf_abs_differences = 0;
+    packets_since_cdf_broadcast = 0;
+    CDF_transmitted = new double[cdfSlots]{0};
 
     currRound = 0; // rounds are used to avoid the count to infinity problem:
     /*
@@ -76,8 +79,13 @@ void ODAR::startup()
     
     // offset to prevent collisions due to synchronous clocks
     double offset = ((double) rand() / (RAND_MAX)) / 10;
-    setTimer(PDR_BROADCAST, 200 + offset);
-    setTimer(CDF_BROADCAST, 200 + offset);
+    double offset2 = ((double) rand() / (RAND_MAX)) / 10;
+
+    if(resilientVersion) {
+        setTimer(PDR_BROADCAST, offset);
+        setTimer(CDF_BROADCAST, offset2);
+    }
+    
     createMask(0); // the mask is used for convolution in ODAR::convoluteCDFAtSinglePosition; for more information, see comments there.
     
     potentialReceiverSetsStrategy = CLIQUES; // we can restrict the allowed sets of forwarding candidates
@@ -122,6 +130,12 @@ void ODAR::timerFiredCallback(int timer)
             setTimer(PDR_BROADCAST, 1);
             break;
         }
+        case CDF_BROADCAST:
+        {
+            checkCdfBroadcast();
+            setTimer(CDF_BROADCAST, 1);
+            break;
+        }
         
         default:
         {
@@ -148,7 +162,7 @@ void ODAR::fromApplicationLayer(cPacket *pkt, const char *destination)
     int slot = (int) (ttd/maxTTD * (cdfSlots-1));
     list<int> receivers = routingTable_inUse[slot];
 
-    if (receivers.empty())
+    if (receivers.empty()) // use minhop if no receivers
     {
         receivers = receiversByHopcount;
     }
@@ -299,6 +313,9 @@ void ODAR::fromMacLayer(cPacket *pkt, int srcMacAddress, double rssi, double lqi
     {
         neighbors.insert(srcMacAddress);
         neighborHopCounts.insert({srcMacAddress, INT_MAX});
+        
+        // initialize PDR to 1
+        currentPdrs.insert({srcMacAddress, 1});
 
         int id = MACToLong.size();
         if (id > 63)
@@ -343,7 +360,7 @@ void ODAR::fromMacLayer(cPacket *pkt, int srcMacAddress, double rssi, double lqi
             {
                 int slot = (int) (ttd/maxTTD * (cdfSlots-1));
                 list<int> receivers = routingTable_inUse[slot];
-                if (receivers.empty())
+                if (receivers.empty()) // use minhop if no receivers
                 {
                     receivers = receiversByHopcount;
                 }
@@ -402,10 +419,14 @@ void ODAR::fromMacLayer(cPacket *pkt, int srcMacAddress, double rssi, double lqi
                     // put count in packet
                     dupPacket->setPacketCounter(packetCount);
 
-                    trace() << "node " << SELF_MAC_ADDRESS << " forwarded packet to maclayer with packet counter " << packetCount << " and packet ID " << dupPacket->getPacketId();
+                    trace() << "node " << SELF_MAC_ADDRESS << " forwarded packet with packet counter " << packetCount << " and packet ID " << dupPacket->getPacketId();
+                    
+                    double difference = abs(CDF_transmitted[slot] - CDF_calculation[slot]);
+                    sum_cdf_abs_differences += difference;
+                    packets_since_cdf_broadcast++;
                 }
 
-                toMacLayer(dupPacket, BROADCAST_MAC_ADDRESS);
+                toMacLayer(dupPacket, BROADCAST_MAC_ADDRESS); // sure?
             }
             break;
         }
@@ -419,14 +440,80 @@ void ODAR::fromMacLayer(cPacket *pkt, int srcMacAddress, double rssi, double lqi
             CFP cfp = netPacket->getPdr();
             map<int, double> receivedPdrs = cfp.getMapIntDouble();
 
-            //trace() << "XXX     retrieved PDR from node " << srcMacAddress << ": " << receivedPdrs[selfMacAdress];
+            trace() << selfMacAdress << " received PDR packet from node " << srcMacAddress << ": " << receivedPdrs[selfMacAdress];
 
             if (txSuccessRates.find(srcMacAddress) == txSuccessRates.end()){
                 txSuccessRates.insert({srcMacAddress, 0});
             }
             txSuccessRates[srcMacAddress] = receivedPdrs[selfMacAdress];
 
+            calculateCDF();
+            break;
+        }
+        case OMAC_ROUTING_CDF_PACKET:
+        {
+            // next two lines for logging only
+            OMAC *omac = dynamic_cast<OMAC*> (getParentModule()->getParentModule()->getSubmodule("Communication")->getSubmodule("MAC"));
+            int selfMacAdress = omac->getMacAdress();
+            trace() << selfMacAdress << " received CDF from node " << srcMacAddress;
 
+            /*
+            "Die IDs aller ihm bekannten Nachbarn."
+            */
+            long idLong = MACToLong[srcMacAddress];
+            if (twoHopNeighborhoods_byLong.find(idLong) == twoHopNeighborhoods_byLong.end())
+            {
+                twoHopNeighborhoods_byLong.insert({idLong, 0L});
+            }
+
+            /*
+            "Bilde aus Knoten Mengen von Knoten, welche gegenseitig benachbart sind."
+            */
+            long neighborsAsLong = nodesetToLong(netPacket -> getNeighbors().getSetInt());
+            if (twoHopNeighborhoods_byLong[idLong] != neighborsAsLong)
+            {
+                
+                twoHopNeighborhoods_byLong[idLong] = neighborsAsLong;
+                findPotentialReceiverSets();
+                //findCliques();
+            }
+
+            /*
+            CDFs und routing table berechnen
+            */
+            int r = netPacket -> getRound();
+            if (r < currRound)
+            {
+                break;
+            }
+            if (r > currRound)
+            {
+                currRound = r;
+                for ( const auto &p : neighborCDFs_byMAC)
+                {
+                    neighborCDFs_byMAC[p.first] = new double[cdfSlots]{0};
+                }
+
+                for (int i = 0; i < cdfSlots; i++){
+                    list<int> y;
+                    for (int node : routingTable_calculation[i])
+                    {
+                        y.push_back(node);
+                    }
+                    routingTable_inUse.insert({i, y});
+                    routingTable_inUse[i] = y;
+
+                    list<int> x;
+                    routingTable_calculation.insert({i, x});
+                    CDF_calculation[i] = 0;
+                }
+            }
+
+            if (r == currRound)
+            {
+                neighborCDFs_byMAC[srcMacAddress] = netPacket -> getCDF().getDoubleArray();
+                calculateCDF();
+            } 
             break;
         }
 
@@ -944,14 +1031,14 @@ void ODAR::calculatePdrBroadcastTimes(double pdr, long srcMacAddress)
         lastPdrBroadcast = now;
     }
     
-    trace() << "last broadcast: " << lastPdrBroadcast << ", result: " << result;
+    //trace() << "last broadcast: " << lastPdrBroadcast << ", result: " << result;
 
     timer = lastPdrBroadcast + result;
 
     // store broadcast timer
     pdrBroadcastTimes[srcMacAddress] = timer;
 
-    trace() << "setting timer to: " << timer;
+    //trace() << "setting timer to: " << timer;
 }
 
 
@@ -978,7 +1065,6 @@ void ODAR::executePdrBroadcast()
     netPacket->setOMacRoutingKind(OMAC_ROUTING_PDR_PACKET);
     netPacket->setSource(SELF_NETWORK_ADDRESS);
     netPacket->setDestination("ALL");
-    //netPacket->setHopcount(hopCount);
     netPacket->setSequenceNumber(currentSequenceNumber++);
 
     CFP cfp;
@@ -998,6 +1084,90 @@ void ODAR::executePdrBroadcast()
         x.second = now + 600;
     }
 
+}
+
+
+void ODAR::checkCdfBroadcast()
+{
+    // calculate avg difference of current and last transmitted CDF
+    double avg_difference;
+    if(packets_since_cdf_broadcast == 0) {
+        avg_difference = 0;
+    } else {
+        avg_difference = sum_cdf_abs_differences / packets_since_cdf_broadcast;
+    }
+    
+    // calculate CDF broadcast timer
+    int result;
+    if(avg_difference == 0) {
+        result = 600;
+    } else {
+        result = std::min((double)600, 6/avg_difference);
+    }
+
+    int now = int(getClock().dbl());
+    if(lastCdfBroadcast == -1) {
+        lastCdfBroadcast = now;
+    }
+    
+    long timer = lastCdfBroadcast + result;
+    if (timer < now) {
+        executeCdfBroadcast();
+    }
+
+    return;
+}
+
+void ODAR::executeCdfBroadcast()
+{
+    // assemble broadcast packet
+    ODARPacket *netPacket = new ODARPacket("ODAR cdf packet", NETWORK_LAYER_PACKET);
+    netPacket->setOMacRoutingKind(OMAC_ROUTING_CDF_PACKET);
+    netPacket->setSource(SELF_NETWORK_ADDRESS);
+    netPacket->setDestination("ALL");
+    netPacket->setSequenceNumber(currentSequenceNumber++);
+
+    CFP cfp;
+
+    // 1. Die IDs aller ihm bekannten Nachbarn. (vgl.: „Nachbarschaften“)
+    std::set<int> nei;
+    for ( const auto &p : txSuccessRates)
+    {
+        if (p.second > neighborSuccRateThreshold)
+        {
+            nei.insert(p.first);
+        }
+    }
+    OMAC *omac = dynamic_cast<OMAC*> (getParentModule()->getParentModule()->getSubmodule("Communication")->getSubmodule("MAC"));
+    int selfMacAdress = omac->getMacAdress();
+    nei.insert(selfMacAdress);
+    cfp.setSetInt(nei); 
+
+    // 2. Sein eigenes CDF (vgl.: „Cumulative Distribution Function (CDF)”)
+    double *c;
+	c = new double[cdfSlots]{0};
+
+    for (int i = 0; i < cdfSlots; i++){
+        c[i] = CDF_calculation[i];
+        CDF_transmitted[i] = CDF_calculation[i];
+    }
+    cfp.setDoubleArray(c); 
+    netPacket->setCDF(cfp);
+    netPacket->setNeighbors(cfp);
+
+    int now = int(getClock().dbl());
+    lastCdfBroadcast = now;
+
+    sum_cdf_abs_differences = 0;
+    packets_since_cdf_broadcast = 0;
+
+    netPacket->setRound(currRound);
+
+    trace() << selfMacAdress << " is sending CDF broadcast!";
+
+    toMacLayer(netPacket, BROADCAST_MAC_ADDRESS);
+
+    
 }
 
 
