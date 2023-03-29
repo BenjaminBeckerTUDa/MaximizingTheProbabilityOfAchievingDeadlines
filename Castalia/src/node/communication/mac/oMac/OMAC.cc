@@ -515,6 +515,12 @@ void OMAC::sendDataPacket()
         }
     }
 
+    // increment packet counter if packet is retransmitted
+    if(txRetries < maxTxRetries) {
+        int packetCounter = macFrame->getPacketCounter();
+        macFrame->setPacketCounter(packetCounter + (maxTxRetries - txRetries));
+    }
+
     toRadioLayer(macFrame->dup());
     double txTime = TX_TIME(macFrame->getByteLength());
 
