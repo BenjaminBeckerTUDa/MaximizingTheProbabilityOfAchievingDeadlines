@@ -15,7 +15,7 @@ package node.communication.mac.oMac;
 simple OMAC like node.communication.mac.iMac {
  parameters:
     //debug parameters
-	bool collectTraceInfo = true;//default (false);
+	bool collectTraceInfo = default (false);
 
 	//mac layer parameters
 	int macMaxPacketSize = default (0);		//no limit on frame size
