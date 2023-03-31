@@ -37,4 +37,5 @@ packet OMacPacket extends MacPacket {
     ReceiversContainer receiversContainer;
     unsigned int packetId;
     int packetCounter;
+    int transmissionID;
 }

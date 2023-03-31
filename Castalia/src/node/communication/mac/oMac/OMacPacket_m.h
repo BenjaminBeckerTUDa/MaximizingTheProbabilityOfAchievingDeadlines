@@ -53,6 +53,7 @@ enum OMacPacket_type {
  *     ReceiversContainer receiversContainer;
  *     unsigned int packetId;
  *     int packetCounter;
+ *     int transmissionID;
  * }
  * </pre>
  */
@@ -63,6 +64,7 @@ class OMacPacket : public ::MacPacket
     ReceiversContainer receiversContainer_var;
     unsigned int packetId_var;
     int packetCounter_var;
+    int transmissionID_var;
 
   private:
     void copy(const OMacPacket& other);
@@ -90,6 +92,8 @@ class OMacPacket : public ::MacPacket
     virtual void setPacketId(unsigned int packetId);
     virtual int getPacketCounter() const;
     virtual void setPacketCounter(int packetCounter);
+    virtual int getTransmissionID() const;
+    virtual void setTransmissionID(int transmissionID);
 };
 
 inline void doPacking(cCommBuffer *b, OMacPacket& obj) {obj.parsimPack(b);}

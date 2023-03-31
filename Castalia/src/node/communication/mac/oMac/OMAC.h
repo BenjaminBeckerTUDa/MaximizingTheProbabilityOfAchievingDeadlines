@@ -52,7 +52,7 @@ private:
 
     /*--- Buffers ---*/
     map<unsigned int, set<int>> overheardAcks;
-    set<unsigned int> sentPackets;
+    set<unsigned int> successfullyReceivedPackets;
     set<unsigned int> ackedPackets;
     queue<OMacPacket *> ackBuffer;
     queue<OMacPacket *> pktToNetBuffer;
@@ -82,6 +82,7 @@ private:
     int txAddr;
     int txRetries;
     bool isSink;
+    int transmissionID_;
 
     std::vector<int> nodes_to_be_killed;
 
