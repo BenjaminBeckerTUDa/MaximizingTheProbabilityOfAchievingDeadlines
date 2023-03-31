@@ -41,6 +41,7 @@ enum OMacTimers
     CARRIER_SENSE = 2,
     TRANSMISSION_TIMEOUT = 3,
     HANDLE_SEND_ACK = 4,
+    KILL_NODE = 5,
 };
 
 class OMAC : public VirtualMac
@@ -81,6 +82,8 @@ private:
     int txAddr;
     int txRetries;
     bool isSink;
+
+    std::vector<int> nodes_to_be_killed;
 
 protected:
     void startup();

@@ -48,6 +48,10 @@ void OMAC::startup()
         pktToNetBuffer.pop();
 
     macState = MAC_STATE_ACTIVE;
+
+    //nodes_to_be_killed = {8, 15, 29, 30, 6, 22, 1, 21, 19, 14, 5, 11, 17, 27, 23, 18, 12, 20, 16, 28, 3, 26, 4, 7, 9, 2, 25, 10, 24, 13}; // exclude sink!
+    nodes_to_be_killed = {8, 6, 1, 5, 3, 4, 7, 9, 2}; // exclude sink!
+    setTimer(KILL_NODE, 100);
 }
 
 int OMAC::getMacAdress()
@@ -115,6 +119,22 @@ void OMAC::timerFiredCallback(int timer)
     {
         handleSendAck();
         break;
+    }
+
+    case KILL_NODE:
+    {
+        if(nodes_to_be_killed.empty()){
+            break;
+        }
+        int node = nodes_to_be_killed.front();
+        trace() <<  node;
+        if(SELF_MAC_ADDRESS == node) {
+            OMacPacket *macFrame = new OMacPacket("OMAC data packet", DESTROY_NODE);
+            toRadioLayer(macFrame);
+            trace() << "Killing node " << node;
+        }
+        nodes_to_be_killed.erase(nodes_to_be_killed.begin());
+        setTimer(KILL_NODE, 60);
     }
 
     default:
@@ -518,7 +538,7 @@ void OMAC::sendDataPacket()
     // increment packet counter if packet is retransmitted
     if(txRetries < maxTxRetries) {
         int packetCounter = macFrame->getPacketCounter();
-        macFrame->setPacketCounter(packetCounter + (maxTxRetries - txRetries));
+        macFrame->setPacketCounter(packetCounter + 1);
     }
 
     toRadioLayer(macFrame->dup());
