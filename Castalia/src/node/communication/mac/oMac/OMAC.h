@@ -19,6 +19,9 @@
 #include "OMacPacket_m.h"
 #include "OMacRoutingPacket_m.h"
 #include "ODARControl_m.h"
+#include "ODAR.h"
+#include "ODARPacket_m.h"
+
 
 using namespace std;
 

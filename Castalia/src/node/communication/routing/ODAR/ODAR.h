@@ -159,12 +159,15 @@ protected:
     void executePdrBroadcast();
     void checkCdfBroadcast();
     void executeCdfBroadcast();
+    
 
     void finish();
 
 public:
     int getPacketCreatedCount();
     int getPacketDeadlineExpiredCount();
+    int calculateTransmissionCount();
+    void overheardPacket(double);
 };
 
 #endif // ODARMODULE

@@ -55,6 +55,8 @@ void ODAR::startup()
 
     if (isSink)
     {
+        sum_cdf_abs_differences = 1;
+        packets_since_cdf_broadcast = 1;
         hopCount = 0; 
         CDF_calculation = new double[cdfSlots]{0};
         for (int i = 0; i < cdfSlots; i++)
@@ -85,6 +87,8 @@ void ODAR::startup()
         setTimer(PDR_BROADCAST, offset);
         setTimer(CDF_BROADCAST, offset2);
     }
+
+    setTimer(77, 640.0);
     
     createMask(0); // the mask is used for convolution in ODAR::convoluteCDFAtSinglePosition; for more information, see comments there.
     
@@ -134,6 +138,16 @@ void ODAR::timerFiredCallback(int timer)
         {
             checkCdfBroadcast();
             setTimer(CDF_BROADCAST, 1);
+            break;
+        }
+        case 77:
+        {
+            string s = "";
+            for(int i = 0; i<cdfSlots; i++){
+                s += std::to_string(CDF_calculation[i]) + ", ";
+            }
+            trace() << "cdf calculation: " << s;
+            setTimer(77, 10);
             break;
         }
         
@@ -192,8 +206,21 @@ void ODAR::fromApplicationLayer(cPacket *pkt, const char *destination)
     netPacket->setReceiversContainer(receiversContainer);
 
     if(this->resilientVersion) {
-                
-        // remove all transmission time entries older than 180 seconds
+        // put count in packet
+        netPacket->setPacketCounter(42);
+        //trace() << "node " << SELF_MAC_ADDRESS << " sent packet with packet counter " << calculateTransmissionCount() << " and packet ID " << packetId;
+    }
+
+    encapsulatePacket(netPacket, pkt);
+
+    toMacLayer(netPacket, BROADCAST_MAC_ADDRESS);
+
+    pktCount++;
+}
+
+int ODAR::calculateTransmissionCount()
+{
+    // remove all transmission time entries older than 180 seconds
         std::vector<long>::iterator it = dataTransmissionTimes.begin();
         int now = int(getClock().dbl());
         while(it != dataTransmissionTimes.end()){
@@ -205,19 +232,7 @@ void ODAR::fromApplicationLayer(cPacket *pkt, const char *destination)
         }
 
         // count transmissions
-        int packetCount = dataTransmissionTimes.size() + 1;
-
-        // put count in packet
-        netPacket->setPacketCounter(packetCount);
-
-        trace() << "node " << SELF_MAC_ADDRESS << " sent packet with packet counter " << packetCount << " and packet ID " << packetId;
-    }
-
-    encapsulatePacket(netPacket, pkt);
-
-    toMacLayer(netPacket, BROADCAST_MAC_ADDRESS);
-
-    pktCount++;
+        return dataTransmissionTimes.size() + 1;
 }
 
 void ODAR::handleNetworkControlCommand(cMessage *pkt)
@@ -279,7 +294,9 @@ void ODAR::handleNetworkControlCommand(cMessage *pkt)
                 calculatePdrBroadcastTimes(pdr, srcMacAddress);
 
                 // logging only
-                trace() << "node " << selfMacAdress << " overheard packet from node " << srcMacAddress << " and calculated PDR of " << pdr << " (" << receivedPackets << " / " << packetCounter << ")";
+                if(selfMacAdress == 7 && srcMacAddress == 3) {
+                    //trace() << "node " << selfMacAdress << " overheard packet from node " << srcMacAddress << " and calculated PDR of " << pdr << " (" << receivedPackets << " / " << packetCounter << ")";
+                }
                 
             }
 
@@ -295,9 +312,11 @@ void ODAR::handleNetworkControlCommand(cMessage *pkt)
             txCount ++; // not needed for resilient protocol version
 
             // store unix timestamp of sent packets
-            int time = int(simTime().dbl());
+            int time = int(getClock().dbl());
             dataTransmissionTimes.push_back(time);
 
+            OMAC *omac = dynamic_cast<OMAC*> (getParentModule()->getParentModule()->getSubmodule("Communication")->getSubmodule("MAC"));
+            int selfMacAdress = omac->getMacAdress();
             break;
         }
 
@@ -401,27 +420,13 @@ void ODAR::fromMacLayer(cPacket *pkt, int srcMacAddress, double rssi, double lqi
                 dupPacket->setReceiversContainer(receiversContainer);
 
                 if(this->resilientVersion) {
-                
-                    // remove all transmission time entries older than 180 seconds
-                    std::vector<long>::iterator it = dataTransmissionTimes.begin();
-                    int now = int(getClock().dbl());
-                    while(it != dataTransmissionTimes.end()){
-                        if ((now - 180) > *it){
-                            it = dataTransmissionTimes.erase(it);
-                        } else {
-                            it++;
-                        }
-                    }
-
-                    // count transmissions
-                    int packetCount = dataTransmissionTimes.size() + 1;
-
                     // put count in packet
-                    dupPacket->setPacketCounter(packetCount);
+                    dupPacket->setPacketCounter(calculateTransmissionCount());
 
-                    trace() << "node " << SELF_MAC_ADDRESS << " forwarded packet with packet counter " << packetCount << " and packet ID " << dupPacket->getPacketId();
+                    //trace() << "node " << SELF_MAC_ADDRESS << " forwarded packet with packet counter " << calculateTransmissionCount() << " and packet ID " << dupPacket->getPacketId();
                     
                     double difference = abs(CDF_transmitted[slot] - CDF_calculation[slot]);
+
                     sum_cdf_abs_differences += difference;
                     packets_since_cdf_broadcast++;
                 }
@@ -440,7 +445,7 @@ void ODAR::fromMacLayer(cPacket *pkt, int srcMacAddress, double rssi, double lqi
             CFP cfp = netPacket->getPdr();
             map<int, double> receivedPdrs = cfp.getMapIntDouble();
 
-            trace() << selfMacAdress << " received PDR packet from node " << srcMacAddress << ": " << receivedPdrs[selfMacAdress];
+            //trace() << selfMacAdress << " received PDR packet from node " << srcMacAddress << ": " << receivedPdrs[selfMacAdress];
 
             if (txSuccessRates.find(srcMacAddress) == txSuccessRates.end()){
                 txSuccessRates.insert({srcMacAddress, 0});
@@ -455,7 +460,7 @@ void ODAR::fromMacLayer(cPacket *pkt, int srcMacAddress, double rssi, double lqi
             // next two lines for logging only
             OMAC *omac = dynamic_cast<OMAC*> (getParentModule()->getParentModule()->getSubmodule("Communication")->getSubmodule("MAC"));
             int selfMacAdress = omac->getMacAdress();
-            trace() << selfMacAdress << " received CDF from node " << srcMacAddress;
+            //trace() << selfMacAdress << " received CDF from node " << srcMacAddress;
 
             /*
             "Die IDs aller ihm bekannten Nachbarn."
@@ -1071,7 +1076,7 @@ void ODAR::executePdrBroadcast()
     cfp.setMapIntDouble(currentPdrs);
     netPacket->setPdr(cfp);
     
-    trace() << "node " << SELF_MAC_ADDRESS << " is sending PDR broadcast";
+    //trace() << "node " << SELF_MAC_ADDRESS << " is sending PDR broadcast";
     toMacLayer(netPacket, BROADCAST_MAC_ADDRESS);
 
     transmittedPdrs = currentPdrs;
@@ -1120,6 +1125,9 @@ void ODAR::checkCdfBroadcast()
 
 void ODAR::executeCdfBroadcast()
 {
+    //if(SELF_MAC_ADDRESS == 6)
+    //trace() << "executeCDFBroadcast";
+
     // assemble broadcast packet
     ODARPacket *netPacket = new ODARPacket("ODAR cdf packet", NETWORK_LAYER_PACKET);
     netPacket->setOMacRoutingKind(OMAC_ROUTING_CDF_PACKET);
@@ -1163,13 +1171,26 @@ void ODAR::executeCdfBroadcast()
 
     netPacket->setRound(currRound);
 
-    trace() << selfMacAdress << " is sending CDF broadcast!";
+    //trace() << selfMacAdress << " is sending CDF broadcast!";
 
     toMacLayer(netPacket, BROADCAST_MAC_ADDRESS);
 
     
 }
 
+void ODAR::overheardPacket(double deadline)
+{
+    double ttd = deadline - getClock().dbl()*1000;
+    if (ttd < 0){
+        return;
+    }
+
+    int slot = (int) (ttd/maxTTD * (cdfSlots-1));
+    double difference = abs(CDF_transmitted[slot] - CDF_calculation[slot]);
+    
+    sum_cdf_abs_differences += difference;
+    packets_since_cdf_broadcast++;
+}
 
 string ODAR::longToBitString(long nodes)
 {
