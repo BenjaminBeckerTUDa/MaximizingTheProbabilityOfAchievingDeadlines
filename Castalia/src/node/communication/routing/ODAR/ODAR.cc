@@ -632,6 +632,11 @@ void ODAR::fromMacLayer(cPacket *pkt, int srcMacAddress, double rssi, double lqi
 
 void ODAR::calculateCDF()
 {
+    if (SELF_MAC_ADDRESS == 0)
+    {
+        return;
+    }
+
     // convolute all CDFs, assuming a single ACK
     for (const auto &p : neighborCDFs_byMAC)
     {
