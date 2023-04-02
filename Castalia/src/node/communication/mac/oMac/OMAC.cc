@@ -276,7 +276,7 @@ void OMAC::fromRadioLayer(cPacket *pkt, double RSSI, double LQI)
         {
             if (!overheardAcks.at(packetId).count(source))
             {
-                return;
+                // return; // old code
             }
         }
 
@@ -329,7 +329,7 @@ void OMAC::fromRadioLayer(cPacket *pkt, double RSSI, double LQI)
         }
         else
         {
-            updateOverheardAcks(packetId, source);
+            updateOverheardAcks(packetId, destination);
         }
         break;
     }
@@ -358,7 +358,7 @@ void OMAC::handleSendAck()
 
         if (overheardAcks.count(packetId))
         {
-            if (!overheardAcks.at(packetId).count(ackPkt->getDestination()))
+            if (overheardAcks.at(packetId).count(ackPkt->getDestination()))
             {
                 delete ackBuffer.front();
                 ackBuffer.pop();

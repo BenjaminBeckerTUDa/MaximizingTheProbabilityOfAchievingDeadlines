@@ -21,7 +21,7 @@
 struct AppNetInfoExchange_type
 {
     AppNetInfoExchange_type();
-    double RSSI;
+    double RSSI; 
     double LQI;
     opp_string source;
     opp_string destination;

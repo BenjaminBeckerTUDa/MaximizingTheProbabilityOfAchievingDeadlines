@@ -21,6 +21,7 @@ enum ODARTimers
     REQUEST_TIMES_FROM_MAC = 2,
     BROADCAST_CONTROL = 3,
     INC_ROUND = 4,
+    AGGREGATION_TRIGGER = 5,
 };
 
 enum potentialReceiverSets
@@ -33,7 +34,7 @@ enum potentialReceiverSets
 
 class ODAR : public VirtualRouting
 {
-private:
+protected:
     list<int> receiversByHopcount; // current receivers list
     set<int> neighbors;
     map<int, int> neighborHopCounts;
@@ -88,9 +89,9 @@ private:
     list<long> cliques_long;
     list<list<int>> cliques;
 
+    bool isSink;
     int hopCount;
     int packetSize;
-    bool isSink;
     unsigned int packetNumber = 0; // sequence number of the pakcet sent from this node
 
     /*--- Monitoring parameters ---*/
@@ -105,15 +106,9 @@ private:
 
     bool minHopOnly;
 
-
-    
-
-
-
     /*--- The .ned file's parameters ---*/
     simtime_t hopCountPeriod;
 
-protected:
     void startup();
     void timerFiredCallback(int);
 

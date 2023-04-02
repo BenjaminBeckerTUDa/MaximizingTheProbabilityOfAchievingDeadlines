@@ -98,7 +98,7 @@ void ODAR::timerFiredCallback(int timer)
         {
             ODARControlMessage *oc = new ODARControlMessage("REQUEST_TIMES", MAC_CONTROL_COMMAND);
             oc->setODARControlMessageKind(REQUEST_TIMES);
-            oc->setDatabytelength(packetSize + netDataFrameOverhead);
+            oc->setDatabytelength(packetSize + netDataFrameOverhead); // paket size
             toMacLayer(oc);
             break;
         }
