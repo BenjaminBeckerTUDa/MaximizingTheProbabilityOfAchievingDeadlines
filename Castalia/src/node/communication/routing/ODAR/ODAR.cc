@@ -88,8 +88,6 @@ void ODAR::startup()
         setTimer(CDF_BROADCAST, offset2);
     }
 
-    setTimer(77, 640.0);
-    
     createMask(0); // the mask is used for convolution in ODAR::convoluteCDFAtSinglePosition; for more information, see comments there.
     
     potentialReceiverSetsStrategy = CLIQUES; // we can restrict the allowed sets of forwarding candidates
@@ -140,17 +138,6 @@ void ODAR::timerFiredCallback(int timer)
             setTimer(CDF_BROADCAST, 1);
             break;
         }
-        case 77:
-        {
-            string s = "";
-            for(int i = 0; i<cdfSlots; i++){
-                s += std::to_string(CDF_calculation[i]) + ", ";
-            }
-            trace() << "cdf calculation: " << s;
-            setTimer(77, 10);
-            break;
-        }
-        
         default:
         {
             break;
@@ -200,19 +187,10 @@ void ODAR::fromApplicationLayer(cPacket *pkt, const char *destination)
     netPacket->setDestination(destination);
     netPacket->setOMacRoutingKind(OMAC_ROUTING_DATA_PACKET);
     netPacket->setPacketId(packetId);
-
     netPacket->setDeadline(deadline);
-
     netPacket->setReceiversContainer(receiversContainer);
 
-    if(this->resilientVersion) {
-        // put count in packet
-        netPacket->setPacketCounter(42);
-        //trace() << "node " << SELF_MAC_ADDRESS << " sent packet with packet counter " << calculateTransmissionCount() << " and packet ID " << packetId;
-    }
-
     encapsulatePacket(netPacket, pkt);
-
     toMacLayer(netPacket, BROADCAST_MAC_ADDRESS);
 
     pktCount++;
@@ -261,8 +239,8 @@ void ODAR::handleNetworkControlCommand(cMessage *pkt)
                 // read piggybacked packet counters
                 int packetCounter = oc->getPacketCounter();
                 
-                OMAC *omac = dynamic_cast<OMAC*> (getParentModule()->getParentModule()->getSubmodule("Communication")->getSubmodule("MAC"));
-                int selfMacAdress = omac->getMacAdress();
+                //OMAC *omac = dynamic_cast<OMAC*> (getParentModule()->getParentModule()->getSubmodule("Communication")->getSubmodule("MAC"));
+                //int selfMacAdress = omac->getMacAdress();
                 //trace() << "node " << selfMacAdress << " heard data packet from node " << srcMacAddress << " with packet counter " << packetCounter;
 
                 // store srcmac + timestamp of received message in dataReceivedTimes
@@ -293,11 +271,7 @@ void ODAR::handleNetworkControlCommand(cMessage *pkt)
                 // calculate new PDR broadcast times
                 calculatePdrBroadcastTimes(pdr, srcMacAddress);
 
-                // logging only
-                if(selfMacAdress == 7 && srcMacAddress == 3) {
-                    //trace() << "node " << selfMacAdress << " overheard packet from node " << srcMacAddress << " and calculated PDR of " << pdr << " (" << receivedPackets << " / " << packetCounter << ")";
-                }
-                
+                //trace() << "node " << selfMacAdress << " overheard packet from node " << srcMacAddress << " and calculated PDR of " << pdr << " (" << receivedPackets << " / " << packetCounter << ")";
             }
 
             if (rxCount.find(srcMacAddress) == rxCount.end()) // this block for original protocol
@@ -409,8 +383,6 @@ void ODAR::fromMacLayer(cPacket *pkt, int srcMacAddress, double rssi, double lqi
                 }
 
                 //trace() << "ttd " << ttd << "\tslot " << slot << "\tlengths of minhop vs our approach: " << receiversByHopcount.size() << " <min vs our> " << routingTable_inUse[slot].size();
-
-
                 
                 ReceiversContainer receiversContainer;
                 receiversContainer.setReceivers(receivers);
@@ -421,7 +393,7 @@ void ODAR::fromMacLayer(cPacket *pkt, int srcMacAddress, double rssi, double lqi
 
                 if(this->resilientVersion) {
                     // put count in packet
-                    dupPacket->setPacketCounter(calculateTransmissionCount());
+                    //dupPacket->setPacketCounter(calculateTransmissionCount());
 
                     //trace() << "node " << SELF_MAC_ADDRESS << " forwarded packet with packet counter " << calculateTransmissionCount() << " and packet ID " << dupPacket->getPacketId();
                     
@@ -457,6 +429,11 @@ void ODAR::fromMacLayer(cPacket *pkt, int srcMacAddress, double rssi, double lqi
         }
         case OMAC_ROUTING_CDF_PACKET:
         {
+            if (isSink)
+            {
+                break;
+            }
+
             // next two lines for logging only
             OMAC *omac = dynamic_cast<OMAC*> (getParentModule()->getParentModule()->getSubmodule("Communication")->getSubmodule("MAC"));
             int selfMacAdress = omac->getMacAdress();
@@ -901,44 +878,46 @@ void ODAR::broadcastControl()
     netPacket->setHopcount(hopCount);
     netPacket->setSequenceNumber(currentSequenceNumber++);
 
-    CFP cfp; //CFP is a wrapper class for all kinds of data-types. It is used inside packets only.
+    if(!resilientVersion){
+        CFP cfp; //CFP is a wrapper class for all kinds of data-types. It is used inside packets only.
 
-    // 1. Die IDs aller ihm bekannten Nachbarn. (vgl.: „Nachbarschaften“)
-    std::set<int> nei;
-    for ( const auto &p : txSuccessRates)
-    {
-        if (p.second > neighborSuccRateThreshold)
+        // 1. Die IDs aller ihm bekannten Nachbarn. (vgl.: „Nachbarschaften“)
+        std::set<int> nei;
+        for ( const auto &p : txSuccessRates)
         {
-            nei.insert(p.first);
+            if (p.second > neighborSuccRateThreshold)
+            {
+                nei.insert(p.first);
+            }
         }
+        OMAC *omac = dynamic_cast<OMAC*> (getParentModule()->getParentModule()->getSubmodule("Communication")->getSubmodule("MAC"));
+        int selfMacAdress = omac->getMacAdress();
+        nei.insert(selfMacAdress);
+        cfp.setSetInt(nei); 
+
+        // 2. Sein eigenes CDF (vgl.: „Cumulative Distribution Function (CDF)”)
+        double *c;
+        c = new double[cdfSlots]{0};
+
+        for (int i = 0; i < cdfSlots; i++){
+            c[i] = CDF_calculation[i];
+        }
+        //cfp.setDoubleArray(c); 
+
+        // 3. Die von jedem einzelnen seiner Nachbarn erfolgreich gehörten Datenpakete. (vgl.: „Messung der Übertragungswahrscheinlichkeiten“)
+        std::map<int,int> ohc;
+        for ( const auto &p : rxCount)
+        {
+            ohc.insert({p.first, p.second});
+        }
+        cfp.setMapIntInt(ohc); 
+
+
+        netPacket -> setOverheardPackets(cfp);
+        netPacket -> setNeighbors(cfp);
+        netPacket -> setCDF(cfp);
+        netPacket -> setRound(currRound);
     }
-    OMAC *omac = dynamic_cast<OMAC*> (getParentModule()->getParentModule()->getSubmodule("Communication")->getSubmodule("MAC"));
-    int selfMacAdress = omac->getMacAdress();
-    nei.insert(selfMacAdress);
-    cfp.setSetInt(nei); 
-
-    // 2. Sein eigenes CDF (vgl.: „Cumulative Distribution Function (CDF)”)
-    double *c;
-	c = new double[cdfSlots]{0};
-
-    for (int i = 0; i < cdfSlots; i++){
-        c[i] = CDF_calculation[i];
-    }
-    cfp.setDoubleArray(c); 
-
-    // 3. Die von jedem einzelnen seiner Nachbarn erfolgreich gehörten Datenpakete. (vgl.: „Messung der Übertragungswahrscheinlichkeiten“)
-    std::map<int,int> ohc;
-    for ( const auto &p : rxCount)
-    {
-        ohc.insert({p.first, p.second});
-    }
-    cfp.setMapIntInt(ohc); 
-
-
-    netPacket -> setOverheardPackets(cfp);
-    netPacket -> setNeighbors(cfp);
-    netPacket -> setCDF(cfp);
-    netPacket -> setRound(currRound);
 
     toMacLayer(netPacket, BROADCAST_MAC_ADDRESS);
 }
@@ -1318,7 +1297,7 @@ void ODAR::finish()
 				flag = false;
 		}
 
-        flag = true;
+        /*flag = true;
 		id = 1;
 		double channelBusy = 0;
         double channelClear = 0;
@@ -1340,7 +1319,7 @@ void ODAR::finish()
 			else
 				flag = false;
 		}
-        channelBusyRatio /=id;
+        channelBusyRatio /=id;*/
 
         double arrivedInTime = pktCountToApp;
 
@@ -1364,14 +1343,14 @@ void ODAR::finish()
 
 
 
-        trace() << "channelBusy " << channelBusy;
-        trace() << "channelClear " << channelClear;
-        trace() << "reachedMaxRetriesCount " << reachedMaxRetriesCount;
+        //trace() << "channelBusy " << channelBusy;
+        //trace() << "channelClear " << channelClear;
+        //trace() << "reachedMaxRetriesCount " << reachedMaxRetriesCount;
         trace() << "createdPackets " << createdPackets;
         trace() << "deadlineExpired " << deadlineExpired;
         trace() << "arrivedInTime " << arrivedInTime;
         trace() << "deadlineachievementratio " << arrivedInTime / createdPackets;
-        trace() << "channelBusyRatio " << channelBusy / (channelClear + channelBusy);
+        //trace() << "channelBusyRatio " << channelBusy / (channelClear + channelBusy);
     }
 
 

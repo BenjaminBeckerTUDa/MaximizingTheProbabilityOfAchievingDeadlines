@@ -50,7 +50,7 @@ void OMAC::startup()
     macState = MAC_STATE_ACTIVE;
 
     //nodes_to_be_killed = {8, 15, 29, 30, 6, 22, 1, 21, 19, 14, 5, 11, 17, 27, 23, 18, 12, 20, 16, 28, 3, 26, 4, 7, 9, 2, 25, 10, 24, 13}; // exclude sink!
-    nodes_to_be_killed = {8, 6, 1, 5, 3, 4, 7, 9, 2}; // exclude sink!
+    nodes_to_be_killed = {};//{8, 6, 1, 5, 3, 4, 7, 9, 2}; // exclude sink!
     setTimer(KILL_NODE, 100);
 }
 
@@ -132,7 +132,7 @@ void OMAC::timerFiredCallback(int timer)
             break;
         }
         int node = nodes_to_be_killed.front();
-        if(SELF_MAC_ADDRESS == 999) {
+        if(SELF_MAC_ADDRESS == node) {
             OMacPacket *macFrame = new OMacPacket("OMAC data packet", DESTROY_NODE);
             toRadioLayer(macFrame);
             trace() << "Killing node " << node;
@@ -201,12 +201,6 @@ void OMAC::fromNetworkLayer(cPacket *netPkt, int destination)
         macFrame->setOMacPacketKind(OMAC_DATA_PACKET);
         macFrame->setPacketId(packetId);
         macFrame->setReceiversContainer(receiversListContainer);
-        //macFrame->setPacketCounter(OMacNetPkt->getPacketCounter());
-
-        if(SELF_MAC_ADDRESS == 3) {
-            //trace() << "MAClayer - node " << SELF_MAC_ADDRESS << " is sending packet counter " << OMacNetPkt->getPacketCounter();
-        }
-        
 
         if (bufferPacket(macFrame))
         {
@@ -244,8 +238,7 @@ void OMAC::fromNetworkLayer(cPacket *netPkt, int destination)
 
     case OMAC_ROUTING_PDR_PACKET:
     {
-        if(SELF_MAC_ADDRESS == 6)
-        trace() << "sending PDR";
+        //trace() << "sending PDR";
         macFrame->setOMacPacketKind(OMAC_PDR_PACKET);
         toRadioLayer(macFrame);
         toRadioLayer(createRadioCommand(SET_STATE, TX));
@@ -255,8 +248,7 @@ void OMAC::fromNetworkLayer(cPacket *netPkt, int destination)
 
     case OMAC_ROUTING_CDF_PACKET:
     {
-        if(SELF_MAC_ADDRESS == 6)
-        trace() << "sending CDF";
+        //trace() << "sending CDF";
         macFrame->setOMacPacketKind(OMAC_CDF_PACKET);
         toRadioLayer(macFrame);
         toRadioLayer(createRadioCommand(SET_STATE, TX));
@@ -300,23 +292,24 @@ void OMAC::fromRadioLayer(cPacket *pkt, double RSSI, double LQI)
         
         OMacPacket *dupMac = new OMacPacket("OMAC duplicated DATA packet", MAC_LAYER_PACKET);
         cPacket *netPkt = decapsulatePacket(macFrame);
+        
         ODAR *odarInstance = dynamic_cast<ODAR*> (getParentModule()->getSubmodule("Routing"));
         ODARPacket *netPacket = dynamic_cast<ODARPacket *>(netPkt);
         double deadline = netPacket->getDeadline();
         odarInstance->overheardPacket(deadline);
 
+        //trace() << "size of receiversListContainer: " << receiversListContainer.getReceivers().size();
         if (indexInReceiversList > -1)
         {   
-            //trace()  << "   "<< SELF_MAC_ADDRESS << " RCV DATA from "<< source <<" for " << receivers << " Packet ID " << packetId << " transmissionId " << transmissionId;
+            //trace()  << "node " << SELF_MAC_ADDRESS << " received data packet with packet ID " << packetId << " from node "<< source << " with transmissionId " << transmissionId;
         }
         else{
+            //trace()  << "node " << SELF_MAC_ADDRESS << " overheard data packet with packet ID " << packetId << " from node "<< source << " with transmissionId " << transmissionId;
             //trace() << "   " << SELF_MAC_ADDRESS << " OHD DATA from "<< source <<" for " << receivers << " Packet ID " << packetId << " transmissionId " << transmissionId << " --> DROP";
             return;
         }
 
-
-        // generate new MAC fram and buffer it
-        
+        // generate new MAC frame and buffer it
         encapsulatePacket(dupMac, netPkt);
         dupMac->setOMacPacketKind(OMAC_DATA_PACKET);
         dupMac->setSource(macFrame->getSource());
@@ -348,7 +341,7 @@ void OMAC::fromRadioLayer(cPacket *pkt, double RSSI, double LQI)
 
         if (destination == SELF_MAC_ADDRESS)
         {   
-            //trace()   << "   "<< SELF_MAC_ADDRESS << " RCV ACK from "<< source <<" for " << destination << " Packet ID " << packetId;
+            //trace()   << "node " << SELF_MAC_ADDRESS << " received ACK from node " << source << " for data packet with packet ID" << packetId;
         }
         else{
             //trace()  << "   " << SELF_MAC_ADDRESS << " OHD ACK from "<< source <<" for " << destination << " Packet ID " << packetId;
@@ -388,15 +381,13 @@ void OMAC::fromRadioLayer(cPacket *pkt, double RSSI, double LQI)
     {
         if (isNotDuplicatePacket(macFrame))
             toNetworkLayer(decapsulatePacket(macFrame));
-        if(SELF_MAC_ADDRESS == 6)
-        trace() << "received a PDR packet from " << source;
+        //trace() << "received a PDR packet from " << source;
         break;
     }
 
     case OMAC_CDF_PACKET:
     {
-        if(SELF_MAC_ADDRESS == 6)
-        trace() << "received CDF packet from " << source;
+        //trace() << "received CDF packet from " << source;
         if (isNotDuplicatePacket(macFrame))
             toNetworkLayer(decapsulatePacket(macFrame));
         break;
@@ -432,7 +423,7 @@ void OMAC::handleSendAck()
             //race() << "  overheardAcks = false";
         }
         
-        //trace() <<SELF_MAC_ADDRESS << " tx ACK to " << ackPkt->getDestination() << " for Packet ID "<< packetId;
+        //trace() << "node " << SELF_MAC_ADDRESS << " is sending ACK to node " << ackPkt->getDestination() << " for Packet ID " << packetId;
 
         toRadioLayer(ackPkt);
         toRadioLayer(createRadioCommand(SET_STATE, TX));
@@ -564,8 +555,11 @@ void OMAC::sendDataPacket()
             receivers += std::to_string(s) + ",";
         }
         receivers += "]";
-        //trace() <<SELF_MAC_ADDRESS << " tx DATA to " << receivers << "Packet ID "<< macFrame->getPacketId() <<" transmissionId "<< macFrame->getTransmissionID();
+        //trace() << "node " << SELF_MAC_ADDRESS << " is sending data packet "<< macFrame->getPacketId() << " with transmissionId " << macFrame->getTransmissionID();
     }
+
+    ReceiversContainer receiversListContainer = macFrame->getReceiversContainer();
+    //trace() << "size of receiversListContainer: " << receiversListContainer.getReceivers().size();
 
     toRadioLayer(macFrame->dup());
     toRadioLayer(createRadioCommand(SET_STATE, TX));
