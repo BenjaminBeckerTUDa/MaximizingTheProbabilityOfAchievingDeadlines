@@ -76,7 +76,7 @@ void ODAR::startup()
         }
     }
     
-    setTimer(BROADCAST_CONTROL, hopCountPeriod); // control messages are broadcast in fixed time-intervals
+    
     setTimer(REQUEST_TIMES_FROM_MAC, .1); // get information from MAC (e.g., time between transmissions, time for each transmission etc.) after 0.1 seconds. so we can be sure, that the MAC is initialized.
     
     // offset to prevent collisions due to synchronous clocks
@@ -86,6 +86,8 @@ void ODAR::startup()
     if(resilientVersion) {
         setTimer(PDR_BROADCAST, offset);
         setTimer(CDF_BROADCAST, offset2);
+    } else {
+        setTimer(BROADCAST_CONTROL, hopCountPeriod); // control messages are broadcast in fixed time-intervals
     }
 
     createMask(0); // the mask is used for convolution in ODAR::convoluteCDFAtSinglePosition; for more information, see comments there.
@@ -148,10 +150,16 @@ void ODAR::timerFiredCallback(int timer)
 
 void ODAR::fromApplicationLayer(cPacket *pkt, const char *destination)
 {
-    if (isSink || receiversByHopcount.empty())
+    if (isSink)// || receiversByHopcount.empty())
     {
         return;
     }
+
+    if(!resilientVersion && receiversByHopcount.empty()) {
+        return;
+    }
+    
+    pktCount++;
 
     DeadlinePacket *dlp = dynamic_cast<DeadlinePacket *>(pkt);
 	if (!dlp)
@@ -163,17 +171,24 @@ void ODAR::fromApplicationLayer(cPacket *pkt, const char *destination)
     int slot = (int) (ttd/maxTTD * (cdfSlots-1));
     list<int> receivers = routingTable_inUse[slot];
 
-    if (receivers.empty()) // use minhop if no receivers
-    {
-        receivers = receiversByHopcount;
+    if(SELF_MAC_ADDRESS == 7) {
+        trace() << receivers.empty();
     }
-    if (minHopOnly){
-        receivers = receiversByHopcount;
+
+    if(!resilientVersion){
+        if (receivers.empty()) // use minhop if no receivers
+        {
+            receivers = receiversByHopcount;
+        }
+        if (minHopOnly){
+            receivers = receiversByHopcount;
+        }
+        if (receivers.empty())
+        {
+            return;
+        }
     }
-    if (receivers.empty())
-    {
-        return;
-    }
+    
 
     // create unique data packet ID
     packetNumber++;
@@ -192,8 +207,6 @@ void ODAR::fromApplicationLayer(cPacket *pkt, const char *destination)
 
     encapsulatePacket(netPacket, pkt);
     toMacLayer(netPacket, BROADCAST_MAC_ADDRESS);
-
-    pktCount++;
 }
 
 int ODAR::calculateTransmissionCount()
@@ -876,46 +889,44 @@ void ODAR::broadcastControl()
     netPacket->setHopcount(hopCount);
     netPacket->setSequenceNumber(currentSequenceNumber++);
 
-    if(!resilientVersion){
-        CFP cfp; //CFP is a wrapper class for all kinds of data-types. It is used inside packets only.
+    CFP cfp; //CFP is a wrapper class for all kinds of data-types. It is used inside packets only.
 
-        // 1. Die IDs aller ihm bekannten Nachbarn. (vgl.: „Nachbarschaften“)
-        std::set<int> nei;
-        for ( const auto &p : txSuccessRates)
+    // 1. Die IDs aller ihm bekannten Nachbarn. (vgl.: „Nachbarschaften“)
+    std::set<int> nei;
+    for ( const auto &p : txSuccessRates)
+    {
+        if (p.second > neighborSuccRateThreshold)
         {
-            if (p.second > neighborSuccRateThreshold)
-            {
-                nei.insert(p.first);
-            }
+            nei.insert(p.first);
         }
-        OMAC *omac = dynamic_cast<OMAC*> (getParentModule()->getParentModule()->getSubmodule("Communication")->getSubmodule("MAC"));
-        int selfMacAdress = omac->getMacAdress();
-        nei.insert(selfMacAdress);
-        cfp.setSetInt(nei); 
-
-        // 2. Sein eigenes CDF (vgl.: „Cumulative Distribution Function (CDF)”)
-        double *c;
-        c = new double[cdfSlots]{0};
-
-        for (int i = 0; i < cdfSlots; i++){
-            c[i] = CDF_calculation[i];
-        }
-        //cfp.setDoubleArray(c); 
-
-        // 3. Die von jedem einzelnen seiner Nachbarn erfolgreich gehörten Datenpakete. (vgl.: „Messung der Übertragungswahrscheinlichkeiten“)
-        std::map<int,int> ohc;
-        for ( const auto &p : rxCount)
-        {
-            ohc.insert({p.first, p.second});
-        }
-        cfp.setMapIntInt(ohc); 
-
-
-        netPacket -> setOverheardPackets(cfp);
-        netPacket -> setNeighbors(cfp);
-        netPacket -> setCDF(cfp);
-        netPacket -> setRound(currRound);
     }
+    OMAC *omac = dynamic_cast<OMAC*> (getParentModule()->getParentModule()->getSubmodule("Communication")->getSubmodule("MAC"));
+    int selfMacAdress = omac->getMacAdress();
+    nei.insert(selfMacAdress);
+    cfp.setSetInt(nei); 
+
+    // 2. Sein eigenes CDF (vgl.: „Cumulative Distribution Function (CDF)”)
+    double *c;
+    c = new double[cdfSlots]{0};
+
+    for (int i = 0; i < cdfSlots; i++){
+        c[i] = CDF_calculation[i];
+    }
+    //cfp.setDoubleArray(c); 
+
+    // 3. Die von jedem einzelnen seiner Nachbarn erfolgreich gehörten Datenpakete. (vgl.: „Messung der Übertragungswahrscheinlichkeiten“)
+    std::map<int,int> ohc;
+    for ( const auto &p : rxCount)
+    {
+        ohc.insert({p.first, p.second});
+    }
+    cfp.setMapIntInt(ohc); 
+
+
+    netPacket -> setOverheardPackets(cfp);
+    netPacket -> setNeighbors(cfp);
+    netPacket -> setCDF(cfp);
+    netPacket -> setRound(currRound);
 
     toMacLayer(netPacket, BROADCAST_MAC_ADDRESS);
 }
