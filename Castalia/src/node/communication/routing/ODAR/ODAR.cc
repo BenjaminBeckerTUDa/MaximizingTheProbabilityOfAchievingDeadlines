@@ -199,14 +199,12 @@ void ODAR::fromApplicationLayer(cPacket *pkt, const char *destination)
 int ODAR::calculateTransmissionCount()
 {
     // remove all transmission time entries older than 180 seconds
-        std::vector<long>::iterator it = dataTransmissionTimes.begin();
-        int now = int(getClock().dbl());
+        std::vector<double>::iterator it = dataTransmissionTimes.begin();
+        int now = getClock().dbl();
         while(it != dataTransmissionTimes.end()){
             if ((now - 180) > *it){
                 it = dataTransmissionTimes.erase(it);
-            } else {
-                it++;
-            }
+            } else { it++; }
         }
 
         // count transmissions
@@ -244,7 +242,7 @@ void ODAR::handleNetworkControlCommand(cMessage *pkt)
                 //trace() << "node " << selfMacAdress << " heard data packet from node " << srcMacAddress << " with packet counter " << packetCounter;
 
                 // store srcmac + timestamp of received message in dataReceivedTimes
-                int time = int(getClock().dbl());
+                double time = getClock().dbl();
                 if(dataReceivedTimes.find(srcMacAddress) == dataReceivedTimes.end()) {
                     dataReceivedTimes.insert(pair<int,vector<long> >(srcMacAddress, vector<long>()));
                 }
@@ -252,7 +250,7 @@ void ODAR::handleNetworkControlCommand(cMessage *pkt)
 
                 // remove all received packet timestamps older than 180s
                 for(auto& [key, value]: dataReceivedTimes) {
-                    std::vector<long>::iterator it = value.begin();
+                    std::vector<double>::iterator it = value.begin();
                     int now = int(getClock().dbl());
                     while(it != value.end()){
                         if ((now - 180) > *it){
@@ -286,7 +284,7 @@ void ODAR::handleNetworkControlCommand(cMessage *pkt)
             txCount ++; // not needed for resilient protocol version
 
             // store unix timestamp of sent packets
-            int time = int(getClock().dbl());
+            double time = getClock().dbl();
             dataTransmissionTimes.push_back(time);
 
             OMAC *omac = dynamic_cast<OMAC*> (getParentModule()->getParentModule()->getSubmodule("Communication")->getSubmodule("MAC"));

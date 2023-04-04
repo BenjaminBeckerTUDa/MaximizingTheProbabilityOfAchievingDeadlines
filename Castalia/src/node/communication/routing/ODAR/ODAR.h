@@ -103,10 +103,10 @@ private:
     int deadlineExpiredCount = 0;
 
     int txCount = 0; // replaced by dataTransmissionTimes in resilient version
-    std::vector<long> dataTransmissionTimes; // timestamps of transmitted packets
+    std::vector<double> dataTransmissionTimes; // timestamps of transmitted packets
 
     map<int, int> rxCount;  // replaced by dataReceivedTimes in resilient version
-    map<int, std::vector<long>> dataReceivedTimes; // timestamps of received packets for every neighbor node
+    map<int, std::vector<double>> dataReceivedTimes; // timestamps of received packets for every neighbor node
 
     long lastPdrBroadcast; // time of last PDR broadcast
     long lastCdfBroadcast; // time of last CDF broadcast
