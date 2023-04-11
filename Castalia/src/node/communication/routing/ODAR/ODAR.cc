@@ -171,10 +171,6 @@ void ODAR::fromApplicationLayer(cPacket *pkt, const char *destination)
     int slot = (int) (ttd/maxTTD * (cdfSlots-1));
     list<int> receivers = routingTable_inUse[slot];
 
-    if(SELF_MAC_ADDRESS == 7) {
-        trace() << receivers.empty();
-    }
-
     if(!resilientVersion){
         if (receivers.empty()) // use minhop if no receivers
         {
@@ -300,8 +296,8 @@ void ODAR::handleNetworkControlCommand(cMessage *pkt)
             double time = getClock().dbl();
             dataTransmissionTimes.push_back(time);
 
-            OMAC *omac = dynamic_cast<OMAC*> (getParentModule()->getParentModule()->getSubmodule("Communication")->getSubmodule("MAC"));
-            int selfMacAdress = omac->getMacAdress();
+            //OMAC *omac = dynamic_cast<OMAC*> (getParentModule()->getParentModule()->getSubmodule("Communication")->getSubmodule("MAC"));
+            //int selfMacAdress = omac->getMacAdress();
             break;
         }
 

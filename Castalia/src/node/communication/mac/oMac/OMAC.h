@@ -45,6 +45,7 @@ enum OMacTimers
     TRANSMISSION_TIMEOUT = 3,
     HANDLE_SEND_ACK = 4,
     KILL_NODE = 5,
+    DEAD_LINK_DETECTION = 6
 };
 
 class OMAC : public VirtualMac
@@ -88,6 +89,7 @@ private:
     int transmissionID_;
 
     std::vector<int> nodesToBeKilled;
+    map<int, double> keepAliveCounter;
 
 protected:
     void startup();
@@ -116,6 +118,7 @@ protected:
 
     void updateOverheardAcks(unsigned int, int);
     void updateOverheardPackets(int, int);
+    void detectDeadLinksAndNodes();
 
     int getIndexInReceiversList(list<int>);
 

@@ -51,7 +51,9 @@ void OMAC::startup()
 
     //nodesToBeKilled = {8, 15, 29, 30, 6, 22, 1, 21, 19, 14, 5, 11, 17, 27, 23, 18, 12, 20, 16, 28, 3, 26, 4, 7, 9, 2, 25, 10, 24, 13}; // exclude sink!
     nodesToBeKilled = {};//{8, 6, 1, 5, 3, 4, 7, 9, 2}; // exclude sink!
-    setTimer(KILL_NODE, 100);
+    setTimer(KILL_NODE, 1000);
+
+    //setTimer(DEAD_LINK_DETECTION, 1);
 }
 
 int OMAC::getMacAdress()
@@ -139,6 +141,13 @@ void OMAC::timerFiredCallback(int timer)
         }
         nodesToBeKilled.erase(nodesToBeKilled.begin());
         setTimer(KILL_NODE, 60);
+        break;
+    }
+
+    case DEAD_LINK_DETECTION:
+    {
+        detectDeadLinksAndNodes();
+        setTimer(DEAD_LINK_DETECTION, 1);
     }
 
     default:
@@ -270,6 +279,15 @@ void OMAC::fromRadioLayer(cPacket *pkt, double RSSI, double LQI)
     int source = macFrame->getSource();
     int destination = macFrame->getDestination();
 
+    // Dead Link and Node Detection
+    double time = getClock().dbl();
+    std::map<int, double>::iterator it = keepAliveCounter.find(source); 
+    if (it != keepAliveCounter.end()) {
+        it->second = time;
+    } else {
+        keepAliveCounter.insert({source, time});
+    }
+        
     switch (macFrame->getOMacPacketKind())
     {
     case OMAC_DATA_PACKET:
@@ -608,6 +626,19 @@ void OMAC::updateOverheardPackets(int node, int packetCounter)
     oc->setPacketCounter(packetCounter);
 	oc->setSenderAddress(node);
 	toNetworkLayer(oc);
+}
+
+void OMAC::detectDeadLinksAndNodes()
+{
+    double now = getClock().dbl();
+    for (auto const& [key, value] : keepAliveCounter) {
+        if((now - 600) > value){
+            // node/link is dead
+            trace() << "Detected dead node/dead link to node: " << key;
+            
+            //keepAliveCounter.erase(key);
+        }
+    }
 }
 
 /**
