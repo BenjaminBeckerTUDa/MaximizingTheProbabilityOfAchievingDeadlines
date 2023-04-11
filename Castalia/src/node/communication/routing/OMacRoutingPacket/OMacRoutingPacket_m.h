@@ -62,7 +62,7 @@ class OMacRoutingPacket : public ::RoutingPacket
     unsigned int packetId_var;
     ReceiversContainer receiversContainer_var;
     double deadline_var;
-    //int packetCounter_var;
+    int packetCounter_var;
 
   private:
     void copy(const OMacRoutingPacket& other);
