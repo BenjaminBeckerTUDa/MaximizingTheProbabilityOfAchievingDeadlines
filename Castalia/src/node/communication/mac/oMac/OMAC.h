@@ -87,7 +87,7 @@ private:
     bool isSink;
     int transmissionID_;
 
-    std::vector<int> nodes_to_be_killed;
+    std::vector<int> nodesToBeKilled;
 
 protected:
     void startup();

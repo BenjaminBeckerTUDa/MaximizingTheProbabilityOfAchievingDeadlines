@@ -80,12 +80,12 @@ void ODAR::startup()
     setTimer(REQUEST_TIMES_FROM_MAC, .1); // get information from MAC (e.g., time between transmissions, time for each transmission etc.) after 0.1 seconds. so we can be sure, that the MAC is initialized.
     
     // offset to prevent collisions due to synchronous clocks
-    double offset = ((double) rand() / (RAND_MAX)) / 10;
-    double offset2 = ((double) rand() / (RAND_MAX)) / 10;
+    double offset_pdr = ((double) rand() / (RAND_MAX)) / 10;
+    double offset_cdf = ((double) rand() / (RAND_MAX)) / 10;
 
     if(resilientVersion) {
-        setTimer(PDR_BROADCAST, offset);
-        setTimer(CDF_BROADCAST, offset2);
+        setTimer(PDR_BROADCAST, 1 + offset_pdr);
+        setTimer(CDF_BROADCAST, 1 + offset_cdf);
     } else {
         setTimer(BROADCAST_CONTROL, hopCountPeriod); // control messages are broadcast in fixed time-intervals
     }
@@ -257,14 +257,14 @@ void ODAR::handleNetworkControlCommand(cMessage *pkt)
                 // store srcmac + timestamp of received message in dataReceivedTimes
                 double time = getClock().dbl();
                 if(dataReceivedTimes.find(srcMacAddress) == dataReceivedTimes.end()) {
-                    dataReceivedTimes.insert(pair<int,vector<long> >(srcMacAddress, vector<long>()));
+                    dataReceivedTimes.insert(pair<int,vector<double>>(srcMacAddress, vector<double>()));
                 }
                 dataReceivedTimes[srcMacAddress].push_back(time);
 
                 // remove all received packet timestamps older than 180s
                 for(auto& [key, value]: dataReceivedTimes) {
                     std::vector<double>::iterator it = value.begin();
-                    int now = int(getClock().dbl());
+                    int now = getClock().dbl();
                     while(it != value.end()){
                         if ((now - 180) > *it){
                             it = value.erase(it);
