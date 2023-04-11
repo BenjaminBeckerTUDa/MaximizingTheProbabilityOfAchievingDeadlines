@@ -209,7 +209,7 @@ int ODAR::calculateTransmissionCount()
 {
     // remove all transmission time entries older than 180 seconds
         std::vector<double>::iterator it = dataTransmissionTimes.begin();
-        int now = getClock().dbl();
+        double now = getClock().dbl();
         while(it != dataTransmissionTimes.end()){
             if ((now - 180) > *it){
                 it = dataTransmissionTimes.erase(it);
@@ -260,7 +260,7 @@ void ODAR::handleNetworkControlCommand(cMessage *pkt)
                 // remove all received packet timestamps older than 180s
                 for(auto& [key, value]: dataReceivedTimes) {
                     std::vector<double>::iterator it = value.begin();
-                    int now = getClock().dbl();
+                    double now = getClock().dbl();
                     while(it != value.end()){
                         if ((now - 180) > *it){
                             it = value.erase(it);
@@ -1021,7 +1021,7 @@ void ODAR::calculatePdrBroadcastTimes(double pdr, long srcMacAddress)
     long timer;
 
     if(lastPdrBroadcast == -1) {
-        int now = int(getClock().dbl());
+        double now = int(getClock().dbl());
         lastPdrBroadcast = now;
     }
     
@@ -1037,7 +1037,7 @@ void ODAR::calculatePdrBroadcastTimes(double pdr, long srcMacAddress)
 
 
 void ODAR::checkPdrBroadcast(){
-    int now = int(getClock().dbl());
+    double now = int(getClock().dbl());
     
     if(pdrBroadcastTimes.size() == 0) {
         return;
@@ -1070,7 +1070,7 @@ void ODAR::executePdrBroadcast()
 
     transmittedPdrs = currentPdrs;
 
-    int now = int(getClock().dbl());
+    double now = int(getClock().dbl());
     lastPdrBroadcast = now;
 
     // set all broadcast times to 10min in the future
@@ -1099,7 +1099,7 @@ void ODAR::checkCdfBroadcast()
         result = std::min((double)600, 6/avg_difference);
     }
 
-    int now = int(getClock().dbl());
+    double now = int(getClock().dbl());
     if(lastCdfBroadcast == -1) {
         lastCdfBroadcast = now;
     }
@@ -1152,7 +1152,7 @@ void ODAR::executeCdfBroadcast()
     netPacket->setCDF(cfp);
     netPacket->setNeighbors(cfp);
 
-    int now = int(getClock().dbl());
+    double now = int(getClock().dbl());
     lastCdfBroadcast = now;
 
     sum_cdf_abs_differences = 0;
