@@ -1,0 +1,792 @@
+Castalia| what:[General] (1)
+Castalia| when:2023-04-12 14:46
+Castalia| repeat:0 label:None
+Castalia|		module:SN.Simulation
+Castalia|			simple output name:Execution time, seconds
+Castalia|				4.32
+Castalia|			simple output name:Execution ratio (simtime/realtime)
+Castalia|				231.481698472
+Castalia|	module:SN.node[0].ResourceManager
+Castalia|		simple output name:Consumed Energy
+Castalia|			67.9979 
+Castalia|		simple output name:Estimated network lifetime (days)
+Castalia|			3.18637 
+Castalia|		simple output name:Remaining Energy
+Castalia|			18652 
+Castalia|	module:SN.node[0].Communication.Radio
+Castalia|		simple output name:RX pkt breakdown
+Castalia|			459 Failed, below sensitivity
+Castalia|			106 Failed, non RX state
+Castalia|			483 Received with NO interference
+Castalia|		simple output name:TXed pkts
+Castalia|			125 TX pkts
+Castalia|	module:SN.node[1].ResourceManager
+Castalia|		simple output name:Consumed Energy
+Castalia|			67.9991 
+Castalia|		simple output name:Remaining Energy
+Castalia|			18652 
+Castalia|	module:SN.node[1].Communication.Radio
+Castalia|		simple output name:RX pkt breakdown
+Castalia|			495 Failed with interference
+Castalia|			882 Failed, below sensitivity
+Castalia|			742 Received with NO interference
+Castalia|		simple output name:TXed pkts
+Castalia|			115 TX pkts
+Castalia|	module:SN.node[2].ResourceManager
+Castalia|		simple output name:Consumed Energy
+Castalia|			67.997 
+Castalia|		simple output name:Remaining Energy
+Castalia|			18652 
+Castalia|	module:SN.node[2].Communication.Radio
+Castalia|		simple output name:RX pkt breakdown
+Castalia|			203 Failed with interference
+Castalia|			1499 Failed, below sensitivity
+Castalia|			100 Failed, non RX state
+Castalia|			103 Received despite interference
+Castalia|			1087 Received with NO interference
+Castalia|		simple output name:TXed pkts
+Castalia|			107 TX pkts
+Castalia|	module:SN.node[3].ResourceManager
+Castalia|		simple output name:Consumed Energy
+Castalia|			67.9965 
+Castalia|		simple output name:Remaining Energy
+Castalia|			18652 
+Castalia|	module:SN.node[3].Communication.Radio
+Castalia|		simple output name:RX pkt breakdown
+Castalia|			398 Failed with interference
+Castalia|			1467 Failed, below sensitivity
+Castalia|			101 Received despite interference
+Castalia|			725 Received with NO interference
+Castalia|		simple output name:TXed pkts
+Castalia|			144 TX pkts
+Castalia|	module:SN.node[4].ResourceManager
+Castalia|		simple output name:Consumed Energy
+Castalia|			67.9984 
+Castalia|		simple output name:Remaining Energy
+Castalia|			18652 
+Castalia|	module:SN.node[4].Communication.Radio
+Castalia|		simple output name:RX pkt breakdown
+Castalia|			101 Failed with interference
+Castalia|			2288 Failed, below sensitivity
+Castalia|			198 Received despite interference
+Castalia|			628 Received with NO interference
+Castalia|		simple output name:TXed pkts
+Castalia|			110 TX pkts
+Castalia|	module:SN.node[5].ResourceManager
+Castalia|		simple output name:Consumed Energy
+Castalia|			67.999 
+Castalia|		simple output name:Remaining Energy
+Castalia|			18652 
+Castalia|	module:SN.node[5].Communication.Radio
+Castalia|		simple output name:RX pkt breakdown
+Castalia|			207 Failed with interference
+Castalia|			896 Failed, below sensitivity
+Castalia|			947 Received with NO interference
+Castalia|		simple output name:TXed pkts
+Castalia|			112 TX pkts
+Castalia|	module:SN.node[6].ResourceManager
+Castalia|		simple output name:Consumed Energy
+Castalia|			67.9977 
+Castalia|		simple output name:Remaining Energy
+Castalia|			18652 
+Castalia|	module:SN.node[6].Communication.Radio
+Castalia|		simple output name:RX pkt breakdown
+Castalia|			101 Failed with interference
+Castalia|			1539 Failed, below sensitivity
+Castalia|			199 Received despite interference
+Castalia|			488 Received with NO interference
+Castalia|		simple output name:TXed pkts
+Castalia|			113 TX pkts
+Castalia|	module:SN.node[7].ResourceManager
+Castalia|		simple output name:Consumed Energy
+Castalia|			67.9975 
+Castalia|		simple output name:Remaining Energy
+Castalia|			18652 
+Castalia|	module:SN.node[7].Communication.Radio
+Castalia|		simple output name:RX pkt breakdown
+Castalia|			297 Failed with interference
+Castalia|			782 Failed, below sensitivity
+Castalia|			99 Received despite interference
+Castalia|			734 Received with NO interference
+Castalia|		simple output name:TXed pkts
+Castalia|			104 TX pkts
+Castalia|	module:SN.node[8].ResourceManager
+Castalia|		simple output name:Consumed Energy
+Castalia|			67.9963 
+Castalia|		simple output name:Remaining Energy
+Castalia|			18652 
+Castalia|	module:SN.node[8].Communication.Radio
+Castalia|		simple output name:RX pkt breakdown
+Castalia|			302 Failed with interference
+Castalia|			2538 Failed, below sensitivity
+Castalia|			198 Failed, non RX state
+Castalia|			99 Received despite interference
+Castalia|			753 Received with NO interference
+Castalia|		simple output name:TXed pkts
+Castalia|			118 TX pkts
+Castalia|	module:SN.node[9].ResourceManager
+Castalia|		simple output name:Consumed Energy
+Castalia|			67.998 
+Castalia|		simple output name:Remaining Energy
+Castalia|			18652 
+Castalia|	module:SN.node[9].Communication.Radio
+Castalia|		simple output name:RX pkt breakdown
+Castalia|			397 Failed with interference
+Castalia|			1127 Failed, below sensitivity
+Castalia|			198 Failed, non RX state
+Castalia|			297 Received despite interference
+Castalia|			931 Received with NO interference
+Castalia|		simple output name:TXed pkts
+Castalia|			106 TX pkts
+Castalia|	module:SN.node[10].ResourceManager
+Castalia|		simple output name:Consumed Energy
+Castalia|			67.9963 
+Castalia|		simple output name:Remaining Energy
+Castalia|			18652 
+Castalia|	module:SN.node[10].Communication.Radio
+Castalia|		simple output name:RX pkt breakdown
+Castalia|			99 Failed with interference
+Castalia|			803 Failed, below sensitivity
+Castalia|			673 Received with NO interference
+Castalia|		simple output name:TXed pkts
+Castalia|			108 TX pkts
+Castalia|	module:SN.node[11].ResourceManager
+Castalia|		simple output name:Consumed Energy
+Castalia|			67.9993 
+Castalia|		simple output name:Remaining Energy
+Castalia|			18652 
+Castalia|	module:SN.node[11].Communication.Radio
+Castalia|		simple output name:RX pkt breakdown
+Castalia|			99 Failed with interference
+Castalia|			683 Failed, below sensitivity
+Castalia|			99 Failed, non RX state
+Castalia|			396 Received despite interference
+Castalia|			1061 Received with NO interference
+Castalia|		simple output name:TXed pkts
+Castalia|			147 TX pkts
+Castalia|	module:SN.node[12].ResourceManager
+Castalia|		simple output name:Consumed Energy
+Castalia|			67.9989 
+Castalia|		simple output name:Remaining Energy
+Castalia|			18652 
+Castalia|	module:SN.node[12].Communication.Radio
+Castalia|		simple output name:RX pkt breakdown
+Castalia|			99 Failed with interference
+Castalia|			770 Failed, below sensitivity
+Castalia|			99 Received despite interference
+Castalia|			708 Received with NO interference
+Castalia|		simple output name:TXed pkts
+Castalia|			117 TX pkts
+Castalia|	module:SN.node[13].ResourceManager
+Castalia|		simple output name:Consumed Energy
+Castalia|			67.9992 
+Castalia|		simple output name:Remaining Energy
+Castalia|			18652 
+Castalia|	module:SN.node[13].Communication.Radio
+Castalia|		simple output name:RX pkt breakdown
+Castalia|			198 Failed with interference
+Castalia|			664 Failed, below sensitivity
+Castalia|			99 Received despite interference
+Castalia|			724 Received with NO interference
+Castalia|		simple output name:TXed pkts
+Castalia|			108 TX pkts
+Castalia|	module:SN.node[14].ResourceManager
+Castalia|		simple output name:Consumed Energy
+Castalia|			67.9987 
+Castalia|		simple output name:Remaining Energy
+Castalia|			18652 
+Castalia|	module:SN.node[14].Communication.Radio
+Castalia|		simple output name:RX pkt breakdown
+Castalia|			600 Failed with interference
+Castalia|			2229 Failed, below sensitivity
+Castalia|			197 Received despite interference
+Castalia|			649 Received with NO interference
+Castalia|		simple output name:TXed pkts
+Castalia|			123 TX pkts
+Castalia|	module:SN.node[15].ResourceManager
+Castalia|		simple output name:Consumed Energy
+Castalia|			67.9986 
+Castalia|		simple output name:Remaining Energy
+Castalia|			18652 
+Castalia|	module:SN.node[15].Communication.Radio
+Castalia|		simple output name:RX pkt breakdown
+Castalia|			101 Failed with interference
+Castalia|			1176 Failed, below sensitivity
+Castalia|			100 Received despite interference
+Castalia|			676 Received with NO interference
+Castalia|		simple output name:TXed pkts
+Castalia|			104 TX pkts
+Castalia|	module:SN.node[16].ResourceManager
+Castalia|		simple output name:Consumed Energy
+Castalia|			67.9993 
+Castalia|		simple output name:Remaining Energy
+Castalia|			18652 
+Castalia|	module:SN.node[16].Communication.Radio
+Castalia|		simple output name:RX pkt breakdown
+Castalia|			404 Failed with interference
+Castalia|			2071 Failed, below sensitivity
+Castalia|			2 Failed, non RX state
+Castalia|			101 Received despite interference
+Castalia|			875 Received with NO interference
+Castalia|		simple output name:TXed pkts
+Castalia|			115 TX pkts
+Castalia|	module:SN.node[17].ResourceManager
+Castalia|		simple output name:Consumed Energy
+Castalia|			67.9991 
+Castalia|		simple output name:Remaining Energy
+Castalia|			18652 
+Castalia|	module:SN.node[17].Communication.Radio
+Castalia|		simple output name:RX pkt breakdown
+Castalia|			103 Failed with interference
+Castalia|			1319 Failed, below sensitivity
+Castalia|			3 Received despite interference
+Castalia|			679 Received with NO interference
+Castalia|		simple output name:TXed pkts
+Castalia|			105 TX pkts
+Castalia|	module:SN.node[18].ResourceManager
+Castalia|		simple output name:Consumed Energy
+Castalia|			67.9979 
+Castalia|		simple output name:Remaining Energy
+Castalia|			18652 
+Castalia|	module:SN.node[18].Communication.Radio
+Castalia|		simple output name:RX pkt breakdown
+Castalia|			799 Failed, below sensitivity
+Castalia|			676 Received with NO interference
+Castalia|		simple output name:TXed pkts
+Castalia|			105 TX pkts
+Castalia|	module:SN.node[19].ResourceManager
+Castalia|		simple output name:Consumed Energy
+Castalia|			67.9971 
+Castalia|		simple output name:Remaining Energy
+Castalia|			18652 
+Castalia|	module:SN.node[19].Communication.Radio
+Castalia|		simple output name:RX pkt breakdown
+Castalia|			594 Failed with interference
+Castalia|			1016 Failed, below sensitivity
+Castalia|			99 Received despite interference
+Castalia|			798 Received with NO interference
+Castalia|		simple output name:TXed pkts
+Castalia|			104 TX pkts
+Castalia|	module:SN.node[20].ResourceManager
+Castalia|		simple output name:Consumed Energy
+Castalia|			67.9993 
+Castalia|		simple output name:Remaining Energy
+Castalia|			18652 
+Castalia|	module:SN.node[20].Communication.Radio
+Castalia|		simple output name:RX pkt breakdown
+Castalia|			198 Failed with interference
+Castalia|			934 Failed, below sensitivity
+Castalia|			800 Received with NO interference
+Castalia|		simple output name:TXed pkts
+Castalia|			107 TX pkts
+Castalia|	module:SN.node[21].ResourceManager
+Castalia|		simple output name:Consumed Energy
+Castalia|			67.9989 
+Castalia|		simple output name:Remaining Energy
+Castalia|			18652 
+Castalia|	module:SN.node[21].Communication.Radio
+Castalia|		simple output name:RX pkt breakdown
+Castalia|			495 Failed with interference
+Castalia|			1596 Failed, below sensitivity
+Castalia|			640 Received with NO interference
+Castalia|		simple output name:TXed pkts
+Castalia|			113 TX pkts
+Castalia|	module:SN.node[22].ResourceManager
+Castalia|		simple output name:Consumed Energy
+Castalia|			67.9979 
+Castalia|		simple output name:Remaining Energy
+Castalia|			18652 
+Castalia|	module:SN.node[22].Communication.Radio
+Castalia|		simple output name:RX pkt breakdown
+Castalia|			495 Failed with interference
+Castalia|			1781 Failed, below sensitivity
+Castalia|			198 Received despite interference
+Castalia|			708 Received with NO interference
+Castalia|		simple output name:TXed pkts
+Castalia|			104 TX pkts
+Castalia|	module:SN.node[23].ResourceManager
+Castalia|		simple output name:Consumed Energy
+Castalia|			67.9978 
+Castalia|		simple output name:Remaining Energy
+Castalia|			18652 
+Castalia|	module:SN.node[23].Communication.Radio
+Castalia|		simple output name:RX pkt breakdown
+Castalia|			305 Failed with interference
+Castalia|			1182 Failed, below sensitivity
+Castalia|			198 Failed, non RX state
+Castalia|			300 Received despite interference
+Castalia|			1117 Received with NO interference
+Castalia|		simple output name:TXed pkts
+Castalia|			125 TX pkts
+Castalia|	module:SN.node[24].ResourceManager
+Castalia|		simple output name:Consumed Energy
+Castalia|			67.9971 
+Castalia|		simple output name:Remaining Energy
+Castalia|			18652 
+Castalia|	module:SN.node[24].Communication.Radio
+Castalia|		simple output name:RX pkt breakdown
+Castalia|			103 Failed with interference
+Castalia|			1496 Failed, below sensitivity
+Castalia|			2 Failed, non RX state
+Castalia|			200 Received despite interference
+Castalia|			1078 Received with NO interference
+Castalia|		simple output name:TXed pkts
+Castalia|			115 TX pkts
+Castalia|	module:SN.node[25].ResourceManager
+Castalia|		simple output name:Consumed Energy
+Castalia|			67.9987 
+Castalia|		simple output name:Remaining Energy
+Castalia|			18652 
+Castalia|	module:SN.node[25].Communication.Radio
+Castalia|		simple output name:RX pkt breakdown
+Castalia|			11 Failed with interference
+Castalia|			1060 Failed, below sensitivity
+Castalia|			99 Failed, non RX state
+Castalia|			3 Received despite interference
+Castalia|			921 Received with NO interference
+Castalia|		simple output name:TXed pkts
+Castalia|			110 TX pkts
+Castalia|	module:SN.node[26].ResourceManager
+Castalia|		simple output name:Consumed Energy
+Castalia|			67.9985 
+Castalia|		simple output name:Remaining Energy
+Castalia|			18652 
+Castalia|	module:SN.node[26].Communication.Radio
+Castalia|		simple output name:RX pkt breakdown
+Castalia|			4 Failed with interference
+Castalia|			1312 Failed, below sensitivity
+Castalia|			99 Failed, non RX state
+Castalia|			1 Received despite interference
+Castalia|			916 Received with NO interference
+Castalia|		simple output name:TXed pkts
+Castalia|			104 TX pkts
+Castalia|	module:SN.node[27].ResourceManager
+Castalia|		simple output name:Consumed Energy
+Castalia|			67.9983 
+Castalia|		simple output name:Remaining Energy
+Castalia|			18652 
+Castalia|	module:SN.node[27].Communication.Radio
+Castalia|		simple output name:RX pkt breakdown
+Castalia|			406 Failed with interference
+Castalia|			1646 Failed, below sensitivity
+Castalia|			101 Received despite interference
+Castalia|			1101 Received with NO interference
+Castalia|		simple output name:TXed pkts
+Castalia|			104 TX pkts
+Castalia|	module:SN.node[28].ResourceManager
+Castalia|		simple output name:Consumed Energy
+Castalia|			67.9971 
+Castalia|		simple output name:Remaining Energy
+Castalia|			18652 
+Castalia|	module:SN.node[28].Communication.Radio
+Castalia|		simple output name:RX pkt breakdown
+Castalia|			198 Failed with interference
+Castalia|			825 Failed, below sensitivity
+Castalia|			198 Received despite interference
+Castalia|			597 Received with NO interference
+Castalia|		simple output name:TXed pkts
+Castalia|			106 TX pkts
+Castalia|	module:SN.node[29].ResourceManager
+Castalia|		simple output name:Consumed Energy
+Castalia|			67.9975 
+Castalia|		simple output name:Remaining Energy
+Castalia|			18652 
+Castalia|	module:SN.node[29].Communication.Radio
+Castalia|		simple output name:RX pkt breakdown
+Castalia|			198 Failed with interference
+Castalia|			1762 Failed, below sensitivity
+Castalia|			16 Failed, non RX state
+Castalia|			199 Received despite interference
+Castalia|			1020 Received with NO interference
+Castalia|		simple output name:TXed pkts
+Castalia|			171 TX pkts
+Castalia|	module:SN.node[30].ResourceManager
+Castalia|		simple output name:Consumed Energy
+Castalia|			67.9974 
+Castalia|		simple output name:Remaining Energy
+Castalia|			18652 
+Castalia|	module:SN.node[30].Communication.Radio
+Castalia|		simple output name:RX pkt breakdown
+Castalia|			430 Failed, below sensitivity
+Castalia|			441 Received with NO interference
+Castalia|		simple output name:TXed pkts
+Castalia|			117 TX pkts
+Castalia|	module:SN.node[31].ResourceManager
+Castalia|		simple output name:Consumed Energy
+Castalia|			67.9963 
+Castalia|		simple output name:Remaining Energy
+Castalia|			18652 
+Castalia|	module:SN.node[31].Communication.Radio
+Castalia|		simple output name:RX pkt breakdown
+Castalia|			198 Failed with interference
+Castalia|			650 Failed, below sensitivity
+Castalia|			7 Failed, non RX state
+Castalia|			99 Received despite interference
+Castalia|			507 Received with NO interference
+Castalia|		simple output name:TXed pkts
+Castalia|			137 TX pkts
+Castalia|	module:SN.node[32].ResourceManager
+Castalia|		simple output name:Consumed Energy
+Castalia|			67.9993 
+Castalia|		simple output name:Remaining Energy
+Castalia|			18652 
+Castalia|	module:SN.node[32].Communication.Radio
+Castalia|		simple output name:RX pkt breakdown
+Castalia|			597 Failed with interference
+Castalia|			1417 Failed, below sensitivity
+Castalia|			201 Received despite interference
+Castalia|			688 Received with NO interference
+Castalia|		simple output name:TXed pkts
+Castalia|			108 TX pkts
+Castalia|	module:SN.node[33].ResourceManager
+Castalia|		simple output name:Consumed Energy
+Castalia|			67.9964 
+Castalia|		simple output name:Remaining Energy
+Castalia|			18652 
+Castalia|	module:SN.node[33].Communication.Radio
+Castalia|		simple output name:RX pkt breakdown
+Castalia|			215 Failed with interference
+Castalia|			708 Failed, below sensitivity
+Castalia|			1 Failed, non RX state
+Castalia|			101 Received despite interference
+Castalia|			931 Received with NO interference
+Castalia|		simple output name:TXed pkts
+Castalia|			135 TX pkts
+Castalia|	module:SN.node[34].ResourceManager
+Castalia|		simple output name:Consumed Energy
+Castalia|			67.9975 
+Castalia|		simple output name:Remaining Energy
+Castalia|			18652 
+Castalia|	module:SN.node[34].Communication.Radio
+Castalia|		simple output name:RX pkt breakdown
+Castalia|			696 Failed with interference
+Castalia|			1816 Failed, below sensitivity
+Castalia|			199 Received despite interference
+Castalia|			705 Received with NO interference
+Castalia|		simple output name:TXed pkts
+Castalia|			138 TX pkts
+Castalia|	module:SN.node[35].ResourceManager
+Castalia|		simple output name:Consumed Energy
+Castalia|			67.9961 
+Castalia|		simple output name:Remaining Energy
+Castalia|			18652 
+Castalia|	module:SN.node[35].Communication.Radio
+Castalia|		simple output name:RX pkt breakdown
+Castalia|			1206 Failed, below sensitivity
+Castalia|			571 Received with NO interference
+Castalia|		simple output name:TXed pkts
+Castalia|			112 TX pkts
+Castalia|	module:SN.node[36].ResourceManager
+Castalia|		simple output name:Consumed Energy
+Castalia|			67.9985 
+Castalia|		simple output name:Remaining Energy
+Castalia|			18652 
+Castalia|	module:SN.node[36].Communication.Radio
+Castalia|		simple output name:RX pkt breakdown
+Castalia|			204 Failed with interference
+Castalia|			1705 Failed, below sensitivity
+Castalia|			2 Received despite interference
+Castalia|			867 Received with NO interference
+Castalia|		simple output name:TXed pkts
+Castalia|			112 TX pkts
+Castalia|	module:SN.node[37].ResourceManager
+Castalia|		simple output name:Consumed Energy
+Castalia|			67.998 
+Castalia|		simple output name:Remaining Energy
+Castalia|			18652 
+Castalia|	module:SN.node[37].Communication.Radio
+Castalia|		simple output name:RX pkt breakdown
+Castalia|			106 Failed with interference
+Castalia|			915 Failed, below sensitivity
+Castalia|			99 Received despite interference
+Castalia|			613 Received with NO interference
+Castalia|		simple output name:TXed pkts
+Castalia|			113 TX pkts
+Castalia|	module:SN.node[38].ResourceManager
+Castalia|		simple output name:Consumed Energy
+Castalia|			67.998 
+Castalia|		simple output name:Remaining Energy
+Castalia|			18652 
+Castalia|	module:SN.node[38].Communication.Radio
+Castalia|		simple output name:RX pkt breakdown
+Castalia|			99 Failed with interference
+Castalia|			1252 Failed, below sensitivity
+Castalia|			198 Received despite interference
+Castalia|			709 Received with NO interference
+Castalia|		simple output name:TXed pkts
+Castalia|			106 TX pkts
+Castalia|	module:SN.node[39].ResourceManager
+Castalia|		simple output name:Consumed Energy
+Castalia|			67.9975 
+Castalia|		simple output name:Remaining Energy
+Castalia|			18652 
+Castalia|	module:SN.node[39].Communication.Radio
+Castalia|		simple output name:RX pkt breakdown
+Castalia|			205 Failed with interference
+Castalia|			1386 Failed, below sensitivity
+Castalia|			367 Received with NO interference
+Castalia|		simple output name:TXed pkts
+Castalia|			110 TX pkts
+Castalia|	module:SN.node[40].ResourceManager
+Castalia|		simple output name:Consumed Energy
+Castalia|			67.9984 
+Castalia|		simple output name:Remaining Energy
+Castalia|			18652 
+Castalia|	module:SN.node[40].Communication.Radio
+Castalia|		simple output name:RX pkt breakdown
+Castalia|			198 Failed with interference
+Castalia|			1202 Failed, below sensitivity
+Castalia|			99 Failed, non RX state
+Castalia|			566 Received with NO interference
+Castalia|		simple output name:TXed pkts
+Castalia|			105 TX pkts
+Castalia|	module:SN.node[41].ResourceManager
+Castalia|		simple output name:Consumed Energy
+Castalia|			67.9983 
+Castalia|		simple output name:Remaining Energy
+Castalia|			18652 
+Castalia|	module:SN.node[41].Communication.Radio
+Castalia|		simple output name:RX pkt breakdown
+Castalia|			552 Failed, below sensitivity
+Castalia|			117 Received with NO interference
+Castalia|		simple output name:TXed pkts
+Castalia|			108 TX pkts
+Castalia|	module:SN.node[42].ResourceManager
+Castalia|		simple output name:Consumed Energy
+Castalia|			67.997 
+Castalia|		simple output name:Remaining Energy
+Castalia|			18652 
+Castalia|	module:SN.node[42].Communication.Radio
+Castalia|		simple output name:RX pkt breakdown
+Castalia|			406 Failed with interference
+Castalia|			2042 Failed, below sensitivity
+Castalia|			100 Failed, non RX state
+Castalia|			199 Received despite interference
+Castalia|			956 Received with NO interference
+Castalia|		simple output name:TXed pkts
+Castalia|			106 TX pkts
+Castalia|	module:SN.node[43].ResourceManager
+Castalia|		simple output name:Consumed Energy
+Castalia|			67.9974 
+Castalia|		simple output name:Remaining Energy
+Castalia|			18652 
+Castalia|	module:SN.node[43].Communication.Radio
+Castalia|		simple output name:RX pkt breakdown
+Castalia|			203 Failed with interference
+Castalia|			1716 Failed, below sensitivity
+Castalia|			1 Failed, non RX state
+Castalia|			201 Received despite interference
+Castalia|			990 Received with NO interference
+Castalia|		simple output name:TXed pkts
+Castalia|			106 TX pkts
+Castalia|	module:SN.node[44].ResourceManager
+Castalia|		simple output name:Consumed Energy
+Castalia|			67.9979 
+Castalia|		simple output name:Remaining Energy
+Castalia|			18652 
+Castalia|	module:SN.node[44].Communication.Radio
+Castalia|		simple output name:RX pkt breakdown
+Castalia|			99 Failed with interference
+Castalia|			1283 Failed, below sensitivity
+Castalia|			1 Received despite interference
+Castalia|			857 Received with NO interference
+Castalia|		simple output name:TXed pkts
+Castalia|			108 TX pkts
+Castalia|	module:SN.node[45].ResourceManager
+Castalia|		simple output name:Consumed Energy
+Castalia|			67.9985 
+Castalia|		simple output name:Remaining Energy
+Castalia|			18652 
+Castalia|	module:SN.node[45].Communication.Radio
+Castalia|		simple output name:RX pkt breakdown
+Castalia|			1581 Failed, below sensitivity
+Castalia|			99 Failed, non RX state
+Castalia|			480 Received with NO interference
+Castalia|		simple output name:TXed pkts
+Castalia|			106 TX pkts
+Castalia|	module:SN.node[46].ResourceManager
+Castalia|		simple output name:Consumed Energy
+Castalia|			67.9989 
+Castalia|		simple output name:Remaining Energy
+Castalia|			18652 
+Castalia|	module:SN.node[46].Communication.Radio
+Castalia|		simple output name:RX pkt breakdown
+Castalia|			495 Failed with interference
+Castalia|			1325 Failed, below sensitivity
+Castalia|			99 Received despite interference
+Castalia|			580 Received with NO interference
+Castalia|		simple output name:TXed pkts
+Castalia|			106 TX pkts
+Castalia|	module:SN.node[47].ResourceManager
+Castalia|		simple output name:Consumed Energy
+Castalia|			67.9978 
+Castalia|		simple output name:Remaining Energy
+Castalia|			18652 
+Castalia|	module:SN.node[47].Communication.Radio
+Castalia|		simple output name:RX pkt breakdown
+Castalia|			108 Failed with interference
+Castalia|			1491 Failed, below sensitivity
+Castalia|			199 Failed, non RX state
+Castalia|			101 Received despite interference
+Castalia|			1308 Received with NO interference
+Castalia|		simple output name:TXed pkts
+Castalia|			107 TX pkts
+Castalia|	module:SN.node[48].ResourceManager
+Castalia|		simple output name:Consumed Energy
+Castalia|			67.9976 
+Castalia|		simple output name:Remaining Energy
+Castalia|			18652 
+Castalia|	module:SN.node[48].Communication.Radio
+Castalia|		simple output name:RX pkt breakdown
+Castalia|			106 Failed with interference
+Castalia|			1383 Failed, below sensitivity
+Castalia|			1 Failed, non RX state
+Castalia|			200 Received despite interference
+Castalia|			1069 Received with NO interference
+Castalia|		simple output name:TXed pkts
+Castalia|			104 TX pkts
+Castalia|	module:SN.node[49].ResourceManager
+Castalia|		simple output name:Consumed Energy
+Castalia|			67.9968 
+Castalia|		simple output name:Remaining Energy
+Castalia|			18652 
+Castalia|	module:SN.node[49].Communication.Radio
+Castalia|		simple output name:RX pkt breakdown
+Castalia|			198 Failed with interference
+Castalia|			1299 Failed, below sensitivity
+Castalia|			99 Received despite interference
+Castalia|			752 Received with NO interference
+Castalia|		simple output name:TXed pkts
+Castalia|			123 TX pkts
+Castalia|	module:SN.node[50].ResourceManager
+Castalia|		simple output name:Consumed Energy
+Castalia|			67.9967 
+Castalia|		simple output name:Remaining Energy
+Castalia|			18652 
+Castalia|	module:SN.node[50].Communication.Radio
+Castalia|		simple output name:RX pkt breakdown
+Castalia|			893 Failed with interference
+Castalia|			1698 Failed, below sensitivity
+Castalia|			102 Received despite interference
+Castalia|			734 Received with NO interference
+Castalia|		simple output name:TXed pkts
+Castalia|			127 TX pkts
+Castalia|	module:SN.node[51].ResourceManager
+Castalia|		simple output name:Consumed Energy
+Castalia|			67.9966 
+Castalia|		simple output name:Remaining Energy
+Castalia|			18652 
+Castalia|	module:SN.node[51].Communication.Radio
+Castalia|		simple output name:RX pkt breakdown
+Castalia|			581 Failed, below sensitivity
+Castalia|			99 Received despite interference
+Castalia|			794 Received with NO interference
+Castalia|		simple output name:TXed pkts
+Castalia|			106 TX pkts
+Castalia|	module:SN.node[52].ResourceManager
+Castalia|		simple output name:Consumed Energy
+Castalia|			67.9984 
+Castalia|		simple output name:Remaining Energy
+Castalia|			18652 
+Castalia|	module:SN.node[52].Communication.Radio
+Castalia|		simple output name:RX pkt breakdown
+Castalia|			205 Failed with interference
+Castalia|			538 Failed, below sensitivity
+Castalia|			106 Received despite interference
+Castalia|			637 Received with NO interference
+Castalia|		simple output name:TXed pkts
+Castalia|			112 TX pkts
+Castalia|	module:SN.node[53].ResourceManager
+Castalia|		simple output name:Consumed Energy
+Castalia|			67.9985 
+Castalia|		simple output name:Remaining Energy
+Castalia|			18652 
+Castalia|	module:SN.node[53].Communication.Radio
+Castalia|		simple output name:RX pkt breakdown
+Castalia|			594 Failed with interference
+Castalia|			1034 Failed, below sensitivity
+Castalia|			198 Received despite interference
+Castalia|			679 Received with NO interference
+Castalia|		simple output name:TXed pkts
+Castalia|			106 TX pkts
+Castalia|	module:SN.node[54].ResourceManager
+Castalia|		simple output name:Consumed Energy
+Castalia|			67.9986 
+Castalia|		simple output name:Remaining Energy
+Castalia|			18652 
+Castalia|	module:SN.node[54].Communication.Radio
+Castalia|		simple output name:RX pkt breakdown
+Castalia|			7 Failed with interference
+Castalia|			2288 Failed, below sensitivity
+Castalia|			99 Failed, non RX state
+Castalia|			102 Received despite interference
+Castalia|			865 Received with NO interference
+Castalia|		simple output name:TXed pkts
+Castalia|			106 TX pkts
+Castalia|	module:SN.node[55].ResourceManager
+Castalia|		simple output name:Consumed Energy
+Castalia|			67.9964 
+Castalia|		simple output name:Remaining Energy
+Castalia|			18652 
+Castalia|	module:SN.node[55].Communication.Radio
+Castalia|		simple output name:RX pkt breakdown
+Castalia|			396 Failed with interference
+Castalia|			1441 Failed, below sensitivity
+Castalia|			99 Failed, non RX state
+Castalia|			302 Received despite interference
+Castalia|			560 Received with NO interference
+Castalia|		simple output name:TXed pkts
+Castalia|			107 TX pkts
+Castalia|	module:SN.node[56].ResourceManager
+Castalia|		simple output name:Consumed Energy
+Castalia|			67.9981 
+Castalia|		simple output name:Remaining Energy
+Castalia|			18652 
+Castalia|	module:SN.node[56].Communication.Radio
+Castalia|		simple output name:RX pkt breakdown
+Castalia|			306 Failed with interference
+Castalia|			1143 Failed, below sensitivity
+Castalia|			1 Received despite interference
+Castalia|			962 Received with NO interference
+Castalia|		simple output name:TXed pkts
+Castalia|			106 TX pkts
+Castalia|	module:SN.node[57].ResourceManager
+Castalia|		simple output name:Consumed Energy
+Castalia|			67.9969 
+Castalia|		simple output name:Remaining Energy
+Castalia|			18652 
+Castalia|	module:SN.node[57].Communication.Radio
+Castalia|		simple output name:RX pkt breakdown
+Castalia|			106 Failed with interference
+Castalia|			1018 Failed, below sensitivity
+Castalia|			2 Failed, non RX state
+Castalia|			102 Received despite interference
+Castalia|			1289 Received with NO interference
+Castalia|		simple output name:TXed pkts
+Castalia|			124 TX pkts
+Castalia|	module:SN.node[58].ResourceManager
+Castalia|		simple output name:Consumed Energy
+Castalia|			67.9963 
+Castalia|		simple output name:Remaining Energy
+Castalia|			18652 
+Castalia|	module:SN.node[58].Communication.Radio
+Castalia|		simple output name:RX pkt breakdown
+Castalia|			106 Failed with interference
+Castalia|			760 Failed, below sensitivity
+Castalia|			106 Received despite interference
+Castalia|			520 Received with NO interference
+Castalia|		simple output name:TXed pkts
+Castalia|			106 TX pkts
+Castalia|	module:SN.node[59].ResourceManager
+Castalia|		simple output name:Consumed Energy
+Castalia|			67.9993 
+Castalia|		simple output name:Remaining Energy
+Castalia|			18652 
+Castalia|	module:SN.node[59].Communication.Radio
+Castalia|		simple output name:RX pkt breakdown
+Castalia|			396 Failed with interference
+Castalia|			662 Failed, below sensitivity
+Castalia|			99 Received despite interference
+Castalia|			751 Received with NO interference
+Castalia|		simple output name:TXed pkts
+Castalia|			106 TX pkts

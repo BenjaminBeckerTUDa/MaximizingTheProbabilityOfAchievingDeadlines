@@ -5,10 +5,13 @@
 #include <list>
 #include <set>
 #include <climits>
+#include <queue>
 #include "VirtualRouting.h"
 #include "ODARPacket_m.h"
 #include "ODARControl_m.h"
 #include "DeadlinePacket_m.h"
+#include "AggPacket_m.h"
+#include "AGGL.h"
 #include "CFP.h"
 #include "OMAC.h"
 #include "Mask.h"
@@ -30,7 +33,15 @@ enum potentialReceiverSets
     CLIQUES = 2,
 };
 
+struct ag_pkt {
+    ODARPacket * pkt;   // the packet
+    double wt;  // max Waiting time
+};
 
+struct Compare {
+    bool operator()(ag_pkt a, ag_pkt b)
+    { return a.wt > b.wt ;};
+};
 
 class ODAR : public VirtualRouting
 {
@@ -75,7 +86,15 @@ protected:
     double maxTimeForCA; // in ms
     double minTimeForCA; // in ms
 
+    /**********************************************Aggregation****************************************************/ 
+    std::priority_queue<ag_pkt, std::vector<ag_pkt>, Compare> pq;
+    list<ODARPacket*> packetqueueIN;
 
+    double maxSizeForPA; // max packet size for aggregation
+    double currentSizeForPA; // current sum of size of every paket in query
+    double mCDF; // the desired CDF probability for calculating the max Waiting time
+    int prio_packetsize; // the Packetsize of the Packet with the lowest waiting time (currently in buffer)
+    /*************************************************************************************************************/ 
 
     int cdfSlots;
     int potentialReceiverSetsStrategy;
@@ -116,6 +135,12 @@ protected:
 
     void fromApplicationLayer(cPacket *, const char *);
     void fromMacLayer(cPacket *, int, double, double);
+
+    void toPriorityQueue(ODARPacket *);
+    void aggregation();
+    void deaggregation(AggPacket *);
+    double maxWaitingTime(double);
+    double packet_timer_calc(double);
 
     void handleNetworkControlCommand(cMessage *);
 

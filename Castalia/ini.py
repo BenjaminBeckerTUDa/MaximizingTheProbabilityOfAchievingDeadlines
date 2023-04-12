@@ -7,7 +7,15 @@ export LD_LIBRARY_PATH=~/omnetpp-4.6/lib
 
 cd /home/dorian/castalia-git/castaliaplr/Castalia 
 make 
-cd /home/dorian/castalia-git/castaliaplr/Castalia/Simulations/PAODAR
+cd /home/dorian/castalia-git/castaliaplr/Castalia/Simulations/OMac
+../../bin/Castalia -debug-on-errors=true -c [General] 
+
+export PATH=$PATH:~/omnetpp-4.6/bin 
+export LD_LIBRARY_PATH=~/omnetpp-4.6/lib 
+
+cd /home/dorian/castalia-git/castaliaplr/Castalia 
+make 
+cd /home/dorian/castalia-git/castaliaplr/Castalia/Simulations/OMac
 ../../bin/Castalia -d -c [General] 
 
 export PATH=$PATH:~/omnetpp-4.6/bin 
