@@ -374,7 +374,7 @@ void ODAR::fromMacLayer(cPacket *pkt, int srcMacAddress, double rssi, double lqi
                         s += std::to_string( neighborCDFs_byMAC[srcMacAddress][i]) + " ";
                     }
                }
-               trace() << "s :" << srcMacAddress << " " << s;
+               //trace() << "s :" << srcMacAddress << " " << s;
                 calculateCDF();
             }     
             
