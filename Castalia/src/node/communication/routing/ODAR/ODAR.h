@@ -23,7 +23,8 @@ enum ODARTimers
     BROADCAST_CONTROL = 3,
     INC_ROUND = 4,
     PDR_BROADCAST = 5,
-    CDF_BROADCAST = 6
+    CDF_BROADCAST = 6,
+    MONITOR_DAR = 7
 };
 
 enum potentialReceiverSets
@@ -99,7 +100,9 @@ private:
     /*--- Monitoring parameters ---*/
     int hopCountCount = 0;
     int pktCount = 0;
+    int pktCountInterval = 0;
     int pktCountToApp = 0;
+    int pktCountToAppInterval = 0;
     int deadlineExpiredCount = 0;
 
     int txCount = 0; // replaced by dataTransmissionTimes in resilient version
@@ -117,6 +120,7 @@ private:
     int packets_since_cdf_broadcast; // Number of data packets received since last CDF broadcast  yx
 
     bool minHopOnly;
+
 
     bool resilientVersion = true; // toggle resilient modifications to ODAR
     
@@ -168,6 +172,7 @@ public:
     int getPacketDeadlineExpiredCount();
     int calculateTransmissionCount();
     void overheardPacket(double);
+    int getAndResetPacketCreatedCount();
 };
 
 #endif // ODARMODULE

@@ -64,6 +64,7 @@ void ODAR::startup()
             CDF_calculation[i]=1; // the sinks CDF is set to 1 for each time-to-deadline
         }
         setTimer(INC_ROUND, hopCountPeriod*3); // the sink increments its round in fixed time-intervals
+        setTimer(MONITOR_DAR, 60);
     }
     else
     {
@@ -140,11 +141,46 @@ void ODAR::timerFiredCallback(int timer)
             setTimer(CDF_BROADCAST, 1);
             break;
         }
+        case MONITOR_DAR:
+        {
+            bool flag = true;
+		    int id = 1;
+		    double createdPackets = 0;
+            //double deadlineExpired = 0;
+		    while (flag)
+		    {
+                cModule *node_ = getParentModule()->getParentModule()->getParentModule()->getSubmodule("node",id);
+                if (node_)
+                {
+                    ODAR *odarInstance = dynamic_cast<ODAR*> (getParentModule()->getParentModule()->getParentModule()->getSubmodule("node",id)->getSubmodule("Communication")->getSubmodule("Routing"));
+                    createdPackets += odarInstance->getAndResetPacketCreatedCount();
+                    //deadlineExpired += odarInstance->getPacketDeadlineExpiredCount();
+                    id ++;
+                }	
+                else
+                    flag = false;
+            }
+
+            trace() << "deadlineachievementratio: " << pktCountToAppInterval / createdPackets;
+            trace() << "pktCountToAppInterval: " << pktCountToAppInterval;
+            trace() << "createdPackets: " <<  createdPackets;
+            pktCountToAppInterval = 0;
+            setTimer(MONITOR_DAR, 60);
+            break;
+        }
         default:
         {
             break;
         }
     }
+}
+
+
+int ODAR::getAndResetPacketCreatedCount()
+{
+    int i = pktCountInterval;
+    pktCountInterval = 0;
+    return i;
 }
 
 
@@ -160,6 +196,7 @@ void ODAR::fromApplicationLayer(cPacket *pkt, const char *destination)
     }
     
     pktCount++;
+    pktCountInterval++;
 
     DeadlinePacket *dlp = dynamic_cast<DeadlinePacket *>(pkt);
 	if (!dlp)
@@ -355,6 +392,7 @@ void ODAR::fromMacLayer(cPacket *pkt, int srcMacAddress, double rssi, double lqi
             {
                 toApplicationLayer(decapsulatePacket(pkt));
                 pktCountToApp++;
+                pktCountToAppInterval++;
             }
             else
             {
@@ -561,7 +599,7 @@ void ODAR::fromMacLayer(cPacket *pkt, int srcMacAddress, double rssi, double lqi
                 }
                 txSuccessRates[srcMacAddress] = txSuccessRate;
             }
-            break;
+            //break;
 
             /*
             CDFs und routing table berechnen
@@ -598,6 +636,15 @@ void ODAR::fromMacLayer(cPacket *pkt, int srcMacAddress, double rssi, double lqi
             if (r == currRound)
             {
                 neighborCDFs_byMAC[srcMacAddress] = netPacket -> getCDF().getDoubleArray();
+                /*string cdf = "";
+                for (int i = 0; i < cdfSlots; i++){
+                    if(i%5 == 0)
+                    cdf += std::to_string(netPacket -> getCDF().getDoubleArray()[i]);
+                }
+                if(srcMacAddress == 3){
+                    trace() << cdf;
+                }*/
+
                 calculateCDF();
             }     
 
@@ -633,7 +680,12 @@ void ODAR::calculateCDF()
     int selfMacAdress = omac->getMacAdress();
     bool show = false;//selfMacAdress == 6 && getClock().dbl() > 900;
 
-   
+    set<unsigned int> deadNodes;
+    if(resilientVersion){
+        deadNodes = omac->detectDeadLinksAndNodes();
+    }
+    
+
     for (int slot_x = 0; slot_x < cdfSlots; slot_x++){
         double maxProb = 0.0;
         list<int> maxReceivers;
@@ -650,7 +702,13 @@ void ODAR::calculateCDF()
                     //if (neighborConvolutedCDFs_withoutACKs_byMAC[mac][slot_x] > ownConvolutedCDFs_withACKs[1][slot_x])
                     if (neighborConvolutedCDFs_withoutACKs_byMAC[mac][slot_x] > convoluteCDFAtSinglePosition(CDF_calculation,1,slot_x))
                     {
-                        candidateList.push_back(mac);
+                        if(!resilientVersion){
+                            candidateList.push_back(mac);
+                        } else {
+                            if(deadNodes.find(mac) == deadNodes.end()){
+                                candidateList.push_back(mac);
+                            }
+                        }
                     }
                 }
             }
@@ -908,7 +966,7 @@ void ODAR::broadcastControl()
     for (int i = 0; i < cdfSlots; i++){
         c[i] = CDF_calculation[i];
     }
-    //cfp.setDoubleArray(c); 
+    cfp.setDoubleArray(c); 
 
     // 3. Die von jedem einzelnen seiner Nachbarn erfolgreich gehörten Datenpakete. (vgl.: „Messung der Übertragungswahrscheinlichkeiten“)
     std::map<int,int> ohc;
