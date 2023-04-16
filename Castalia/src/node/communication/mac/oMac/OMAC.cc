@@ -50,6 +50,19 @@ void OMAC::startup()
     macState = MAC_STATE_ACTIVE;
     setTimer(KILL_NODE, FIRST_NODE_KILLED_AFTER);
 
+    // Logging the configuration
+    if(isSink){
+        string nodes = "";
+        for(int i: nodesToBeKilled){
+            std::stringstream ss;
+            ss << i;
+            nodes.append(ss.str());
+            nodes.append(", ");
+        }
+        trace() << "Nodes to be killed: " << nodes.substr(0, nodes.size()-2);
+        trace() << "First node killed after: " << KILL_INTERVAL;
+        trace() << "Node kill interval: " << FIRST_NODE_KILLED_AFTER;
+    }
 }
 
 int OMAC::getMacAdress()
