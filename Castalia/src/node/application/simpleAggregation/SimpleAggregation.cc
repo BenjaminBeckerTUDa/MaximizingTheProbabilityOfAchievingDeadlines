@@ -34,7 +34,6 @@ void SimpleAggregation::startup()
 
 	// Logging configuration parameters
 	if(isSink){
-		trace() << "---------------- CONFIGURATION ---------------";
     	trace() << "sendInterval: " << sendInterval*1000 << " ms";
     	trace() << "Simlulation time limit: " << ev.getConfig()->getConfigValue("sim-time-limit");
     	trace() << "Packet size: " << (double)par("packetSize") << " byte";

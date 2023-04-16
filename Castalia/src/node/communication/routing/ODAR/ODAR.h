@@ -122,7 +122,6 @@ private:
 
     bool minHopOnly;
 
-
     bool resilientVersion = false; // toggle resilient modifications to ODAR
     
     

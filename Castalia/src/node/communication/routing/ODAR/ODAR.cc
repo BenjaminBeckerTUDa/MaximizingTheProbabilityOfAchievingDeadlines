@@ -51,10 +51,12 @@ void ODAR::startup()
     /*
     minHop: use all nodes as forwarding set, which have a smaller hop-count towards the sink than the current node.
     */
-    
+
 
     if (isSink)
     {
+        trace() << "---------------- CONFIGURATION ---------------";
+        trace() << "resilientVersion: " << resilientVersion;
         sum_cdf_abs_differences = 1;
         packets_since_cdf_broadcast = 1;
         hopCount = 0; 
@@ -1449,15 +1451,15 @@ void ODAR::finish()
         //trace() << "channelBusy " << channelBusy;
         //trace() << "channelClear " << channelClear;
         //trace() << "reachedMaxRetriesCount " << reachedMaxRetriesCount;
-        trace() << "Total created data packets " << createdPackets;
-        trace() << "deadlineExpired " << deadlineExpired;
-        trace() << "arrivedInTime " << arrivedInTime;
-        trace() << "Deadline achievement ratio " << arrivedInTime / createdPackets;
-        trace() << "Total packets transmitted " << totalPacketsTransmitted;
-        trace() << "Total PDRs transmitted " << totalPdrsTransmitted;
-        trace() << "Total CDFs transmitted " << totalCdfsTransmitted;
-        trace() << "Total data packets transmitted " << totalDataPacketsTransmitted;
-        trace() << "Total kb transmitted " << totalBytesTransmitted / 1000;
+        trace() << "Finish - Total created data packets: " << createdPackets;
+        trace() << "Finish - deadlineExpired: " << deadlineExpired;
+        trace() << "Finish - arrivedInTime: " << arrivedInTime;
+        trace() << "Finish - Deadline achievement ratio: " << arrivedInTime / createdPackets;
+        trace() << "Finish - Total packets transmitted: " << totalPacketsTransmitted;
+        trace() << "Finish - Total PDRs transmitted: " << totalPdrsTransmitted;
+        trace() << "Finish - Total CDFs transmitted: " << totalCdfsTransmitted;
+        trace() << "Finish - Total data packets transmitted: " << totalDataPacketsTransmitted;
+        trace() << "Finish - Total kb transmitted: " << totalBytesTransmitted / 1000;
         //trace() << "channelBusyRatio " << channelBusy / (channelClear + channelBusy);
         
     }

@@ -106,7 +106,7 @@ private:
     /*--- Kill nodes configuration ---*/
     int KILL_INTERVAL = 60;
     int FIRST_NODE_KILLED_AFTER = 12000;
-    std::vector<int> nodesToBeKilled = {8, 16, 41, 50, 23, 4, 27, 39, 32, 56}; // exclude sink!
+    std::vector<int> nodesToBeKilled = {4, 5, 6, 7, 8}; // exclude sink!
 
 protected:
     void startup();

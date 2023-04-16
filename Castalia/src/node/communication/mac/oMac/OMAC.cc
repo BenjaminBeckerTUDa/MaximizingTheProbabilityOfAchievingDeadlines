@@ -60,8 +60,8 @@ void OMAC::startup()
             nodes.append(", ");
         }
         trace() << "Nodes to be killed: " << nodes.substr(0, nodes.size()-2);
-        trace() << "First node killed after: " << KILL_INTERVAL;
-        trace() << "Node kill interval: " << FIRST_NODE_KILLED_AFTER;
+        trace() << "First node killed after: " << KILL_INTERVAL << "s";
+        trace() << "Node kill interval: " << FIRST_NODE_KILLED_AFTER << "s";
     }
 }
 
@@ -673,7 +673,7 @@ set<unsigned int> OMAC::detectDeadLinksAndNodes()
     double now = getClock().dbl();
     for (auto const& entry : deadLinkDetectionTimestamps) {
         if((now - 605) > entry.second){
-            trace() << "Detected dead node/dead link from node " << entry.first << " to node " << SELF_MAC_ADDRESS;
+            //trace() << "Detected dead node/dead link from node " << entry.first << " to node " << SELF_MAC_ADDRESS;
             deadNodes.insert(entry.first);
         }
     }
