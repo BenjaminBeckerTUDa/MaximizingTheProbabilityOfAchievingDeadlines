@@ -32,6 +32,16 @@ void SimpleAggregation::startup()
 	double randomTime = (static_cast<double>(rand()) / static_cast<double>(RAND_MAX)) * sendInterval;
 	setTimer(SEND_AGGREGATED_VALUE, randomTime);
 
+	// Logging configuration parameters
+	if(isSink){
+		trace() << "---------------- CONFIGURATION ---------------";
+    	trace() << "sendInterval: " << sendInterval*1000 << " ms";
+    	trace() << "Simlulation time limit: " << ev.getConfig()->getConfigValue("sim-time-limit");
+    	trace() << "Packet size: " << (double)par("packetSize") << " byte";
+    	trace() << "Max TTD: " << (double)par("maxTTD") << " ms";
+	}
+	
+
 	// seed for random number generator
 }
 
@@ -50,7 +60,7 @@ void SimpleAggregation::timerFiredCallback(int index)
 
 		totalPackets++;
 		double randomTime = (static_cast<double>(rand()) / static_cast<double>(RAND_MAX)) * sendInterval + sendInterval / 2;
-		trace() << "application: toNetworkLayer; next in " << randomTime;
+		//trace() << "application: toNetworkLayer; next in " << randomTime;
 		setTimer(SEND_AGGREGATED_VALUE, randomTime);
 		break;
 	}
@@ -65,8 +75,8 @@ void SimpleAggregation::fromNetworkLayer(ApplicationPacket *rcvPacket,
 	// do the aggregation bit. For this example aggregation function is a simple max.
 	if (theData > aggregatedValue)
 		aggregatedValue = theData;
-	if (isSink)
-		trace() << "application: fromNetworkLayer from " << source << "received value " << theData;
+	//if (isSink)
+		//trace() << "application: fromNetworkLayer from " << source << "received value " << theData;
 }
 
 void SimpleAggregation::handleSensorReading(SensorReadingMessage *rcvReading)
@@ -78,5 +88,5 @@ void SimpleAggregation::handleSensorReading(SensorReadingMessage *rcvReading)
 
 void SimpleAggregation::handleNeworkControlMessage(cMessage *msg)
 {
-	trace() << "application: handleNeworkControlMessage " << msg->getKind();
+	//trace() << "application: handleNeworkControlMessage " << msg->getKind();
 }

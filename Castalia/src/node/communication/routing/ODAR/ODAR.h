@@ -104,6 +104,7 @@ private:
     int pktCountToApp = 0;
     int pktCountToAppInterval = 0;
     int deadlineExpiredCount = 0;
+    int intervalCounter = 1;
 
     int txCount = 0; // replaced by dataTransmissionTimes in resilient version
     std::vector<double> dataTransmissionTimes; // timestamps of transmitted packets
@@ -122,7 +123,7 @@ private:
     bool minHopOnly;
 
 
-    bool resilientVersion = true; // toggle resilient modifications to ODAR
+    bool resilientVersion = false; // toggle resilient modifications to ODAR
     
     
 
@@ -172,6 +173,7 @@ public:
     int getPacketDeadlineExpiredCount();
     int calculateTransmissionCount();
     void overheardPacket(double);
+    bool getResilientVersion();
     int getAndResetPacketCreatedCount();
 };
 

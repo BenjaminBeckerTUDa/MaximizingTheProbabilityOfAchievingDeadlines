@@ -48,10 +48,7 @@ void OMAC::startup()
         pktToNetBuffer.pop();
 
     macState = MAC_STATE_ACTIVE;
-
-    //nodesToBeKilled = {8, 15, 29, 30, 6, 22, 1, 21, 19, 14, 5, 11, 17, 27, 23, 18, 12, 20, 16, 28, 3, 26, 4, 7, 9, 2, 25, 10, 24, 13}; // exclude sink!
-    nodesToBeKilled = {};//{8, 6, 1, 5, 3, 4, 7, 9, 2}; // exclude sink!
-    setTimer(KILL_NODE, 1000);
+    setTimer(KILL_NODE, FIRST_NODE_KILLED_AFTER);
 
 }
 
@@ -139,7 +136,7 @@ void OMAC::timerFiredCallback(int timer)
             trace() << "Killing node " << node;
         }
         nodesToBeKilled.erase(nodesToBeKilled.begin());
-        setTimer(KILL_NODE, 60);
+        setTimer(KILL_NODE, KILL_INTERVAL);
         break;
     }
 
@@ -223,6 +220,10 @@ void OMAC::fromNetworkLayer(cPacket *netPkt, int destination)
     case OMAC_ROUTING_HOPCOUNT_PACKET:
     {
         macFrame->setOMacPacketKind(OMAC_CONTROL_PACKET);
+        totalPacketsTransmitted++;
+        totalPacketsTransmittedInterval++;
+        totalBytesTransmittedInterval += macFrame->getByteLength();
+        totalBytesTransmitted += macFrame->getByteLength();
         toRadioLayer(macFrame);
         toRadioLayer(createRadioCommand(SET_STATE, TX));
         hopCountTransmission++;
@@ -232,6 +233,12 @@ void OMAC::fromNetworkLayer(cPacket *netPkt, int destination)
     case OMAC_ROUTING_CONTROL_PACKET:
     {
         macFrame->setOMacPacketKind(OMAC_CONTROL_PACKET);
+        totalCdfsTransmitted ++;
+        totalCdfsTransmittedInterval ++;
+        totalPacketsTransmittedInterval++;
+        totalPacketsTransmitted++;
+        totalBytesTransmittedInterval += macFrame->getByteLength();
+        totalBytesTransmitted += macFrame->getByteLength();
         toRadioLayer(macFrame);
         toRadioLayer(createRadioCommand(SET_STATE, TX));
         controlTransmission++;
@@ -242,6 +249,12 @@ void OMAC::fromNetworkLayer(cPacket *netPkt, int destination)
     {
         //trace() << "sending PDR";
         macFrame->setOMacPacketKind(OMAC_PDR_PACKET);
+        totalPdrsTransmitted ++;
+        totalPdrsTransmittedInterval ++;
+        totalPacketsTransmittedInterval++;
+        totalPacketsTransmitted++;
+        totalBytesTransmittedInterval += macFrame->getByteLength();
+        totalBytesTransmitted += macFrame->getByteLength();
         toRadioLayer(macFrame);
         toRadioLayer(createRadioCommand(SET_STATE, TX));
         controlTransmission++;
@@ -252,6 +265,12 @@ void OMAC::fromNetworkLayer(cPacket *netPkt, int destination)
     {
         //trace() << "sending CDF";
         macFrame->setOMacPacketKind(OMAC_CDF_PACKET);
+        totalCdfsTransmitted ++;
+        totalCdfsTransmittedInterval ++;
+        totalPacketsTransmittedInterval++;
+        totalPacketsTransmitted++;
+        totalBytesTransmittedInterval += macFrame->getByteLength();
+        totalBytesTransmitted += macFrame->getByteLength();
         toRadioLayer(macFrame);
         toRadioLayer(createRadioCommand(SET_STATE, TX));
         controlTransmission++;
@@ -436,6 +455,10 @@ void OMAC::handleSendAck()
         
         //trace() << "node " << SELF_MAC_ADDRESS << " is sending ACK to node " << ackPkt->getDestination() << " for Packet ID " << packetId;
 
+        totalPacketsTransmittedInterval++;
+        totalPacketsTransmitted++;
+        totalBytesTransmittedInterval += ackPkt->getByteLength();
+        totalBytesTransmitted += ackPkt->getByteLength();
         toRadioLayer(ackPkt);
         toRadioLayer(createRadioCommand(SET_STATE, TX));
         ackBuffer.pop();
@@ -528,6 +551,10 @@ void OMAC::sendDataPacket()
 
     if (macFrame->getOMacPacketKind() == OMAC_CONTROL_PACKET)
     {
+        totalPacketsTransmittedInterval++;
+        totalPacketsTransmitted++;
+        totalBytesTransmittedInterval += macFrame->getByteLength();
+        totalBytesTransmitted += macFrame->getByteLength();
         toRadioLayer(macFrame->dup());
         toRadioLayer(createRadioCommand(SET_STATE, TX));
         setMacState(MAC_STATE_IN_TX, "sent hop count packet");
@@ -572,6 +599,12 @@ void OMAC::sendDataPacket()
     ReceiversContainer receiversListContainer = macFrame->getReceiversContainer();
     //trace() << "size of receiversListContainer: " << receiversListContainer.getReceivers().size();
 
+    totalPacketsTransmittedInterval++;
+    totalPacketsTransmitted++;
+    totalDataPacketsTransmitted++;
+    totalDataPacketsTransmittedInterval++;
+    totalBytesTransmittedInterval += macFrame->getByteLength();
+    totalBytesTransmitted += macFrame->getByteLength();
     toRadioLayer(macFrame->dup());
     toRadioLayer(createRadioCommand(SET_STATE, TX));
 }
@@ -625,10 +658,10 @@ set<unsigned int> OMAC::detectDeadLinksAndNodes()
 {
     set<unsigned int> deadNodes;
     double now = getClock().dbl();
-    for (auto const& [key, value] : deadLinkDetectionTimestamps) {
-        if((now - 605) > value){
-            trace() << "Detected dead node/dead link from node " << key << " to node " << SELF_MAC_ADDRESS;
-            deadNodes.insert(key);
+    for (auto const& entry : deadLinkDetectionTimestamps) {
+        if((now - 605) > entry.second){
+            trace() << "Detected dead node/dead link from node " << entry.first << " to node " << SELF_MAC_ADDRESS;
+            deadNodes.insert(entry.first);
         }
     }
     return deadNodes;
@@ -664,6 +697,49 @@ int OMAC::getChannelBusyCount()
 int OMAC::getMaxRetriesCount()
 {
     return reachedMaxRetriesCount;
+}
+
+int OMAC::getTotalBytesTransmitted()
+{
+    return totalBytesTransmitted;
+}
+
+int OMAC::getTotalPdrsTransmitted()
+{
+    return totalPdrsTransmitted;
+}
+
+int OMAC::getTotalCdfsTransmitted()
+{
+    return totalCdfsTransmitted;
+}
+
+int OMAC::getTotalDataPacketsTransmitted()
+{
+    return totalDataPacketsTransmitted;
+}
+
+int OMAC::getTotalPacketsTransmitted()
+{
+    return totalPacketsTransmitted;
+}
+
+map<string, int> OMAC::getAndResetIntervalCounters()
+{
+    map<string, int> counters;
+    counters.insert(pair<string, int>("totalPacketsTransmittedInterval", totalPacketsTransmittedInterval));
+    counters.insert(pair<string, int>("totalBytesTransmittedInterval", totalBytesTransmittedInterval));
+    counters.insert(pair<string, int>("totalPdrsTransmittedInterval", totalPdrsTransmittedInterval));
+    counters.insert(pair<string, int>("totalCdfsTransmittedInterval", totalCdfsTransmittedInterval));
+    counters.insert(pair<string, int>("totalDataPacketsTransmittedInterval", totalDataPacketsTransmittedInterval));
+    
+    totalPacketsTransmittedInterval = 0;
+    totalBytesTransmittedInterval = 0;
+    totalPdrsTransmittedInterval = 0;
+    totalCdfsTransmittedInterval = 0;
+    totalDataPacketsTransmittedInterval = 0;
+
+    return counters;
 }
 
 void OMAC::finishSpecific()

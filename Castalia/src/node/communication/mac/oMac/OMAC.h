@@ -87,8 +87,26 @@ private:
     bool isSink;
     int transmissionID_;
 
-    std::vector<int> nodesToBeKilled;
+    /*--- Dead Link Detection ---*/
     map<int, double> deadLinkDetectionTimestamps;
+
+    /*--- Logging variables ---*/
+    int totalPacketsTransmitted = 0;
+    int totalBytesTransmitted = 0;
+    int totalPdrsTransmitted = 0;
+    int totalCdfsTransmitted = 0;
+    int totalDataPacketsTransmitted = 0;
+
+    int totalPacketsTransmittedInterval = 0;
+    int totalBytesTransmittedInterval = 0;
+    int totalPdrsTransmittedInterval = 0;
+    int totalCdfsTransmittedInterval = 0;
+    int totalDataPacketsTransmittedInterval = 0;
+
+    /*--- Kill nodes configuration ---*/
+    int KILL_INTERVAL = 60;
+    int FIRST_NODE_KILLED_AFTER = 12000;
+    std::vector<int> nodesToBeKilled = {8, 16, 41, 50, 23, 4, 27, 39, 32, 56}; // exclude sink!
 
 protected:
     void startup();
@@ -128,6 +146,12 @@ public:
     int getChannelClearCount();
     int getChannelBusyCount();
     int getMaxRetriesCount();
+    int getTotalPacketsTransmitted();
+    int getTotalBytesTransmitted();
+    int getTotalPdrsTransmitted();
+    int getTotalCdfsTransmitted();
+    int getTotalDataPacketsTransmitted();
+    map<string, int> getAndResetIntervalCounters();
     set<unsigned int> detectDeadLinksAndNodes();
 
 };

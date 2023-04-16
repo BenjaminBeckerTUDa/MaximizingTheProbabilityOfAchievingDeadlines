@@ -18,7 +18,7 @@ package node.application.simpleAggregation;
 simple SimpleAggregation like node.application.iApplication {
  parameters:
  	string applicationID = default ("simpleAggregation");
-	bool collectTraceInfo = default (true);
+	bool collectTraceInfo = true;//default (true);
 	int priority = default (1);
 	int packetHeaderOverhead = default (8);	// in bytes
 	int constantDataPayload = default (2);	// in bytes

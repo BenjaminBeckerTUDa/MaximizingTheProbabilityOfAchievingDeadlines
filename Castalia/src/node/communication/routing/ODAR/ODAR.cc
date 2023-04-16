@@ -161,11 +161,44 @@ void ODAR::timerFiredCallback(int timer)
                     flag = false;
             }
 
-            trace() << "deadlineachievementratio: " << pktCountToAppInterval / createdPackets;
-            trace() << "pktCountToAppInterval: " << pktCountToAppInterval;
-            trace() << "createdPackets: " <<  createdPackets;
+            flag = true;
+            id = 1;
+            int totalPacketsTransmittedInterval = 0;
+            int totalBytesTransmittedInterval = 0;
+            int totalPdrsTransmittedInterval = 0;
+            int totalCdfsTransmittedInterval = 0;
+            int totalDataPacketsTransmittedInterval = 0;
+            while (flag)
+            {
+                cModule *node_ = getParentModule()->getParentModule()->getParentModule()->getSubmodule("node",id);
+                if (node_)
+                {
+                    OMAC *omacInstance = dynamic_cast<OMAC*> (getParentModule()->getParentModule()->getParentModule()->getSubmodule("node",id)->getSubmodule("Communication")->getSubmodule("MAC"));
+                    map<string, int> counters = omacInstance->getAndResetIntervalCounters();
+                    totalPacketsTransmittedInterval += counters["totalPacketsTransmittedInterval"];
+                    totalBytesTransmittedInterval += counters["totalBytesTransmittedInterval"];
+                    totalPdrsTransmittedInterval += counters["totalPdrsTransmittedInterval"];
+                    totalCdfsTransmittedInterval += counters["totalCdfsTransmittedInterval"];
+                    totalDataPacketsTransmittedInterval += counters["totalDataPacketsTransmittedInterval"];
+                    id ++;
+                }	
+                else
+                    flag = false;
+            }
+
+            trace() << "----------------- INTERVAL " << intervalCounter << " -----------------";
+            trace() << "Deadline achievement ratio: " << pktCountToAppInterval / createdPackets;
+            trace() << "Created packets: " <<  createdPackets;
+            trace() << "Packets arrived at AppLayer: " << pktCountToAppInterval;
+            trace() << "Total packets transmitted: " << totalPacketsTransmittedInterval;
+            trace() << "Total bytes transmitted: " << totalBytesTransmittedInterval;
+            trace() << "Total PDRs transmitted: " << totalPdrsTransmittedInterval;
+            trace() << "Total CDFs transmitted: " << totalCdfsTransmittedInterval;
+            trace() << "Total data packets transmitted: " << totalDataPacketsTransmittedInterval;
+
             pktCountToAppInterval = 0;
             setTimer(MONITOR_DAR, 60);
+            intervalCounter += 1;
             break;
         }
         default:
@@ -295,12 +328,12 @@ void ODAR::handleNetworkControlCommand(cMessage *pkt)
                 dataReceivedTimes[srcMacAddress].push_back(time);
 
                 // remove all received packet timestamps older than 180s
-                for(auto& [key, value]: dataReceivedTimes) {
-                    std::vector<double>::iterator it = value.begin();
+                for(auto& entry: dataReceivedTimes) {
+                    std::vector<double>::iterator it = entry.second.begin();
                     double now = getClock().dbl();
-                    while(it != value.end()){
+                    while(it != entry.second.end()){
                         if ((now - 180) > *it){
-                            it = value.erase(it);
+                            it = entry.second.erase(it);
                         } else {
                             it++;
                         }
@@ -1360,12 +1393,17 @@ void ODAR::finish()
 				flag = false;
 		}
 
-        /*flag = true;
+        flag = true;
 		id = 1;
-		double channelBusy = 0;
-        double channelClear = 0;
-        double channelBusyRatio;
-        double reachedMaxRetriesCount = 0;
+		//double channelBusy = 0;
+        //double channelClear = 0;
+        //double channelBusyRatio;
+        //double reachedMaxRetriesCount = 0;
+        double totalPacketsTransmitted = 0;
+        double totalBytesTransmitted = 0;
+        double totalPdrsTransmitted = 0;
+        double totalCdfsTransmitted = 0;
+        double totalDataPacketsTransmitted = 0;
 
 		while (flag)
 		{
@@ -1373,21 +1411,26 @@ void ODAR::finish()
 			if (node_)
 			{
 				OMAC *omacInstance = dynamic_cast<OMAC*> (getParentModule()->getParentModule()->getParentModule()->getSubmodule("node",id)->getSubmodule("Communication")->getSubmodule("MAC"));
-				channelBusy += omacInstance->getChannelBusyCount();
-                channelClear += omacInstance->getChannelClearCount();
-                channelBusyRatio += omacInstance->getChannelBusyCount() / (omacInstance->getChannelBusyCount() + omacInstance->getChannelClearCount());
-                reachedMaxRetriesCount += omacInstance->getMaxRetriesCount();
+				//channelBusy += omacInstance->getChannelBusyCount();
+                //channelClear += omacInstance->getChannelClearCount();
+                //channelBusyRatio += omacInstance->getChannelBusyCount() / (omacInstance->getChannelBusyCount() + omacInstance->getChannelClearCount());
+                //reachedMaxRetriesCount += omacInstance->getMaxRetriesCount();
+                totalPacketsTransmitted += omacInstance->getTotalPacketsTransmitted();
+                totalBytesTransmitted += omacInstance->getTotalBytesTransmitted();
+                totalPdrsTransmitted += omacInstance->getTotalPdrsTransmitted();
+                totalCdfsTransmitted += omacInstance->getTotalCdfsTransmitted();
+                totalDataPacketsTransmitted += omacInstance->getTotalDataPacketsTransmitted();
 				id ++;
 			}	
 			else
 				flag = false;
 		}
-        channelBusyRatio /=id;*/
+        //channelBusyRatio /=id;
 
         double arrivedInTime = pktCountToApp;
 
-        trace() << "NETWORK-STATS:";
-        if (minHopOnly){
+        trace() << "----------------- NETWORK-STATS -----------------";
+        /*if (minHopOnly){
             trace() << "Min-Hop";
         }
         else
@@ -1401,19 +1444,22 @@ void ODAR::finish()
 
         if (potentialReceiverSetsStrategy == CLIQUES){
             trace() << "potentialReceiverSetsStrategy = CLIQUES";
-        }
-
-
-
+        }*/
 
         //trace() << "channelBusy " << channelBusy;
         //trace() << "channelClear " << channelClear;
         //trace() << "reachedMaxRetriesCount " << reachedMaxRetriesCount;
-        trace() << "createdPackets " << createdPackets;
+        trace() << "Total created data packets " << createdPackets;
         trace() << "deadlineExpired " << deadlineExpired;
         trace() << "arrivedInTime " << arrivedInTime;
-        trace() << "deadlineachievementratio " << arrivedInTime / createdPackets;
+        trace() << "Deadline achievement ratio " << arrivedInTime / createdPackets;
+        trace() << "Total packets transmitted " << totalPacketsTransmitted;
+        trace() << "Total PDRs transmitted " << totalPdrsTransmitted;
+        trace() << "Total CDFs transmitted " << totalCdfsTransmitted;
+        trace() << "Total data packets transmitted " << totalDataPacketsTransmitted;
+        trace() << "Total kb transmitted " << totalBytesTransmitted / 1000;
         //trace() << "channelBusyRatio " << channelBusy / (channelClear + channelBusy);
+        
     }
 
 
@@ -1477,4 +1523,10 @@ void ODAR::findPotentialReceiverSets() {
             break;
         }
     }
+}
+
+
+bool ODAR::getResilientVersion()
+{
+    return resilientVersion;
 }
