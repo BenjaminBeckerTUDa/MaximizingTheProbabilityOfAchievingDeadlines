@@ -122,9 +122,9 @@ private:
 
     bool minHopOnly;
 
-    bool resilientVersion = false; // toggle resilient modifications to ODAR
+    bool resilientVersion = true; // toggle resilient modifications to ODAR
     
-    
+    map<int, int> packetCountToAppIntervalPerNode;
 
 
     /*--- The .ned file's parameters ---*/
@@ -174,6 +174,7 @@ public:
     void overheardPacket(double);
     bool getResilientVersion();
     int getAndResetPacketCreatedCount();
+    void debugTrace(int);
 };
 
 #endif // ODARMODULE

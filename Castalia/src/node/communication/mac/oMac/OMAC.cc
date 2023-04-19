@@ -369,6 +369,7 @@ void OMAC::fromRadioLayer(cPacket *pkt, double RSSI, double LQI)
         ackPkt->setDestination(source);
         ackPkt->setPacketId(packetId);
         ackPkt->setTransmissionID(transmissionId);
+        ackPkt->setByteLength(11);
         ackBuffer.push(ackPkt);
 
         waitTimeout = TX_TIME(ackPacketSize + 2);

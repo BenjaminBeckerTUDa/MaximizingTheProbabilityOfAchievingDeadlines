@@ -146,7 +146,25 @@ void ODAR::timerFiredCallback(int timer)
         case MONITOR_DAR:
         {
             bool flag = true;
-		    int id = 1;
+            int id = 1;
+            while (flag)
+            {
+                cModule *node_ = getParentModule()->getParentModule()->getParentModule()->getSubmodule("node",id);
+                if (node_)
+                {
+                    ODAR *odarInstance = dynamic_cast<ODAR*> (getParentModule()->getParentModule()->getParentModule()->getSubmodule("node",id)->getSubmodule("Communication")->getSubmodule("Routing"));
+                    if(intervalCounter > 1 && intervalCounter < 117) {
+                        odarInstance->debugTrace(packetCountToAppIntervalPerNode[id]);
+                        packetCountToAppIntervalPerNode[id] = 0;
+                    }
+                    id ++;
+                }	
+                else
+                    flag = false;
+            }
+
+            flag = true;
+		    id = 1;
 		    double createdPackets = 0;
             //double deadlineExpired = 0;
 		    while (flag)
@@ -198,6 +216,9 @@ void ODAR::timerFiredCallback(int timer)
             trace() << "Total CDFs transmitted: " << totalCdfsTransmittedInterval;
             trace() << "Total data packets transmitted: " << totalDataPacketsTransmittedInterval;
 
+            
+
+
             pktCountToAppInterval = 0;
             setTimer(MONITOR_DAR, 60);
             intervalCounter += 1;
@@ -210,6 +231,36 @@ void ODAR::timerFiredCallback(int timer)
     }
 }
 
+
+void ODAR::debugTrace(int packetCountToAppIntervalPerNode)
+{
+    string s = "CDF: ";
+    string s2 = "Routing table: ";
+    for(int i = 0; i< 100; i++){
+        if(i % 5 == 0) {
+            s += std::to_string(CDF_calculation[i]) + ",";
+            list<int> x = routingTable_inUse[i];
+            s2 += "(";
+            for(int y: x){
+                s2 += std::to_string(y) + ",";
+            }
+            s2 += ")";
+        }
+    }
+
+    trace() << s;
+    trace() << s2;
+
+    trace() << "packetCountToAppIntervalPerNode: " << packetCountToAppIntervalPerNode;
+    trace() << pktCountInterval;
+    if(pktCountInterval > 0){
+        trace() << "DA Ratio: " << packetCountToAppIntervalPerNode/pktCountInterval;
+        
+    }
+    
+
+
+}
 
 int ODAR::getAndResetPacketCreatedCount()
 {
@@ -425,6 +476,12 @@ void ODAR::fromMacLayer(cPacket *pkt, int srcMacAddress, double rssi, double lqi
 
             if (isSink)
             {
+                int nodeId = std::stoi(netPacket->getSource());
+                if(packetCountToAppIntervalPerNode.find(nodeId) == packetCountToAppIntervalPerNode.end()){
+                    packetCountToAppIntervalPerNode.insert({nodeId, 0});
+                }
+                packetCountToAppIntervalPerNode[nodeId]++;
+                //trace() << nodeId << ": " << packetCountToAppIntervalPerNode[nodeId];
                 toApplicationLayer(decapsulatePacket(pkt));
                 pktCountToApp++;
                 pktCountToAppInterval++;

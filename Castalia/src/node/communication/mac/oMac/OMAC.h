@@ -104,9 +104,9 @@ private:
     int totalDataPacketsTransmittedInterval = 0;
 
     /*--- Kill nodes configuration ---*/
-    int KILL_INTERVAL = 60;
-    int FIRST_NODE_KILLED_AFTER = 12000;
-    std::vector<int> nodesToBeKilled = {4, 5, 6, 7, 8}; // exclude sink!
+    int KILL_INTERVAL = 10000;
+    int FIRST_NODE_KILLED_AFTER = 20000;
+    std::vector<int> nodesToBeKilled = {}; // exclude sink!
 
 protected:
     void startup();
