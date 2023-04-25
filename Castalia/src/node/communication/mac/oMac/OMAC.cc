@@ -126,7 +126,7 @@ void OMAC::timerFiredCallback(int timer)
 
 void OMAC::resetDefaultState(const char *descr)
 {
-    simtime_t randomContentionInterval = genk_dblrand(1) * contentionPeriod;
+    simtime_t randomContentionInterval = genk_dblrand(1) * contentionPeriod; // genk_dblrand ist was??
     while (!TXBuffer.empty())
     {
         if (txRetries <= 0)
@@ -161,7 +161,6 @@ void OMAC::fromNetworkLayer(cPacket *netPkt, int destination)
     {
         return;
     }
-
     OMacPacket *macFrame = new OMacPacket("OMAC data packet", MAC_LAYER_PACKET);
     encapsulatePacket(macFrame, netPkt);
     macFrame->setSource(SELF_MAC_ADDRESS);
@@ -200,6 +199,7 @@ void OMAC::fromNetworkLayer(cPacket *netPkt, int destination)
         toRadioLayer(macFrame);
         toRadioLayer(createRadioCommand(SET_STATE, TX));
         hopCountTransmission++;
+        trace() << "GEHHTTT";
         break;
     }
 

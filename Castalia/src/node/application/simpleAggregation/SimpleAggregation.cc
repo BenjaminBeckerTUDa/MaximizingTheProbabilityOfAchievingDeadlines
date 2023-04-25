@@ -45,7 +45,6 @@ void SimpleAggregation::timerFiredCallback(int index)
 		newPacket->setSequenceNumber(totalPackets);
 		newPacket->setByteLength(packetSize);
 		newPacket->setDeadline(maxTTD + (getClock().dbl()*1000) );
-
 		toNetworkLayer(newPacket, "sink");
 
 		totalPackets++;
