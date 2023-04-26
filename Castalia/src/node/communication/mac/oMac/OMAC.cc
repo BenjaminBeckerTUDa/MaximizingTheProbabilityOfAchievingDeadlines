@@ -147,6 +147,7 @@ void OMAC::timerFiredCallback(int timer)
             OMacPacket *macFrame = new OMacPacket("OMAC data packet", DESTROY_NODE);
             toRadioLayer(macFrame);
             trace() << "Killing node " << node;
+            nodeAlive = false;
         }
         nodesToBeKilled.erase(nodesToBeKilled.begin());
         setTimer(KILL_NODE, KILL_INTERVAL);
@@ -159,6 +160,13 @@ void OMAC::timerFiredCallback(int timer)
     }
     }
 }
+
+
+bool OMAC::getNodeAlive()
+{
+    return nodeAlive;
+}
+
 
 void OMAC::resetDefaultState(const char *descr)
 {

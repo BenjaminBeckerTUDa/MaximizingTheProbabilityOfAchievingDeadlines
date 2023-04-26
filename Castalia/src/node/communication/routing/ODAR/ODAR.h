@@ -126,6 +126,10 @@ private:
     
     map<int, int> packetCountToAppIntervalPerNode;
 
+    //
+    int * test123 = new int[10]{0};
+    int test123counter = 0;
+
 
     /*--- The .ned file's parameters ---*/
     simtime_t hopCountPeriod;

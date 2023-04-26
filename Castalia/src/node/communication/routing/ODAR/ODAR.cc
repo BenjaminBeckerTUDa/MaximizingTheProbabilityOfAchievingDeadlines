@@ -22,6 +22,9 @@ void ODAR::startup()
 
 
     cdfSlots = (int) par("cdfSlots"); // number of slots used for the CDF; granularity, which changes the accuracy of deadline-achievement-probability-predictions
+    for(int i = 0; i<10; i++){
+        test123[i] = cdfSlots - 1;
+    }
 
     // no previous PDR/CDF broadcast has taken place, since we are starting up
     lastPdrBroadcast = -1;
@@ -248,7 +251,7 @@ void ODAR::debugTrace(int packetCountToAppIntervalPerNode)
         }
     }
 
-    trace() << s;
+    /* trace() << s;
     trace() << s2;
 
     trace() << "packetCountToAppIntervalPerNode: " << packetCountToAppIntervalPerNode;
@@ -256,7 +259,7 @@ void ODAR::debugTrace(int packetCountToAppIntervalPerNode)
     if(pktCountInterval > 0){
         trace() << "DA Ratio: " << packetCountToAppIntervalPerNode/pktCountInterval;
         
-    }
+    } */
     
 
 
@@ -278,6 +281,13 @@ void ODAR::fromApplicationLayer(cPacket *pkt, const char *destination)
     }
 
     if(!resilientVersion && receiversByHopcount.empty()) {
+        return;
+    }
+
+    OMAC *omacInstance = dynamic_cast<OMAC*> (getParentModule()->getSubmodule("MAC"));
+	bool nodeAlive = omacInstance->getNodeAlive();
+
+    if(!nodeAlive) {
         return;
     }
     
@@ -538,6 +548,10 @@ void ODAR::fromMacLayer(cPacket *pkt, int srcMacAddress, double rssi, double lqi
 
                     sum_cdf_abs_differences += difference;
                     packets_since_cdf_broadcast++;
+
+                    test123[test123counter] = slot;
+                    test123counter++;
+                    test123counter = test123counter % 10;
                 }
 
                 toMacLayer(dupPacket, BROADCAST_MAC_ADDRESS); // sure?
@@ -1240,6 +1254,12 @@ void ODAR::checkCdfBroadcast()
     } else {
         avg_difference = sum_cdf_abs_differences / packets_since_cdf_broadcast;
     }
+
+    double test123sum = 0;
+    for(int i = 0; i<10; i++){
+        test123sum += abs(CDF_transmitted[test123[i]] - CDF_calculation[test123[i]]);
+    }
+    avg_difference = test123sum / 10;
     
     // calculate CDF broadcast timer
     int result;

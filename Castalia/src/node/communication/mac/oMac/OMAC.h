@@ -104,9 +104,10 @@ private:
     int totalDataPacketsTransmittedInterval = 0;
 
     /*--- Kill nodes configuration ---*/
-    int KILL_INTERVAL = 10000;
-    int FIRST_NODE_KILLED_AFTER = 20000;
+    int KILL_INTERVAL = 60;
+    int FIRST_NODE_KILLED_AFTER = 12000;
     std::vector<int> nodesToBeKilled = {}; // exclude sink!
+    bool nodeAlive = true;
 
 protected:
     void startup();
@@ -153,6 +154,7 @@ public:
     int getTotalDataPacketsTransmitted();
     map<string, int> getAndResetIntervalCounters();
     set<unsigned int> detectDeadLinksAndNodes();
+    bool getNodeAlive();
 
 };
 
