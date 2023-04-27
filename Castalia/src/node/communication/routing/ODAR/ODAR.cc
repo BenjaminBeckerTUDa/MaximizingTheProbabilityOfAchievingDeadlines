@@ -41,7 +41,7 @@ void ODAR::startup()
 
     If the received round is larger than the own round, then:
       - the own round is updated to the received round 
-      - a new empty routing table (routingTable_calculation) is allocated (but not yet used). This table will be updated several times (steps explained below) and will become operational (i.e. used for forwarding decisions) the next time a sequence number larger than the own is received (when these steps here are applied the next time and a new routingTable_calculation is allocated).
+      - a new empty routing table (routingTable_inUse) is allocated (but not yet used). This table will be updated several times (steps explained below) and will become operational (i.e. used for forwarding decisions) the next time a sequence number larger than the own is received (when these steps here are applied the next time and a new routingTable_inUse is allocated).
       - all locally stored CDFs of neighbors and the nodes own CDF are erased.
       - what is not implemented yet, but should be done: all link succes-rates are calculated from the current histograms.
 
@@ -68,7 +68,7 @@ void ODAR::startup()
         {
             CDF_calculation[i]=1; // the sinks CDF is set to 1 for each time-to-deadline
         }
-        setTimer(INC_ROUND, hopCountPeriod*3); // the sink increments its round in fixed time-intervals
+        //setTimer(INC_ROUND, hopCountPeriod*3); // the sink increments its round in fixed time-intervals
         setTimer(MONITOR_DAR, 60);
     }
     else
@@ -77,7 +77,7 @@ void ODAR::startup()
         CDF_calculation = new double[cdfSlots]{0}; // the nodes CDF is initialized by 0 for each time-to-deadline
         list<int> x;
         for (int i = 0; i < cdfSlots; i++){
-            routingTable_calculation.insert({i, x}); // routing table is empty; see "currRound" for more information
+            routingTable_inUse.insert({i, x}); // routing table is empty; see "currRound" for more information
             routingTable_inUse.insert({i, x}); // routing table is empty; see "currRound" for more information
         }
     }
@@ -629,7 +629,7 @@ void ODAR::fromMacLayer(cPacket *pkt, int srcMacAddress, double rssi, double lqi
 
                 for (int i = 0; i < cdfSlots; i++){
                     list<int> y;
-                    for (int node : routingTable_calculation[i])
+                    for (int node : routingTable_inUse[i])
                     {
                         y.push_back(node);
                     }
@@ -637,7 +637,7 @@ void ODAR::fromMacLayer(cPacket *pkt, int srcMacAddress, double rssi, double lqi
                     routingTable_inUse[i] = y;
 
                     list<int> x;
-                    routingTable_calculation.insert({i, x});
+                    routingTable_inUse.insert({i, x});
                     CDF_calculation[i] = 0;
                 }
             }
@@ -726,7 +726,7 @@ void ODAR::fromMacLayer(cPacket *pkt, int srcMacAddress, double rssi, double lqi
 
                 for (int i = 0; i < cdfSlots; i++){
                     list<int> y;
-                    for (int node : routingTable_calculation[i])
+                    for (int node : routingTable_inUse[i])
                     {
                         y.push_back(node);
                     }
@@ -734,7 +734,7 @@ void ODAR::fromMacLayer(cPacket *pkt, int srcMacAddress, double rssi, double lqi
                     routingTable_inUse[i] = y;
 
                     list<int> x;
-                    routingTable_calculation.insert({i, x});
+                    routingTable_inUse.insert({i, x});
                     CDF_calculation[i] = 0;
                 }
             }
@@ -864,7 +864,7 @@ void ODAR::calculateCDF()
                 }
             }            
         }
-        routingTable_calculation[slot_x] = maxReceivers;
+        routingTable_inUse[slot_x] = maxReceivers;
         CDF_calculation[slot_x] = maxProb;
         if (show)
         {
@@ -1264,9 +1264,9 @@ void ODAR::checkCdfBroadcast()
     // calculate CDF broadcast timer
     int result;
     if(avg_difference == 0) {
-        result = 600;
+        result = 10;
     } else {
-        result = std::min((double)600, 6/avg_difference);
+        result = std::min((double) 10, 0.5/avg_difference);
     }
 
     double now = int(getClock().dbl());
