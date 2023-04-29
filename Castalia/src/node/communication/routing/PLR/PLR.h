@@ -62,6 +62,7 @@ class PLR: public VirtualRouting {
 	int* routingTable;		// routing table in use
 	int* routingTable_calc;		// routing table during calculations, which will be used in the next round
 	double* cdf;		// cdf of this node
+	std::map<int, double> monitoring_pdr; // used by plr; describes the ration of packets sent from x to y to the number of packets successfully received by y from x. monitoring_pdr[y] is calculated using sendCount from node x and receiveCount from y, which is transmitted using probe packets.
 
 
 // used for average delay only
@@ -102,21 +103,21 @@ class PLR: public VirtualRouting {
 	int monitoring_receivedPacketsInTime;
 	int monitoring_slots_1;
 	double monitoring_slots;
-	std::map<int, int*> monitoring_forwardedTo;
-	std::map<int, int*> monitoring_receivedFrom;
-	std::map<int, int*> monitoring_probeTo;
-	std::map<int, int*> monitoring_probeFrom;
-	std::map<int, int*> monitoring_SourceOfsuccessfullyDeliveredPackets;
-	std::map<int, double> monitoring_fails;
-	std::map<int, double> monitoring_successes;
-	std::map<int, double> monitoring_pdr;
-	int* monitoring_receivedCDFs;
-	int* monitoring_broadcastedCDFs;
-	int* monitoring_receivedProbes;
-	int* monitoring_sentProbes;
-	int* monitoring_receivedData;
-	int* monitoring_sentData;
-	int* monitoring_droppedData;
+	// for the following monitoring variables, "time" in this comments refers to the timeslot during the simulations
+	std::map<int, int*> monitoring_forwardedTo; // whenever a data packet is forwarded from node x to node y, monitoring_forwardedTo[y][time]++
+	std::map<int, int*> monitoring_receivedFrom; // whenever a data packet is received by node x from node y, monitoring_receivedFrom[y][time]++
+	std::map<int, int*> monitoring_probeTo; // whenever a probe packet is send from node x to node y, monitoring_probeTo[y][time]++
+	std::map<int, int*> monitoring_probeFrom; // whenever a probe packet is received by node x from node y, monitoring_probeFrom[y][time]++
+	std::map<int, int*> monitoring_SourceOfsuccessfullyDeliveredPackets; // whenever a data packet is received within deadline by the sink node from node y, monitoring_SourceOfsuccessfullyDeliveredPackets[y][time]++
+	std::map<int, double> monitoring_fails; // irrelevant
+	std::map<int, double> monitoring_successes; // irrelevant
+	int* monitoring_receivedCDFs; // whenever a cdf packet is received by node x, monitoring_receivedCDFs[time]++
+	int* monitoring_broadcastedCDFs; // whenever a cdf packet is broadcasted by node x, monitoring_broadcastedCDFs[time]++
+	int* monitoring_receivedProbes; // whenever a probe packet is received by node x, monitoring_receivedProbes[time]++
+	int* monitoring_sentProbes; // whenever a probe packet is send by node x, monitoring_sentProbes[time]++
+	int* monitoring_receivedData; // whenever a data packet is received by node x, monitoring_receivedData[time]++
+	int* monitoring_sentData; // whenever a data packet is send by node x, monitoring_sentData[time]++
+	int* monitoring_droppedData; // whenever a data packet is dropped by node x at the net layer (i.e., the routing table had no entry for the specific ttd, or ttd < 0), monitoring_droppedData[time]++
 
  public:
 	int test();		// for monitoring
