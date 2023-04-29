@@ -95,16 +95,16 @@ class PLR: public VirtualRouting {
 
 // for monitoring
 // the following parameters are used for monitoring and logging of network statistics only.
-	double riceK;
-	int appSendInterval;
-	int txRetries;
-	double* cdf_forTrace;
-	double simTime;
-	int monitoring_receivedPacketsInTime;
-	int monitoring_slots_1;
-	double monitoring_slots;
+	double riceK; // to output parameter from PHY
+	int appSendInterval; // to output parameter from APP
+	int txRetries; // to output parameter from MAC
+	double* cdf_forTrace; // cdf used during last round; so when cdfs get reset at the beginning of a new round, we can output the cdf from last round at the end of simulation
+	double simTime; // irrelevant
+	int monitoring_receivedPacketsInTime; // number of packets received in time by the sink.
+	int monitoring_slots_1; // = monitoring_slots + 1
+	double monitoring_slots; // number of slots used for monitoring of an experiment. slots are used to monitor statistics over time, slotted in intervals of equal size
 	// for the following monitoring variables, "time" in this comments refers to the timeslot during the simulations
-	std::map<int, int*> monitoring_forwardedTo; // whenever a data packet is forwarded from node x to node y, monitoring_forwardedTo[y][time]++
+	std::map<int, int*> monitoring_forwardedTo; // whenever a data packet is forwarded from node x to node y, monitoring_forwardedTo[y][time]++. special values: monitoring_forwardedTo[-1][time] is used for dropped packets. monitoring_forwardedTo[0][time] is used for packets received at the sink in time.  
 	std::map<int, int*> monitoring_receivedFrom; // whenever a data packet is received by node x from node y, monitoring_receivedFrom[y][time]++
 	std::map<int, int*> monitoring_probeTo; // whenever a probe packet is send from node x to node y, monitoring_probeTo[y][time]++
 	std::map<int, int*> monitoring_probeFrom; // whenever a probe packet is received by node x from node y, monitoring_probeFrom[y][time]++
