@@ -23,14 +23,14 @@ void ODAR::startup()
 
     cdfSlots = (int) par("cdfSlots"); // number of slots used for the CDF; granularity, which changes the accuracy of deadline-achievement-probability-predictions
     for(int i = 0; i<10; i++){
-        test123[i] = cdfSlots - 1;
+        storedCdfSlots[i] = cdfSlots - 1;
     }
 
     // no previous PDR/CDF broadcast has taken place, since we are starting up
-    lastPdrBroadcast = -1;
+    lastPdrBroadcast = -1; // can be merged with lastCdfBroadcast in next line
     lastCdfBroadcast = -1;
-    sum_cdf_abs_differences = 0;
-    packets_since_cdf_broadcast = 0;
+    sum_cdf_abs_differences = 0; // not needed anymore
+    packets_since_cdf_broadcast = 0; // not needed anymore
     CDF_transmitted = new double[cdfSlots]{0};
 
     currRound = 0; // rounds are used to avoid the count to infinity problem:
@@ -60,8 +60,8 @@ void ODAR::startup()
     {
         trace() << "---------------- CONFIGURATION ---------------";
         trace() << "resilientVersion: " << resilientVersion;
-        sum_cdf_abs_differences = 1;
-        packets_since_cdf_broadcast = 1;
+        sum_cdf_abs_differences = 1; // not needed anymore
+        packets_since_cdf_broadcast = 1; // not needed anymore
         hopCount = 0; 
         CDF_calculation = new double[cdfSlots]{0};
         for (int i = 0; i < cdfSlots; i++)
@@ -148,7 +148,7 @@ void ODAR::timerFiredCallback(int timer)
         }
         case MONITOR_DAR:
         {
-            bool flag = true;
+            /* bool flag = true;
             int id = 1;
             while (flag)
             {
@@ -164,11 +164,13 @@ void ODAR::timerFiredCallback(int timer)
                 }	
                 else
                     flag = false;
-            }
+            } */
 
-            flag = true;
-		    id = 1;
+            bool flag = true;
+		    int id = 1;
 		    double createdPackets = 0;
+            int cdfCounterInterval = 0;
+            int pdrCounterInterval = 0;
             //double deadlineExpired = 0;
 		    while (flag)
 		    {
@@ -178,6 +180,12 @@ void ODAR::timerFiredCallback(int timer)
                     ODAR *odarInstance = dynamic_cast<ODAR*> (getParentModule()->getParentModule()->getParentModule()->getSubmodule("node",id)->getSubmodule("Communication")->getSubmodule("Routing"));
                     createdPackets += odarInstance->getAndResetPacketCreatedCount();
                     //deadlineExpired += odarInstance->getPacketDeadlineExpiredCount();
+                    cdfCounterInterval += odarInstance->cdfCounter;
+                    pdrCounterInterval += odarInstance->pdrCounter;
+
+                    odarInstance->cdfCounter = 0;
+                    odarInstance->pdrCounter = 0;
+                    
                     id ++;
                 }	
                 else
@@ -191,6 +199,7 @@ void ODAR::timerFiredCallback(int timer)
             int totalPdrsTransmittedInterval = 0;
             int totalCdfsTransmittedInterval = 0;
             int totalDataPacketsTransmittedInterval = 0;
+            //int duplicateCounter = 0;
             while (flag)
             {
                 cModule *node_ = getParentModule()->getParentModule()->getParentModule()->getSubmodule("node",id);
@@ -203,6 +212,7 @@ void ODAR::timerFiredCallback(int timer)
                     totalPdrsTransmittedInterval += counters["totalPdrsTransmittedInterval"];
                     totalCdfsTransmittedInterval += counters["totalCdfsTransmittedInterval"];
                     totalDataPacketsTransmittedInterval += counters["totalDataPacketsTransmittedInterval"];
+                    //duplicateCounter += counters["duplicateCounter"];
                     id ++;
                 }	
                 else
@@ -218,9 +228,9 @@ void ODAR::timerFiredCallback(int timer)
             trace() << "Total PDRs transmitted: " << totalPdrsTransmittedInterval;
             trace() << "Total CDFs transmitted: " << totalCdfsTransmittedInterval;
             trace() << "Total data packets transmitted: " << totalDataPacketsTransmittedInterval;
-
-            
-
+            trace() << "cdfCounter: " << cdfCounterInterval;
+            trace() << "pdrCounter: " << pdrCounterInterval;
+            //trace() << "duplicateCounter: " << duplicateCounter;
 
             pktCountToAppInterval = 0;
             setTimer(MONITOR_DAR, 60);
@@ -235,7 +245,7 @@ void ODAR::timerFiredCallback(int timer)
 }
 
 
-void ODAR::debugTrace(int packetCountToAppIntervalPerNode)
+void ODAR::debugTrace(int id)
 {
     string s = "CDF: ";
     string s2 = "Routing table: ";
@@ -245,14 +255,16 @@ void ODAR::debugTrace(int packetCountToAppIntervalPerNode)
             list<int> x = routingTable_inUse[i];
             s2 += "(";
             for(int y: x){
-                s2 += std::to_string(y) + ",";
+                if(y == id) {
+                    s2 += std::to_string(y) + ",";
+                }
             }
             s2 += ")";
         }
     }
-
-    /* trace() << s;
     trace() << s2;
+    /* trace() << s;
+    
 
     trace() << "packetCountToAppIntervalPerNode: " << packetCountToAppIntervalPerNode;
     trace() << pktCountInterval;
@@ -514,7 +526,7 @@ void ODAR::fromMacLayer(cPacket *pkt, int srcMacAddress, double rssi, double lqi
 
                 OMAC *omac = dynamic_cast<OMAC*> (getParentModule()->getParentModule()->getSubmodule("Communication")->getSubmodule("MAC"));
                 int selfMacAdress = omac->getMacAdress();
-                if (selfMacAdress == 21)
+                /* if (selfMacAdress == 21)
                 {
                     string str1 = "receivers by odar: ";
                     for (int i : routingTable_inUse[slot])
@@ -527,7 +539,7 @@ void ODAR::fromMacLayer(cPacket *pkt, int srcMacAddress, double rssi, double lqi
                         str1 += std::to_string(i) + ", ";
                     }
                     //trace() << str1 << "ttd" << ttd;
-                }
+                } */
 
                 //trace() << "ttd " << ttd << "\tslot " << slot << "\tlengths of minhop vs our approach: " << receiversByHopcount.size() << " <min vs our> " << routingTable_inUse[slot].size();
                 
@@ -549,9 +561,9 @@ void ODAR::fromMacLayer(cPacket *pkt, int srcMacAddress, double rssi, double lqi
                     sum_cdf_abs_differences += difference;
                     packets_since_cdf_broadcast++;
 
-                    test123[test123counter] = slot;
-                    test123counter++;
-                    test123counter = test123counter % 10;
+                    storedCdfSlots[slotCounter] = slot;
+                    slotCounter++;
+                    slotCounter = slotCounter % 10;
                 }
 
                 toMacLayer(dupPacket, BROADCAST_MAC_ADDRESS); // sure?
@@ -1088,6 +1100,22 @@ void ODAR::broadcastControl()
     netPacket -> setCDF(cfp);
     netPacket -> setRound(currRound);
 
+    if(resilientVersion){
+        for (int i = 0; i < cdfSlots; i++){
+            CDF_transmitted[i] = CDF_calculation[i];
+        }
+        double now = int(getClock().dbl());
+        lastCdfBroadcast = now;
+
+        transmittedPdrs = currentPdrs;
+        lastPdrBroadcast = now;
+
+        // set all pdr broadcast times to 10min in the future
+        for (auto& x : pdrBroadcastTimes) {
+            x.second = now + 600;
+        }
+    }
+
     toMacLayer(netPacket, BROADCAST_MAC_ADDRESS);
 }
 
@@ -1177,9 +1205,9 @@ void ODAR::calculatePdrBroadcastTimes(double pdr, long srcMacAddress)
     // calculate PDR broadcast timer
     int result;
     if(pdr_difference == 0) {
-        result = 600;
+        result = 35;
     } else {
-        result = std::min((double)600, 6/pdr_difference);
+        result = std::min((double)35, 10/pdr_difference);
     }
     
     long timer;
@@ -1210,10 +1238,13 @@ void ODAR::checkPdrBroadcast(){
     for (auto const& x : pdrBroadcastTimes) {
         if (x.second < now) {
             //trace() << "timer: " << x.second << ", now: " << now;
-            executePdrBroadcast();
+            //executePdrBroadcast();
+            broadcastControl();
+            pdrCounter++;
             return;
         }
     }
+
 }
 
 void ODAR::executePdrBroadcast()
@@ -1249,24 +1280,24 @@ void ODAR::checkCdfBroadcast()
 {
     // calculate avg difference of current and last transmitted CDF
     double avg_difference;
-    if(packets_since_cdf_broadcast == 0) {
+    /* if(packets_since_cdf_broadcast == 0) {
         avg_difference = 0;
     } else {
         avg_difference = sum_cdf_abs_differences / packets_since_cdf_broadcast;
-    }
+    } */
 
-    double test123sum = 0;
+    double sum_of_differences = 0;
     for(int i = 0; i<10; i++){
-        test123sum += abs(CDF_transmitted[test123[i]] - CDF_calculation[test123[i]]);
+        sum_of_differences += abs(CDF_transmitted[storedCdfSlots[i]] - CDF_calculation[storedCdfSlots[i]]);
     }
-    avg_difference = test123sum / 10;
+    avg_difference = sum_of_differences / 10;
     
     // calculate CDF broadcast timer
     int result;
     if(avg_difference == 0) {
-        result = 10;
+        result = 30;
     } else {
-        result = std::min((double) 10, 0.5/avg_difference);
+        result = std::min((double) 30, 0.4/avg_difference);
     }
 
     double now = int(getClock().dbl());
@@ -1276,7 +1307,9 @@ void ODAR::checkCdfBroadcast()
     
     long timer = lastCdfBroadcast + result;
     if (timer < now) {
-        executeCdfBroadcast();
+        //executeCdfBroadcast();
+        broadcastControl();
+        cdfCounter++;
     }
 
     return;

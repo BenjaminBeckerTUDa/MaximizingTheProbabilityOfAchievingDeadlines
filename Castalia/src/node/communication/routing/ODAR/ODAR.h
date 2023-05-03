@@ -127,9 +127,10 @@ private:
     map<int, int> packetCountToAppIntervalPerNode;
 
     //
-    int * test123 = new int[10]{0};
-    int test123counter = 0;
+    int * storedCdfSlots = new int[10]{0};
+    int slotCounter = 0;
 
+    
 
     /*--- The .ned file's parameters ---*/
     simtime_t hopCountPeriod;
@@ -179,6 +180,10 @@ public:
     bool getResilientVersion();
     int getAndResetPacketCreatedCount();
     void debugTrace(int);
+    
+
+    int pdrCounter = 0;
+    int cdfCounter = 0;
 };
 
 #endif // ODARMODULE

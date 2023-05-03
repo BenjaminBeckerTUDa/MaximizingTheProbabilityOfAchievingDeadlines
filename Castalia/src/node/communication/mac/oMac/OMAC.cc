@@ -241,10 +241,12 @@ void OMAC::fromNetworkLayer(cPacket *netPkt, int destination)
     case OMAC_ROUTING_HOPCOUNT_PACKET:
     {
         macFrame->setOMacPacketKind(OMAC_CONTROL_PACKET);
-        totalPacketsTransmitted++;
-        totalPacketsTransmittedInterval++;
-        totalBytesTransmittedInterval += macFrame->getByteLength();
-        totalBytesTransmitted += macFrame->getByteLength();
+        if(nodeAlive) {
+            totalPacketsTransmitted++;
+            totalPacketsTransmittedInterval++;
+            totalBytesTransmittedInterval += macFrame->getByteLength();
+            totalBytesTransmitted += macFrame->getByteLength();
+        }
         toRadioLayer(macFrame);
         toRadioLayer(createRadioCommand(SET_STATE, TX));
         hopCountTransmission++;
@@ -254,12 +256,14 @@ void OMAC::fromNetworkLayer(cPacket *netPkt, int destination)
     case OMAC_ROUTING_CONTROL_PACKET:
     {
         macFrame->setOMacPacketKind(OMAC_CONTROL_PACKET);
-        totalCdfsTransmitted ++;
-        totalCdfsTransmittedInterval ++;
-        totalPacketsTransmittedInterval++;
-        totalPacketsTransmitted++;
-        totalBytesTransmittedInterval += macFrame->getByteLength();
-        totalBytesTransmitted += macFrame->getByteLength();
+        if(nodeAlive) {
+            totalCdfsTransmitted ++;
+            totalCdfsTransmittedInterval ++;
+            totalPacketsTransmittedInterval++;
+            totalPacketsTransmitted++;
+            totalBytesTransmittedInterval += macFrame->getByteLength();
+            totalBytesTransmitted += macFrame->getByteLength();
+        }
         toRadioLayer(macFrame);
         toRadioLayer(createRadioCommand(SET_STATE, TX));
         controlTransmission++;
@@ -270,12 +274,14 @@ void OMAC::fromNetworkLayer(cPacket *netPkt, int destination)
     {
         //trace() << "sending PDR";
         macFrame->setOMacPacketKind(OMAC_PDR_PACKET);
-        totalPdrsTransmitted ++;
-        totalPdrsTransmittedInterval ++;
-        totalPacketsTransmittedInterval++;
-        totalPacketsTransmitted++;
-        totalBytesTransmittedInterval += macFrame->getByteLength();
-        totalBytesTransmitted += macFrame->getByteLength();
+        if(nodeAlive) {
+            totalPdrsTransmitted ++;
+            totalPdrsTransmittedInterval ++;
+            totalPacketsTransmittedInterval++;
+            totalPacketsTransmitted++;
+            totalBytesTransmittedInterval += macFrame->getByteLength();
+            totalBytesTransmitted += macFrame->getByteLength();
+        }
         toRadioLayer(macFrame);
         toRadioLayer(createRadioCommand(SET_STATE, TX));
         controlTransmission++;
@@ -286,12 +292,14 @@ void OMAC::fromNetworkLayer(cPacket *netPkt, int destination)
     {
         //trace() << "sending CDF";
         macFrame->setOMacPacketKind(OMAC_CDF_PACKET);
-        totalCdfsTransmitted ++;
-        totalCdfsTransmittedInterval ++;
-        totalPacketsTransmittedInterval++;
-        totalPacketsTransmitted++;
-        totalBytesTransmittedInterval += macFrame->getByteLength();
-        totalBytesTransmitted += macFrame->getByteLength();
+        if(nodeAlive) {
+            totalCdfsTransmitted ++;
+            totalCdfsTransmittedInterval ++;
+            totalPacketsTransmittedInterval++;
+            totalPacketsTransmitted++;
+            totalBytesTransmittedInterval += macFrame->getByteLength();
+            totalBytesTransmitted += macFrame->getByteLength();
+        }
         toRadioLayer(macFrame);
         toRadioLayer(createRadioCommand(SET_STATE, TX));
         controlTransmission++;
@@ -334,12 +342,12 @@ void OMAC::fromRadioLayer(cPacket *pkt, double RSSI, double LQI)
         ReceiversContainer receiversListContainer = macFrame->getReceiversContainer();
         int indexInReceiversList = getIndexInReceiversList(receiversListContainer.getReceivers());
 
-        string receivers = "[";
+        /* string receivers = "[";
         for (int s : receiversListContainer.getReceivers())
         {
             receivers += std::to_string(s) + ",";
         }
-        receivers += "]";
+        receivers += "]"; */
         
         OMacPacket *dupMac = new OMacPacket("OMAC duplicated DATA packet", MAC_LAYER_PACKET);
         cPacket *netPkt = decapsulatePacket(macFrame);
@@ -477,10 +485,12 @@ void OMAC::handleSendAck()
         
         //trace() << "node " << SELF_MAC_ADDRESS << " is sending ACK to node " << ackPkt->getDestination() << " for Packet ID " << packetId;
 
-        totalPacketsTransmittedInterval++;
-        totalPacketsTransmitted++;
-        totalBytesTransmittedInterval += ackPkt->getByteLength();
-        totalBytesTransmitted += ackPkt->getByteLength();
+        if(nodeAlive) {
+            totalPacketsTransmittedInterval++;
+            totalPacketsTransmitted++;
+            totalBytesTransmittedInterval += ackPkt->getByteLength();
+            totalBytesTransmitted += ackPkt->getByteLength(); 
+        }
         toRadioLayer(ackPkt);
         toRadioLayer(createRadioCommand(SET_STATE, TX));
         ackBuffer.pop();
@@ -489,6 +499,14 @@ void OMAC::handleSendAck()
         // check if this packet has been sent before, YES: drop
         if (successfullyReceivedPackets.count(packetId))
         {
+            //duplicateCounter++;
+            /* int id = SELF_MAC_ADDRESS;
+            ODAR *odarInstance = dynamic_cast<ODAR*> (getParentModule()->getParentModule()->getParentModule()->getSubmodule("node",id)->getSubmodule("Communication")->getSubmodule("Routing"));
+            odarInstance->debugTrace(ackPkt->getDestination());
+            id = ackPkt->getDestination();
+            odarInstance = dynamic_cast<ODAR*> (getParentModule()->getParentModule()->getParentModule()->getSubmodule("node",id)->getSubmodule("Communication")->getSubmodule("Routing"));
+            odarInstance->debugTrace(SELF_MAC_ADDRESS); */
+            
             //trace()   << "   "<< "   "<< "state: successfullyReceivedPackets.count("<<packetId<<") --> Packet not to NET";
         }
         else
@@ -573,10 +591,12 @@ void OMAC::sendDataPacket()
 
     if (macFrame->getOMacPacketKind() == OMAC_CONTROL_PACKET)
     {
-        totalPacketsTransmittedInterval++;
-        totalPacketsTransmitted++;
-        totalBytesTransmittedInterval += macFrame->getByteLength();
-        totalBytesTransmitted += macFrame->getByteLength();
+        if(nodeAlive) {
+            totalPacketsTransmittedInterval++;
+            totalPacketsTransmitted++;
+            totalBytesTransmittedInterval += macFrame->getByteLength();
+            totalBytesTransmitted += macFrame->getByteLength();
+        }
         toRadioLayer(macFrame->dup());
         toRadioLayer(createRadioCommand(SET_STATE, TX));
         setMacState(MAC_STATE_IN_TX, "sent hop count packet");
@@ -621,12 +641,15 @@ void OMAC::sendDataPacket()
     ReceiversContainer receiversListContainer = macFrame->getReceiversContainer();
     //trace() << "size of receiversListContainer: " << receiversListContainer.getReceivers().size();
 
-    totalPacketsTransmittedInterval++;
-    totalPacketsTransmitted++;
-    totalDataPacketsTransmitted++;
-    totalDataPacketsTransmittedInterval++;
-    totalBytesTransmittedInterval += macFrame->getByteLength();
-    totalBytesTransmitted += macFrame->getByteLength();
+    if(nodeAlive) {
+        totalPacketsTransmittedInterval++;
+        totalPacketsTransmitted++;
+        totalDataPacketsTransmitted++;
+        totalDataPacketsTransmittedInterval++;
+        totalBytesTransmittedInterval += macFrame->getByteLength();
+        totalBytesTransmitted += macFrame->getByteLength(); 
+    }
+    
     toRadioLayer(macFrame->dup());
     toRadioLayer(createRadioCommand(SET_STATE, TX));
 }
@@ -681,7 +704,7 @@ set<unsigned int> OMAC::detectDeadLinksAndNodes()
     set<unsigned int> deadNodes;
     double now = getClock().dbl();
     for (auto const& entry : deadLinkDetectionTimestamps) {
-        if((now - 605) > entry.second){
+        if((now - 65) > entry.second){ // set this to the maximum broadcast time plus a buffer of a few seconds
             //trace() << "Detected dead node/dead link from node " << entry.first << " to node " << SELF_MAC_ADDRESS;
             deadNodes.insert(entry.first);
         }
@@ -754,12 +777,14 @@ map<string, int> OMAC::getAndResetIntervalCounters()
     counters.insert(pair<string, int>("totalPdrsTransmittedInterval", totalPdrsTransmittedInterval));
     counters.insert(pair<string, int>("totalCdfsTransmittedInterval", totalCdfsTransmittedInterval));
     counters.insert(pair<string, int>("totalDataPacketsTransmittedInterval", totalDataPacketsTransmittedInterval));
+    //counters.insert(pair<string, int>("duplicateCounter", duplicateCounter));
     
     totalPacketsTransmittedInterval = 0;
     totalBytesTransmittedInterval = 0;
     totalPdrsTransmittedInterval = 0;
     totalCdfsTransmittedInterval = 0;
     totalDataPacketsTransmittedInterval = 0;
+    duplicateCounter = 0;
 
     return counters;
 }
