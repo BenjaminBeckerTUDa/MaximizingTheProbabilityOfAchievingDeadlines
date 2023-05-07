@@ -42,7 +42,7 @@ struct ag_pkt {
 
 struct Compare {
     bool operator()(ag_pkt a, ag_pkt b)
-    { return a.wt > b.wt ;};
+    { return a.wt < b.wt ;};
 };
 
 template <class T, class I>
@@ -98,6 +98,8 @@ protected:
     map<int, double * > neighborConvolutedCDFs_withoutACKs_byMAC;
     map<int, double * > neighborConvolutedCDFs_withACKs_byMAC;
 
+    int sendInterval;
+
 
 
     double maxTTD; // in ms
@@ -110,17 +112,19 @@ protected:
     std::priority_queue<ag_pkt, std::vector<ag_pkt>, Compare> pq;
     list<ODARPacket*> packetqueueIN;
 
-    double maxSizeForPA = 300; // max packet size for aggregation
+    
     int currentSizeForPA = 0; // current sum of size of every paket in query
-    double diff_CDF = 0.01; // the desired CDF probability for calculating the max Waiting time
-    double thresholdWaitingTime = 0.1;
+    
     int prio_packetsize; // the Packetsize of the Packet with the lowest waiting time (currently in buffer)
 
     list<int> packetsreceived;
 
-    list<unsigned int> t_aggpkt;
+    list<list<std::string>> t_aggpkt;
 
-    bool aggModus = true;
+    bool aggModus;
+    double diff_CDF; // the desired CDF probability for calculating the max Waiting time
+    double thresholdWaitingTime;
+    int maxSizeForPA = 1500; // max packet size for aggregation
 
     /*--- Monitoring parameters ---*/
     int aggpktCount = 0; // number of packets which are aggregated
@@ -128,6 +132,7 @@ protected:
     int deaggCount = 0; // number of deaggregations
     int aggViaSize = 0;
     int aggViaTime = 0;
+    int singlepkt = 0;
     /*************************************************************************************************************/ 
 
     int cdfSlots;
@@ -205,6 +210,7 @@ public:
     int getDeaggregationPacketCount();
     int getAggregationViaSize();
     int getAggregationViaTime();
+    int getSinglePacket();
 };
 
 #endif // ODARMODULE

@@ -199,7 +199,6 @@ void OMAC::fromNetworkLayer(cPacket *netPkt, int destination)
         toRadioLayer(macFrame);
         toRadioLayer(createRadioCommand(SET_STATE, TX));
         hopCountTransmission++;
-        trace() << "GEHHTTT";
         break;
     }
 

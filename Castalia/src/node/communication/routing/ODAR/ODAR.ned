@@ -37,6 +37,10 @@ simple ODAR like node.communication.routing.iRouting
 	int netDataFrameOverhead = default (10);	// bytes
 	int netBufferSize = default (32);	// number of messages
 	int cdfSlots = default(100);
+	bool aggModus = default(true);
+	double thresholdWaitingTime = default(0.5);
+	double diff_CDF = default(0.02);
+	int maxSizeForPA = default(1500);
 
 	double hopCountPeriod = default(10000); // in msec
 

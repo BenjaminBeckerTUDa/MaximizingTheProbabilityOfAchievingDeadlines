@@ -20,8 +20,17 @@ void ODAR::startup()
     else
         opp_error("\nODAR has to be used with an application that defines the parameter maxTTD");
 
-
+    if (appModule->hasPar("sendInterval"))
+            sendInterval = (int) appModule->par("sendInterval"); // used to calculate the transmission delay
+    else
+        opp_error("\nODAR has to be used with an application that defines the parameter sendInterval");
+    
     cdfSlots = (int) par("cdfSlots"); // number of slots used for the CDF; granularity, which changes the accuracy of deadline-achievement-probability-predictions
+    
+    aggModus = (bool) par("aggModus"); 
+    thresholdWaitingTime = (double) par("thresholdWaitingTime");
+	diff_CDF = (double) par("diff_CDF");
+	maxSizeForPA = (int) par("maxSizeForPA");
 
     currRound = 0; // rounds are used to avoid the count to infinity problem:
     /*
@@ -109,36 +118,37 @@ void ODAR::timerFiredCallback(int timer)
         }
         case AGGREGATION_TRIGGER:
         {
-            if(!pq.empty()) {
+            if(!pq.empty()) {   // is the priority queue empty?
 
-                ODARPacket* pkt_top = pq.top().pkt; // gets the prio_packet from buffer
+                ODARPacket* pkt_top = pq.top().pkt; // gets the top packet from the queue
 
-                double deadline = pkt_top -> getDeadline();
-                double test = deadline - getClock().dbl()*1000;
-              //  trace() << "test: " << test << "pkt_top: " << pkt_top;
+                double deadline = pkt_top -> getDeadline(); // get deadline of top packet
 
-               // double timer = this->ODAR::packet_timer_calc(deadline);
-                double timer = packet_timer_calc(deadline);
+                double timer = packet_timer_calc(deadline);    // calculate the point of time for which the top packets WT is reached
 
-                // Checks if the sending time is reached
-                if(timer >= getClock().dbl()*1000) {  
+                double timer2 = pq.top().wt;
+
+                if(timer2 >= getClock().dbl()*1000) { // Checks if the waiting time is reached 
 
                     std::list<ODARPacket*> pktsInQueue;
-
-                    // get all packets from queue 
-                    while(!pq.empty()) {
+                    
+                    while(!pq.empty()) {    // get all packets from queue 
 
                         ODARPacket *topPA = pq.top().pkt;  
 
-                        // get a Packet from list
-                        pktsInQueue.push_back(topPA);
+                        double time = pq.top().wt;
+                      //  trace() << "time: " << time;
+
+                        pktsInQueue.push_back(topPA);   // get a Packet from list
 
                         pq.pop();
                     }
-                    aggViaTime++;
+                    aggViaTime++;   // for trace file
+
+                    currentSizeForPA = 0;
+                    
                     ODAR::aggregation(currentSizeForPA, pktsInQueue);
-                }
-                
+                }  
             }
             break; 
         }
@@ -287,7 +297,6 @@ void ODAR::fromMacLayer(cPacket *pkt, int srcMacAddress, double rssi, double lqi
     if (aggModus == true) {
 
         if (aggPacket) {
-            trace() << "GEHTTTT ";
             ODAR::deaggregation(aggPacket);
             return;
         }   
@@ -308,6 +317,7 @@ void ODAR::fromMacLayer(cPacket *pkt, int srcMacAddress, double rssi, double lqi
 
             
             if(listContains(packetsreceived, pktID)) {
+               // trace() << "singlekick";
                 return; 
             } else {
                 packetsreceived.push_front(pktID);
@@ -498,57 +508,57 @@ void ODAR::toPriorityQueue(ODARPacket *pkt) {
 
     // get the Deadline
     double deadline = pkt -> getDeadline();
-    //double test = deadline - getClock().dbl()*1000;
-    //trace() << "test: " << test;  //-> deadline stimmt -> immer 100
 
     // Max Waiting Time 
     double maxWT = ODAR::maxWaitingTime(deadline); 
-    //trace() << "maxWT: " << maxWT;
+
+    // should waiting time be less than 0
     if( maxWT < 0 ) { maxWT = 0; }
-    // Size of Packet
-    //trace()<< "Size: " << packetSize;
-    //trace() << "packetCount: " << pktCount;
+
+    //if (currentSizeForPA != 0) {
+    //trace() << " currentsize: " << currentSizeForPA << " packetsize: " << packetSize << " pqsize: " << pq.size();
+    //}
 
     if(currentSizeForPA+packetSize >= maxSizeForPA) {
 
-        std::list<ODARPacket*> pktsInQueue;
+        std::list<ODARPacket*> pktsInQueue;  // packet list of all packets in queue 
 
         while(!pq.empty()) {
 
-            ODARPacket *topPA = pq.top().pkt;  
+            ODARPacket *topPA = pq.top().pkt;  // top packet
 
-            // get a Packet from list
-            pktsInQueue.push_back(topPA);
+             double time = pq.top().wt;
+            trace() << "time: " << time;
 
-            pq.pop();
+            pktsInQueue.push_back(topPA);   // get the top packet from priority queue
+
+            pq.pop();   // delete top packet from priority queue
         }
-
-        // reset current priority queue size
-        currentSizeForPA = 0;
-
-        aggViaSize++;
+        currentSizeForPA = 0;   // reset current priority queue size
+        
+        aggViaSize++;   // for tracefile
 
         // aggregate all packets in priority queue
-        ODAR::aggregation(currentSizeForPA, pktsInQueue);        
-        
+        ODAR::aggregation(currentSizeForPA, pktsInQueue);               
     } 
-    // Add Size to PQ Size
+
+    // Add packet size to current priority queue size
     currentSizeForPA += packetSize; 
+
+    // timer
+    double maxTimer = maxWT + getClock().dbl()*1000;
 
     // formate to used struced in priority queue
     ag_pkt packet;
     packet.pkt = pkt;
-    packet.wt = maxWT;
+    packet.wt = maxTimer;
 
-    
     // queue packet into priority queue
     pq.push(packet);
 
-    ODARPacket *topPA = pq.top().pkt;
-
     double ag_timer = maxWT / 1000; // from ms to s
 
-    // set Timer to max Waiting Time
+    // set timer to max waiting time
     setTimer(AGGREGATION_TRIGGER, ag_timer);
     
 }
@@ -562,8 +572,12 @@ void ODAR::aggregation(int aggPktSize, list<ODARPacket*> pktsFromQueue) {
     }
 
     if(pktsFromQueue.size() == 1) {
+        singlepkt++;
+        //trace() << " Size 1 ";
 
         ODARPacket * topPkt = pktsFromQueue.front()-> dup();
+        unsigned int toppktid = topPkt->getPacketId();
+       // trace()<<"topPKT: "<< toppktid;
 
         double deadline = topPkt ->getDeadline();
         double ttd = deadline - getClock().dbl()*1000;
@@ -593,8 +607,6 @@ void ODAR::aggregation(int aggPktSize, list<ODARPacket*> pktsFromQueue) {
     // Data of Aggregated Packets
     AGGL aggl;
 
-   // OLD std::list<ODARPacket*> outPackets;
-
     double deadline = pktsFromQueue.front()->getDeadline();
     double ttd = deadline - getClock().dbl()*1000;
     int slot = (int) (ttd/maxTTD * (cdfSlots-1));
@@ -615,16 +627,6 @@ void ODAR::aggregation(int aggPktSize, list<ODARPacket*> pktsFromQueue) {
     ReceiversContainer receiversContainer;
     receiversContainer.setReceivers(receivers);
 
-    /* Old code
-    if(pq.size() == 1) {
-        ODARPacket * topPkt = pq.top().pkt -> dup();
-        topPkt->setReceiversContainer(receiversContainer);
-        toMacLayer(topPkt, BROADCAST_MAC_ADDRESS);
-        pq.pop();
-        return;
-    }
-    */
-
     // make new Aggregation Packet
     AggPacket *a_pkt = new AggPacket("Aggregation packet", NETWORK_LAYER_PACKET);
 
@@ -644,30 +646,18 @@ void ODAR::aggregation(int aggPktSize, list<ODARPacket*> pktsFromQueue) {
 
     a_pkt->setDeadline(deadline);
 
-    /* OLD CODE
-    //Aggregate Packets
-    while(!pq.empty()) {
-
-        ODARPacket *topPA = pq.top().pkt;
-        deadline = topPA -> getDeadline();  
-
-        unsigned int pktID = topPA->getPacketId();
-        t_aggpkt.push_back(pktID);
-
-        // get a Packet from list
-        outPackets.push_back(topPA);
-
-        // get Data of Packet
-        deadlines.push_back(deadline);
-
-       // a_data += p_data;
-        pq.pop();
-        aggpktCount++;
-    }
-
-    */
     // set Data of Aggregated Packet
     aggl.setListODAR(pktsFromQueue);
+
+    std::list<std::string> t_list;
+
+    for(auto const & pkts : pktsFromQueue) {
+        int deadline = pkts -> getPacketId();
+        std::string t_deadline = std::to_string(deadline);
+        t_list.push_back(t_deadline);
+    }
+
+    t_aggpkt.push_back(t_list);
 
     a_pkt->setPackets(aggl);
 
@@ -701,6 +691,7 @@ void ODAR::deaggregation(AggPacket *agg_pkt) {
         unsigned int pktID = pkt->getPacketId();
 
         if(listContains(packetsreceived, pktID)) {
+          //  trace() << "sinkkick";
             continue; 
         } else {
             packetsreceived.push_front(pktID); 
@@ -729,19 +720,19 @@ void ODAR::deaggregation(AggPacket *agg_pkt) {
             double ttd = deadline - getClock().dbl()*1000;
             //trace() << "Deadline: " << deadline;
 
+            unsigned int pktID = pkt->getPacketId();
+            
+            if(listContains(packetsreceived, pktID)) {
+               // trace() << "multikick";
+                continue; 
+            } else {
+                packetsreceived.push_front(pktID); 
+            }
+
             if (ttd < 0){
             deadlineExpiredCount++;
             continue;
             }
-
-            unsigned int pktID = pkt->getPacketId();
-            
-            if(listContains(packetsreceived, pktID)) {
-                continue; 
-            } else {
-            packetsreceived.push_front(pktID); 
-            }
-            
 
             int slot = (int) (ttd/maxTTD * (cdfSlots-1));
             OMAC *omac = dynamic_cast<OMAC*> (getParentModule()->getParentModule()->getSubmodule("Communication")->getSubmodule("MAC"));
@@ -816,7 +807,6 @@ double ODAR::maxWaitingTime(double deadline) {
    // trace() << "diffslot: " << diffslot;
     double maxWT = ttd - (maxTTD * diffslot);
   //  trace() << "maxWait: " << maxWT << " maxTTD: " << maxTTD << " ttd: " << ttd << " slot: " << slot << " cdfSlots: " << cdfSlots; 
-    
     return maxWT;
 }
 
@@ -1333,6 +1323,12 @@ int ODAR::getAggregationViaTime()
     return aggViaTime;
 }
 
+int ODAR::getSinglePacket()
+{
+    // function used in "void ODAR::finish()" to gather this information at the sink node and trace it
+    return singlepkt;
+}
+
 
 
 
@@ -1350,11 +1346,12 @@ void ODAR::finish()
 		int id = 1;
 		double createdPackets = 0;
         double deadlineExpired = 0;
-        double aggpktCountALL = 0;
-        double aggCountALL = 0;
-        double deaggCountALL = 0;
-        double aggViaSizeALL = 0;
-        double aggViaTimeALL = 0;
+        int aggpktCountALL = 0;
+        int aggCountALL = 0;
+        int deaggCountALL = 0;
+        int aggViaSizeALL = 0;
+        int aggViaTimeALL = 0;
+        int singlepktALL = 0;
 
 		while (flag)
 		{
@@ -1369,6 +1366,7 @@ void ODAR::finish()
                 deaggCountALL += odarInstance->getDeaggregationPacketCount();
                 aggViaSizeALL += odarInstance->getAggregationViaSize();
                 aggViaTimeALL += odarInstance->getAggregationViaTime();
+                singlepktALL += odarInstance->getSinglePacket();
 				id ++;
 			}	
 			else
@@ -1401,6 +1399,15 @@ void ODAR::finish()
 
         double arrivedInTime = pktCountToApp;
 
+        trace() << "__________________________________________";
+        if (aggModus==true){trace() << "Aggregation: true";}
+        if (aggModus==false){trace() << "Aggregation: false";}
+        trace() << "sendinterval: " << sendInterval << " ms";
+        trace() << "maxTTD: " << maxTTD << " ms";
+        trace() << "packetSize: " << packetSize << " byte";
+        trace() << "thresholdWaitingTime: " << thresholdWaitingTime;
+        trace() << "diff_CDF: " << diff_CDF;
+        trace() << "__________________________________________";
         trace() << "NETWORK-STATS:";
         if (minHopOnly){
             trace() << "Min-Hop";
@@ -1418,9 +1425,7 @@ void ODAR::finish()
             trace() << "potentialReceiverSetsStrategy = CLIQUES";
         }
 
-
-
-
+        
         trace() << "channelBusy " << channelBusy;
         trace() << "channelClear " << channelClear;
         trace() << "reachedMaxRetriesCount " << reachedMaxRetriesCount;
@@ -1429,6 +1434,7 @@ void ODAR::finish()
         trace() << "how many deaggregation happend: " << deaggCountALL;
         trace() << "how often is aggregation called via Size: " << aggViaSizeALL;
         trace() << "how often is aggregation called via Time: " << aggViaTimeALL;
+        trace() << "how many single packets were in queue: " << singlepktALL;
         trace() << "createdPackets " << createdPackets;
         trace() << "deadlineExpired " << deadlineExpired;
         trace() << "arrivedInTime " << arrivedInTime;
@@ -1436,14 +1442,18 @@ void ODAR::finish()
         trace() << "channelBusyRatio " << channelBusy / (channelClear + channelBusy);
     }
 
+    /*
     string strA = "aggregated packets: ";
-    strA = strA + "[";
-    for (unsigned int apkt : t_aggpkt) {
-        strA = strA + " " + std::to_string(apkt);
+    for (list<std::string> l_apkt : t_aggpkt) {
+        if (l_apkt.empty()) {continue;}
+        strA = strA + "[";
+        for (std::string apkt : l_apkt) {
+            strA = strA + apkt + " ";
+        }
+        strA = strA + "]";
     }
-    strA = strA +"] ";
-    
     trace() << strA;
+    */
 
     string str1 = "receivers for minHop: ";
     str1 = str1 + "[";
