@@ -165,10 +165,7 @@ protected:
 
     void calculatePdrBroadcastTimes(double, long);
     void checkPdrBroadcast();
-    void executePdrBroadcast();
     void checkCdfBroadcast();
-    void executeCdfBroadcast();
-    
 
     void finish();
 
@@ -179,8 +176,6 @@ public:
     void overheardPacket(double);
     bool getResilientVersion();
     int getAndResetPacketCreatedCount();
-    void debugTrace(int);
-    
 
     int pdrCounter = 0;
     int cdfCounter = 0;

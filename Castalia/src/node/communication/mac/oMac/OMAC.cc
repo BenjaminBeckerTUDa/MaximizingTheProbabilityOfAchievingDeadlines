@@ -499,14 +499,6 @@ void OMAC::handleSendAck()
         // check if this packet has been sent before, YES: drop
         if (successfullyReceivedPackets.count(packetId))
         {
-            //duplicateCounter++;
-            /* int id = SELF_MAC_ADDRESS;
-            ODAR *odarInstance = dynamic_cast<ODAR*> (getParentModule()->getParentModule()->getParentModule()->getSubmodule("node",id)->getSubmodule("Communication")->getSubmodule("Routing"));
-            odarInstance->debugTrace(ackPkt->getDestination());
-            id = ackPkt->getDestination();
-            odarInstance = dynamic_cast<ODAR*> (getParentModule()->getParentModule()->getParentModule()->getSubmodule("node",id)->getSubmodule("Communication")->getSubmodule("Routing"));
-            odarInstance->debugTrace(SELF_MAC_ADDRESS); */
-            
             //trace()   << "   "<< "   "<< "state: successfullyReceivedPackets.count("<<packetId<<") --> Packet not to NET";
         }
         else
@@ -704,7 +696,7 @@ set<unsigned int> OMAC::detectDeadLinksAndNodes()
     set<unsigned int> deadNodes;
     double now = getClock().dbl();
     for (auto const& entry : deadLinkDetectionTimestamps) {
-        if((now - 65) > entry.second){ // set this to the maximum broadcast time plus a buffer of a few seconds
+        if((now - 65) > entry.second){ // 65 set this to the maximum broadcast time plus a buffer of a few seconds
             //trace() << "Detected dead node/dead link from node " << entry.first << " to node " << SELF_MAC_ADDRESS;
             deadNodes.insert(entry.first);
         }
