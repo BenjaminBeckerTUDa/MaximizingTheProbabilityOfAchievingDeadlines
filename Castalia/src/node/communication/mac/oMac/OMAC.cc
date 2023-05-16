@@ -270,42 +270,6 @@ void OMAC::fromNetworkLayer(cPacket *netPkt, int destination)
         break;
     }
 
-    case OMAC_ROUTING_PDR_PACKET:
-    {
-        //trace() << "sending PDR";
-        macFrame->setOMacPacketKind(OMAC_PDR_PACKET);
-        if(nodeAlive) {
-            totalPdrsTransmitted ++;
-            totalPdrsTransmittedInterval ++;
-            totalPacketsTransmittedInterval++;
-            totalPacketsTransmitted++;
-            totalBytesTransmittedInterval += macFrame->getByteLength();
-            totalBytesTransmitted += macFrame->getByteLength();
-        }
-        toRadioLayer(macFrame);
-        toRadioLayer(createRadioCommand(SET_STATE, TX));
-        controlTransmission++;
-        break;
-    }
-
-    case OMAC_ROUTING_CDF_PACKET:
-    {
-        //trace() << "sending CDF";
-        macFrame->setOMacPacketKind(OMAC_CDF_PACKET);
-        if(nodeAlive) {
-            totalCdfsTransmitted ++;
-            totalCdfsTransmittedInterval ++;
-            totalPacketsTransmittedInterval++;
-            totalPacketsTransmitted++;
-            totalBytesTransmittedInterval += macFrame->getByteLength();
-            totalBytesTransmitted += macFrame->getByteLength();
-        }
-        toRadioLayer(macFrame);
-        toRadioLayer(createRadioCommand(SET_STATE, TX));
-        controlTransmission++;
-        break;
-    }
-
     default:
         break;
     }
@@ -432,22 +396,6 @@ void OMAC::fromRadioLayer(cPacket *pkt, double RSSI, double LQI)
 
     case OMAC_CONTROL_PACKET:
     {
-        if (isNotDuplicatePacket(macFrame))
-            toNetworkLayer(decapsulatePacket(macFrame));
-        break;
-    }
-
-    case OMAC_PDR_PACKET:
-    {
-        if (isNotDuplicatePacket(macFrame))
-            toNetworkLayer(decapsulatePacket(macFrame));
-        //trace() << "received a PDR packet from " << source;
-        break;
-    }
-
-    case OMAC_CDF_PACKET:
-    {
-        //trace() << "received CDF packet from " << source;
         if (isNotDuplicatePacket(macFrame))
             toNetworkLayer(decapsulatePacket(macFrame));
         break;
