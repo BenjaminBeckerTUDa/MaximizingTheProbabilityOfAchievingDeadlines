@@ -137,7 +137,6 @@ void ODAR::timerFiredCallback(int timer)
                         ODARPacket *topPA = pq.top().pkt;  
 
                         double time = pq.top().wt;
-                      //  trace() << "time: " << time;
 
                         pktsInQueue.push_back(topPA);   // get a Packet from list
 
@@ -188,7 +187,6 @@ void ODAR::fromApplicationLayer(cPacket *pkt, const char *destination)
     if(!listContains(packetsreceived, packetId)) {
         packetsreceived.push_front(packetId);
     }
-   // trace() << "liste: " << packetsreceived.front();
 
     netPacket->setDeadline(deadline);
     
@@ -317,7 +315,6 @@ void ODAR::fromMacLayer(cPacket *pkt, int srcMacAddress, double rssi, double lqi
 
             
             if(listContains(packetsreceived, pktID)) {
-               // trace() << "singlekick";
                 return; 
             } else {
                 packetsreceived.push_front(pktID);
@@ -464,7 +461,6 @@ void ODAR::fromMacLayer(cPacket *pkt, int srcMacAddress, double rssi, double lqi
             if (r == currRound)
             {
                 neighborCDFs_byMAC[srcMacAddress] = netPacket -> getCDF().getDoubleArray();
-               // trace() << "calculateCDF!!";
                string s = ""; 
                for (int i = 0; i < cdfSlots; i++){
                     if(i%5 == 0) {
@@ -515,9 +511,6 @@ void ODAR::toPriorityQueue(ODARPacket *pkt) {
     // should waiting time be less than 0
     if( maxWT < 0 ) { maxWT = 0; }
 
-    //if (currentSizeForPA != 0) {
-    //trace() << " currentsize: " << currentSizeForPA << " packetsize: " << packetSize << " pqsize: " << pq.size();
-    //}
 
     if(currentSizeForPA+packetSize >= maxSizeForPA) {
 
@@ -565,19 +558,17 @@ void ODAR::toPriorityQueue(ODARPacket *pkt) {
 
 void ODAR::aggregation(int aggPktSize, list<ODARPacket*> pktsFromQueue) {
 
-    cancelTimer(AGGREGATION_TRIGGER);
+    cancelTimer(AGGREGATION_TRIGGER);   // cancel timer to avoid wrong aggregation
 
-    if(pktsFromQueue.empty()) {
+    if(pktsFromQueue.empty()) {     // if queue was empty
         return;
     }
 
-    if(pktsFromQueue.size() == 1) {
-        singlepkt++;
-        //trace() << " Size 1 ";
+    if(pktsFromQueue.size() == 1) {     // if only one packet was in queue
+        singlepkt++;    // for trace file
 
         ODARPacket * topPkt = pktsFromQueue.front()-> dup();
         unsigned int toppktid = topPkt->getPacketId();
-       // trace()<<"topPKT: "<< toppktid;
 
         double deadline = topPkt ->getDeadline();
         double ttd = deadline - getClock().dbl()*1000;
@@ -637,29 +628,27 @@ void ODAR::aggregation(int aggPktSize, list<ODARPacket*> pktsFromQueue) {
 
     // set ByteLength to Size of all Packets in Queue combined
     a_pkt->setByteLength(aggPktSize);
-    //int sizesss = sizeof(*a_pkt);
-   // trace() << "sizesss: " << sizesss;
-
+    // set packet Routing type
     a_pkt->setOMacRoutingKind(OMAC_ROUTING_DATA_PACKET);
-
+    // set Receivers
     a_pkt->setReceiversContainer(receiversContainer);
-
+    // set deadline
     a_pkt->setDeadline(deadline);
 
     // set Data of Aggregated Packet
     aggl.setListODAR(pktsFromQueue);
+    // set list of packets
+    a_pkt->setPackets(aggl);
 
     std::list<std::string> t_list;
 
-    for(auto const & pkts : pktsFromQueue) {
+    for(auto const & pkts : pktsFromQueue) {    // for trace file
         int deadline = pkts -> getPacketId();
         std::string t_deadline = std::to_string(deadline);
         t_list.push_back(t_deadline);
     }
 
     t_aggpkt.push_back(t_list);
-
-    a_pkt->setPackets(aggl);
 
     // counts how often an aggregated packets is created
     aggCount++;
@@ -673,41 +662,38 @@ void ODAR::aggregation(int aggPktSize, list<ODARPacket*> pktsFromQueue) {
 void ODAR::deaggregation(AggPacket *agg_pkt) {
 
     deaggCount++;
-    std::list<ODARPacket*> outPackets;
+    std::list<ODARPacket*> outPackets;  // list of packets
     
-    outPackets = agg_pkt->getPackets().getListODAR(); 
-    ODARPacket * first_outPackets = outPackets.front();
-    double testdeadline = first_outPackets->getDeadline();
+    outPackets = agg_pkt->getPackets().getListODAR();   // get list of packets from AggPacket
 
     if(isSink) {
-        for (auto const & pkt : outPackets) {
+        for (auto const & pkt : outPackets) {   // checks every packet in list
 
         ODARPacket *netPacket = dynamic_cast<ODARPacket *>(pkt);
 
-        if (!netPacket) {
+        if (!netPacket) {   // checks if packet is ODARPacket
             return;
         } 
 
         unsigned int pktID = pkt->getPacketId();
 
-        if(listContains(packetsreceived, pktID)) {
-          //  trace() << "sinkkick";
+        if(listContains(packetsreceived, pktID)) {  // checks if packet was already received
             continue; 
         } else {
-            packetsreceived.push_front(pktID); 
+            packetsreceived.push_front(pktID);  // tracks packet as received
         }
 
         double deadline = pkt->getDeadline();
         double ttd = deadline - getClock().dbl()*1000;
 
-        if (ttd < 0){
+        if (ttd < 0){               // checks if deadline is expired
         deadlineExpiredCount++;
         continue;
         }
 
-        ODARPacket *dupPacket = pkt->dup();
+        ODARPacket *dupPacket = pkt->dup();     // to avoid decapsulate error
 
-        toApplicationLayer(decapsulatePacket(dupPacket));  
+        toApplicationLayer(decapsulatePacket(dupPacket));  // sends to application layer
         pktCountToApp++;
         }
     } 
@@ -715,15 +701,12 @@ void ODAR::deaggregation(AggPacket *agg_pkt) {
     {
         for (auto const & pkt : outPackets)
         {
-            //trace() << "pkt: " << pkt;
             double deadline = pkt->getDeadline();
             double ttd = deadline - getClock().dbl()*1000;
-            //trace() << "Deadline: " << deadline;
 
             unsigned int pktID = pkt->getPacketId();
             
             if(listContains(packetsreceived, pktID)) {
-               // trace() << "multikick";
                 continue; 
             } else {
                 packetsreceived.push_front(pktID); 
@@ -749,10 +732,7 @@ void ODAR::deaggregation(AggPacket *agg_pkt) {
                 {
                     str1 += std::to_string(i) + ", ";
                 }
-                //trace() << str1 << "ttd" << ttd;
             }
-
-            //trace() << "ttd " << ttd << "\tslot " << slot << "\tlengths of minhop vs our approach: " << receiversByHopcount.size() << " <min vs our> " << routingTable_inUse[slot].size();
 
             ODARPacket *dupPacket = pkt->dup();
 
@@ -769,44 +749,31 @@ void ODAR::deaggregation(AggPacket *agg_pkt) {
     
 double ODAR::maxWaitingTime(double deadline) {
 
-
     double ttd = deadline - getClock().dbl()*1000; // time to deadline
-
-    //trace() << "ttd muss unter 100 sein: " << ttd;
-    //trace() << "deadline: " << deadline << "Clock: " << getClock().dbl()*1000;
-
     int slot = (int) (ttd/maxTTD * (cdfSlots-1)); // CDF slot of ttd
 
-   // trace() << "maxTTD: " << maxTTD << " ttd: " << ttd << " cdfSlots: " << cdfSlots; 
-   // trace() << "old slot: " << slot;
-   // if (ttd <= 0) { return -1.0;}
-
     double current_CDF = CDF_calculation[slot]; //CDF probability of ttd 
-    //trace() << "current CDF: " << current_CDF;
 
     if (current_CDF <= thresholdWaitingTime || slot < 0) {
         return 0;
     }
 
-    double mCDF;
+    double mCDF; // CDF difference to be achieved
 
-    if (current_CDF > diff_CDF) {  
+    if (current_CDF > diff_CDF) {  // set new CDF 
         mCDF = current_CDF-diff_CDF;
     } else {
         mCDF = current_CDF;
     }
-    //trace() << "mCDF: " << mCDF;
 
     while (current_CDF >= mCDF && slot > 0)  { // mCDF == the desired CDF probability for calculating the max Waiting time
         slot--;
         current_CDF = CDF_calculation[slot];  
     }
 
-    //trace() << "new slot: " << slot << " new CDF: " << current_CDF;
-    double diffslot = (double)(slot)/ (double) (cdfSlots-1);
-   // trace() << "diffslot: " << diffslot;
-    double maxWT = ttd - (maxTTD * diffslot);
-  //  trace() << "maxWait: " << maxWT << " maxTTD: " << maxTTD << " ttd: " << ttd << " slot: " << slot << " cdfSlots: " << cdfSlots; 
+    double diffslot = (double)(slot)/ (double) (cdfSlots-1); // slot of desired CDF
+    double maxWT = ttd - (maxTTD * diffslot);   // max waiting time
+
     return maxWT;
 }
 
