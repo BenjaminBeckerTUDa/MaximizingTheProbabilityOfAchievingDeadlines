@@ -1,5 +1,4 @@
 #include "ODAR.h"
-
 Define_Module(ODAR);
 
 void ODAR::startup()
@@ -48,7 +47,7 @@ void ODAR::startup()
 
     if (isSink)
     {
-        hopCount = 0; 
+        hopCount =  0; 
         CDF_calculation = new double[cdfSlots]{0};
         for (int i = 0; i < cdfSlots; i++)
         {
@@ -81,9 +80,6 @@ void ODAR::startup()
     
     neighborSuccRateThreshold = .8; // a neighbor for mode "CLIQUES" is defined as any node, where the packet success rate is above "neighborSuccRateThreshold"
 }
-
-
-
 void ODAR::timerFiredCallback(int timer)
 {
     switch (timer)
@@ -115,8 +111,6 @@ void ODAR::timerFiredCallback(int timer)
         }
     }
 }
-
-
 void ODAR::fromApplicationLayer(cPacket *pkt, const char *destination)
 {
     if (isSink || receiversByHopcount.empty())
@@ -168,7 +162,6 @@ void ODAR::fromApplicationLayer(cPacket *pkt, const char *destination)
 
     pktCount++;
 }
-
 void ODAR::handleNetworkControlCommand(cMessage *pkt)
 {
     ODARControlMessage *oc = dynamic_cast<ODARControlMessage *>(pkt);
@@ -205,10 +198,6 @@ void ODAR::handleNetworkControlCommand(cMessage *pkt)
 
     }
 }
-
-
-
-
 void ODAR::fromMacLayer(cPacket *pkt, int srcMacAddress, double rssi, double lqi)
 {
 
@@ -407,10 +396,6 @@ void ODAR::fromMacLayer(cPacket *pkt, int srcMacAddress, double rssi, double lqi
         }
     }
 }
-
-
-
-
 void ODAR::calculateCDF()
 {
     // convolute all CDFs, assuming a single ACK
@@ -506,7 +491,6 @@ void ODAR::calculateCDF()
 
     }
 }
-
 void ODAR::createMask(int nrOfACKs)
 {
     // create mask, to convolute with
@@ -553,8 +537,6 @@ void ODAR::createMask(int nrOfACKs)
     m.setSlots(slots);
     masks.insert({nrOfACKs, m});
 }
-
-
 double ODAR::convoluteCDFAtSinglePosition(double * nodeCDF, int nrOfACKs, int slotNr)
 {
     // convolutes a CDF of a neighboring node with the PDF of the delays, which occur in the MAC.
@@ -573,8 +555,6 @@ double ODAR::convoluteCDFAtSinglePosition(double * nodeCDF, int nrOfACKs, int sl
     }
     return result;
 }
-
-
 double *  ODAR::convoluteCDF(double * nodeCDF, int nrOfACKs)
 {
     // convolutes a CDF with the expected delays, which occur in the MAC.
@@ -665,8 +645,6 @@ double *  ODAR::convoluteCDF(double * nodeCDF, int nrOfACKs)
     }
     return convolutedCDF;
 }
-
-
 void ODAR::broadcastControl()
 {
     // broadcast of control message, which 
@@ -718,7 +696,6 @@ void ODAR::broadcastControl()
 
     toMacLayer(netPacket, BROADCAST_MAC_ADDRESS);
 }
-
 /*
 Code for ODAR, when potentialReceiverSetsStrategy == NONE
 */
@@ -731,7 +708,6 @@ void ODAR::findNeighbors() {
     }
     cliques.push_back(n);
 }
-
 /*
 Code for ODAR, when potentialReceiverSetsStrategy == CLIQUES
 */
@@ -787,9 +763,6 @@ void ODAR::findCliques() {
         cliques.push_back(clique);
     }
 }
-
-
-
 string ODAR::longToBitString(long nodes)
 {
     // function to return a string of 0's and 1's, for a long
@@ -810,7 +783,6 @@ string ODAR::longToBitString(long nodes)
     }
     return s;
 }
-
 void ODAR::bronKerbosch(long r, long p, long x, map<long,long> N) {
     // recursive function to find all maximal cliques
     // https://en.wikipedia.org/wiki/Bron%E2%80%93Kerbosch_algorithm
@@ -836,7 +808,6 @@ void ODAR::bronKerbosch(long r, long p, long x, map<long,long> N) {
         x = x | v;
     }
 }
-
 long ODAR::nodesetToLong(set<int> setOfNodes)
 {
     // ids of nodes in setOfNodes is converted to a single long, 
@@ -852,7 +823,6 @@ long ODAR::nodesetToLong(set<int> setOfNodes)
     }
     return setOfNodesLong;
 }
-
 list<int> ODAR::longToNodelist(long setOfNodesLong)
 {
     // ids of nodes in setOfNodes is converted to a single long, 
@@ -869,25 +839,19 @@ list<int> ODAR::longToNodelist(long setOfNodesLong)
     }
     return listOfNodes;
 }
-
 int ODAR::getPacketCreatedCount()
 {
     // function used in "void ODAR::finish()" to gather this information at the sink node and trace it
     return pktCount;
 }
-
 int ODAR::getPacketDeadlineExpiredCount()
 {
     // function used in "void ODAR::finish()" to gather this information at the sink node and trace it
     return deadlineExpiredCount;
 }
-
-
 /*
 Code for Tracing at end of simulation
 */
-
-
 void ODAR::finish()
 {
     // this function is used for tracing purposes at the end of simulation only
@@ -993,7 +957,6 @@ void ODAR::finish()
         trace() << str1;
     }
 }
-
 /*
 Code for Min-Hop only
 */
@@ -1008,10 +971,6 @@ void ODAR::updateReceiverList()
         }
     }
 }
-
-/*
-Code for Min-Hop only
-*/
 void ODAR::findPotentialReceiverSets() {
     switch (potentialReceiverSetsStrategy)
     {
