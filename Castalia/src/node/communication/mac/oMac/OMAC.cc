@@ -162,6 +162,9 @@ void OMAC::fromNetworkLayer(cPacket *netPkt, int destination)
         return;
     }
 
+    
+
+
     OMacPacket *macFrame = new OMacPacket("OMAC data packet", MAC_LAYER_PACKET);
     encapsulatePacket(macFrame, netPkt);
     macFrame->setSource(SELF_MAC_ADDRESS);
@@ -230,7 +233,6 @@ void OMAC::fromRadioLayer(cPacket *pkt, double RSSI, double LQI)
     {
     case OMAC_DATA_PACKET:
     {
-        
         updateOverheardPackets(source);
 
         unsigned int packetId = macFrame->getPacketId();
@@ -257,6 +259,7 @@ void OMAC::fromRadioLayer(cPacket *pkt, double RSSI, double LQI)
             ackPkt->setPacketId(packetId);
 
             toRadioLayer(ackPkt);
+
             toRadioLayer(createRadioCommand(SET_STATE, TX));
 
             setMacState(MAC_STATE_IN_TX, "transmitting ACK packet");
@@ -298,9 +301,10 @@ void OMAC::fromRadioLayer(cPacket *pkt, double RSSI, double LQI)
         ackPkt->setSource(SELF_MAC_ADDRESS);
         ackPkt->setDestination(source);
         ackPkt->setPacketId(packetId);
+        ackPkt->setByteLength(ackPacketSize);
         ackBuffer.push(ackPkt);
 
-        waitTimeout = TX_TIME(ackPacketSize + 2);
+        waitTimeout = TX_TIME(ackPacketSize + 1);
         setTimer(HANDLE_SEND_ACK, indexInReceiversList * waitTimeout);
         break;
     }
@@ -369,6 +373,7 @@ void OMAC::handleSendAck()
         }
 
         toRadioLayer(ackPkt);
+
         toRadioLayer(createRadioCommand(SET_STATE, TX));
         ackBuffer.pop();
         setMacState(MAC_STATE_IN_TX, "transmitting ACK packet");
@@ -403,7 +408,7 @@ int OMAC::handleControlCommand(cMessage *msg)
     {
         ODARControlMessage *oc = new ODARControlMessage("REPLY_TIMES", NETWORK_CONTROL_COMMAND);
 	    oc->setODARControlMessageKind(REPLY_TIMES);
-        oc->setRequiredTimeForACK(TX_TIME(ackPacketSize + 2));
+        oc->setRequiredTimeForACK(TX_TIME(ackPacketSize+1));
         oc->setRequiredTimeForDATA(TX_TIME(odarMsg->getDatabytelength() + macFrameOverhead));
         oc->setMaxTimeForCA(contentionPeriod);
         oc->setMinTimeForCA(0);
@@ -458,20 +463,24 @@ void OMAC::sendDataPacket()
         return;
     }
 
-    toRadioLayer(macFrame->dup());
-    double txTime = TX_TIME(macFrame->getByteLength());
-
+    toRadioLayer(macFrame->dup()); 
     txRetries--;
 
-    waitTimeout = TX_TIME(ackPacketSize + 2);
+    waitTimeout = TX_TIME(ackPacketSize+1);
     int waitTimeoutCount = macFrame->getReceiversContainer().getReceivers().size();
+
+    txTime = TX_TIME(macFrame->getByteLength());
     setMacState(MAC_STATE_WAIT_FOR_ACK, "sent DATA packet");
+
     setTimer(TRANSMISSION_TIMEOUT, txTime + waitTimeoutCount * waitTimeout);
     dataTransmissions++;
+
 
     ODARControlMessage *oc = new ODARControlMessage("INC_TX", NETWORK_CONTROL_COMMAND);
 	oc->setODARControlMessageKind(INC_TX);
 	toNetworkLayer(oc);
+
+    
 
     toRadioLayer(createRadioCommand(SET_STATE, TX));
 }

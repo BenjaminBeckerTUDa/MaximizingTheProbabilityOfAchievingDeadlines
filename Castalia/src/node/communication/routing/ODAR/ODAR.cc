@@ -3,6 +3,8 @@ Define_Module(ODAR);
 
 void ODAR::startup()
 {
+    if (isSink)
+        trace() << "_______experiment starts here_______";
     cModule *appModule = getParentModule()->getParentModule()->getSubmodule("Application");
     if (appModule->hasPar("isSink"))
         isSink = appModule->par("isSink"); // one node is used as a sink node
@@ -113,6 +115,8 @@ void ODAR::timerFiredCallback(int timer)
 }
 void ODAR::fromApplicationLayer(cPacket *pkt, const char *destination)
 {
+
+    trace() << "pkt->getByteLength() <<  << packetSize;  " << pkt->getByteLength() << "; " << packetSize;
     if (isSink || receiversByHopcount.empty())
     {
         return;
@@ -124,7 +128,7 @@ void ODAR::fromApplicationLayer(cPacket *pkt, const char *destination)
 		return;
 	}
     double deadline = dlp->getDeadline();
-    double ttd = deadline - getClock().dbl()*1000;
+    double ttd = deadline - getClock().dbl()*1000.0;
     int slot = (int) (ttd/maxTTD * (cdfSlots-1));
     list<int> receivers = routingTable_inUse[slot];
 
@@ -156,7 +160,17 @@ void ODAR::fromApplicationLayer(cPacket *pkt, const char *destination)
     netPacket->setDeadline(deadline);
 
     netPacket->setReceiversContainer(receiversContainer);
+
+    netPacket->setTime_ForMonitoring(getClock().dbl());
+
     encapsulatePacket(netPacket, pkt);
+
+    string s = "";
+    for (int r : receivers)
+    {
+        s += std:: to_string(r) + ", ";
+    }
+    // trace() << "to MAC: packet from " << SELF_MAC_ADDRESS << " to " << s << " at time " << getClock().dbl();
     
     toMacLayer(netPacket, BROADCAST_MAC_ADDRESS);
 
@@ -174,10 +188,10 @@ void ODAR::handleNetworkControlCommand(cMessage *pkt)
         case REPLY_TIMES:
         {
             // converting the times to [ms]
-            timeForACK = oc->getRequiredTimeForACK().dbl()*1000;
-            timeForDATA = oc->getRequiredTimeForDATA().dbl()*1000;
-            maxTimeForCA = oc->getMaxTimeForCA().dbl()*1000;
-            minTimeForCA = oc->getMinTimeForCA().dbl()*1000;
+            timeForACK = oc->getRequiredTimeForACK().dbl()*1000.0;
+            timeForDATA = oc->getRequiredTimeForDATA().dbl()*1000.0;
+            maxTimeForCA = oc->getMaxTimeForCA().dbl()*1000.0;
+            minTimeForCA = oc->getMinTimeForCA().dbl()*1000.0;
             break;
         }
         case INC_RCV:
@@ -233,8 +247,11 @@ void ODAR::fromMacLayer(cPacket *pkt, int srcMacAddress, double rssi, double lqi
         {
         case OMAC_ROUTING_DATA_PACKET:
         {
+
+            trace() << "from MAC: packet from " << srcMacAddress << " to " << SELF_MAC_ADDRESS << " with delay\t" << (getClock().dbl() - netPacket->getTime_ForMonitoring()) * 1000;
+
             double deadline = netPacket->getDeadline();
-            double ttd = deadline - getClock().dbl()*1000;
+            double ttd = deadline - getClock().dbl()*1000.0;
             if (ttd < 0){
                 deadlineExpiredCount++;
                 break;
@@ -275,10 +292,7 @@ void ODAR::fromMacLayer(cPacket *pkt, int srcMacAddress, double rssi, double lqi
                     {
                         str1 += std::to_string(i) + ", ";
                     }
-                    //trace() << str1 << "ttd" << ttd;
                 }
-
-                //trace() << "ttd " << ttd << "\tslot " << slot << "\tlengths of minhop vs our approach: " << receiversByHopcount.size() << " <min vs our> " << routingTable_inUse[slot].size();
 
 
                 
@@ -288,6 +302,14 @@ void ODAR::fromMacLayer(cPacket *pkt, int srcMacAddress, double rssi, double lqi
                 dupPacket->setSource(SELF_NETWORK_ADDRESS);
                 dupPacket->setSequenceNumber(currentSequenceNumber++);
                 dupPacket->setReceiversContainer(receiversContainer);
+
+                string s = "";
+                for (int r : receivers)
+                {
+                    s += std:: to_string(r) + ", ";
+                }
+                // trace() << "to MAC: packet from " << SELF_MAC_ADDRESS << " to " << s << " at time " << getClock().dbl();
+
                 toMacLayer(dupPacket, BROADCAST_MAC_ADDRESS);
             }
             break;
@@ -479,16 +501,6 @@ void ODAR::calculateCDF()
         }
         routingTable_calculation[slot_x] = maxReceivers;
         CDF_calculation[slot_x] = maxProb;
-        if (show)
-        {
-            trace() << "MAXPROB::  " << maxProb;
-            string str4 = "RECEIVERS:: ";
-            for (int i : maxReceivers){
-                str4 += std::to_string(i) + ", ";
-            }
-            trace() << str4;
-        }
-
     }
 }
 void ODAR::createMask(int nrOfACKs)
@@ -841,12 +853,12 @@ list<int> ODAR::longToNodelist(long setOfNodesLong)
 }
 int ODAR::getPacketCreatedCount()
 {
-    // function used in "void ODAR::finish()" to gather this information at the sink node and trace it
+    // function used in "void ODAR::finish()" to gather this information at the sink node and t.race it
     return pktCount;
 }
 int ODAR::getPacketDeadlineExpiredCount()
 {
-    // function used in "void ODAR::finish()" to gather this information at the sink node and trace it
+    // function used in "void ODAR::finish()" to gather this information at the sink node and t.race it
     return deadlineExpiredCount;
 }
 /*
@@ -854,6 +866,27 @@ Code for Tracing at end of simulation
 */
 void ODAR::finish()
 {
+
+
+    if (isSink)
+        trace() << "_______experiment ends here_______";
+        trace() << "stats:";
+     
+    double timePerSlot = (double) maxTTD / (double) cdfSlots; 
+    for (int i = 0; i < cdfSlots; i++)
+    {   
+        if (CDF_calculation[i] > 0)
+        {
+            if (CDF_calculation[i] < 1)
+            {
+                double slotTime = (timePerSlot*i);
+               trace() << "time:\t" + std::to_string(slotTime) + "\tval:\t " + std::to_string(CDF_calculation[i]); 
+            }
+        }     
+    }
+    
+    if (1)
+        return;
     // this function is used for tracing purposes at the end of simulation only
     if (isSink)
     {

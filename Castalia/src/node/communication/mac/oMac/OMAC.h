@@ -65,6 +65,8 @@ private:
     int reachedMaxRetriesCount;
     map<int, int> overheardPackets;
 
+    double monitoring_timestamp;
+
     /*--- The .ned file's parameters ---*/
     int maxTxRetries;
     int ackPacketSize;
@@ -72,6 +74,7 @@ private:
     simtime_t contentionPeriod;
     simtime_t phyDelayForValidCS; // delay for valid CS
     simtime_t waitTimeout;
+    simtime_t txTime;
 
     int phyLayerOverhead;
     double phyDataRate;

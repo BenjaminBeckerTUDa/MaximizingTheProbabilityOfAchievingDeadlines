@@ -101,14 +101,7 @@ private:
     int txCount = 0;
     map<int, int> rxCount;
 
-
-
     bool minHopOnly;
-
-
-    
-
-
 
     /*--- The .ned file's parameters ---*/
     simtime_t hopCountPeriod;

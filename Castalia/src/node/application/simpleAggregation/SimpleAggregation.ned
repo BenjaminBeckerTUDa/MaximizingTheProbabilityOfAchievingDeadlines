@@ -20,7 +20,7 @@ simple SimpleAggregation like node.application.iApplication {
  	string applicationID = default ("simpleAggregation");
 	bool collectTraceInfo = default (true);
 	int priority = default (1);
-	int packetHeaderOverhead = default (8);	// in bytes
+	int packetHeaderOverhead = default (0);	// in bytes
 	int constantDataPayload = default (2);	// in bytes
 	int maxTTD = default (1000);	// in ms
 	int sendInterval = default (80000);	// in ms

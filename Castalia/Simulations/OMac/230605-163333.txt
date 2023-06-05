@@ -1,0 +1,32 @@
+Castalia| what:[General] (1)
+Castalia| when:2023-06-05 16:33
+Castalia| repeat:0 label:None
+Castalia|		module:SN.Simulation
+Castalia|			simple output name:Execution time, seconds
+Castalia|				1.717
+Castalia|			simple output name:Execution ratio (simtime/realtime)
+Castalia|				116482.238518
+Castalia|	module:SN.node[0].ResourceManager
+Castalia|		simple output name:Consumed Energy
+Castalia|			13599.9 
+Castalia|		simple output name:Estimated network lifetime (days)
+Castalia|			3.18629 
+Castalia|		simple output name:Remaining Energy
+Castalia|			5120.05 
+Castalia|	module:SN.node[0].Communication.Radio
+Castalia|		simple output name:RX pkt breakdown
+Castalia|			2 Failed, non RX state
+Castalia|			32497 Received with NO interference
+Castalia|		simple output name:TXed pkts
+Castalia|			21249 TX pkts
+Castalia|	module:SN.node[1].ResourceManager
+Castalia|		simple output name:Consumed Energy
+Castalia|			13599.8 
+Castalia|		simple output name:Remaining Energy
+Castalia|			5120.19 
+Castalia|	module:SN.node[1].Communication.Radio
+Castalia|		simple output name:RX pkt breakdown
+Castalia|			2 Failed, non RX state
+Castalia|			21247 Received with NO interference
+Castalia|		simple output name:TXed pkts
+Castalia|			32499 TX pkts
